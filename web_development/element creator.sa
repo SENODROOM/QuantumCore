@@ -1,0 +1,36 @@
+// Simple Element Creator
+function createDiv(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  div.style.padding = '10px';
+  div.style.margin = '5px';
+  div.style.border = '1px solid #ccc';
+  return div;
+}
+
+function addElements() {
+  const container = document.getElementById('container');
+  
+  for (let i = 1; i <= 5; i++) {
+    const element = createDiv(`Item ${i}`);
+    container.appendChild(element);
+  }
+}
+
+function createButton(text, onClick) {
+  const button = document.createElement('button');
+  button.textContent = text;
+  button.onclick = onClick;
+  return button;
+}
+
+// Usage
+addElements();
+
+const newButton = createButton('Click Me', () => {
+  alert('Dynamic button clicked!');
+});
+
+document.body.appendChild(newButton);
+
+console.log('Element creator ready!');

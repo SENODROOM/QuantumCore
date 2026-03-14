@@ -4,16 +4,42 @@ This directory contains JavaScript examples covering web development, algorithms
 
 ## 📁 Directory Structure
 
-### 🔍 [algorithms/](./algorithms/)
-- **maze generator** - Procedural maze generation
-- **markov chain** - Markov chain implementation
-- **dungeon generator** - Procedural dungeon generation
-- **astar pathfinding** - A* pathfinding algorithm
-- **chunky monkey** - Array chunking algorithm
-- **mutations** - String mutations algorithm
+### 🌐 [web_development/](./web_development/)
+- **button click** - Simple button click event handlers
+- **form input** - Basic form input handling and validation
+- **element creator** - Dynamic DOM element creation
+- **style changer** - Dynamic CSS style manipulation
+- **api fetch** - Basic API calls with fetch()
+
+### 🛠️ [system_tools/](./system_tools/)
+- **file reader** - Simple file reading functionality
+- **simple logger** - Basic logging system
+- **storage helper** - LocalStorage and SessionStorage utilities
+- **timer utility** - Timer and countdown functions
+- **url helper** - URL parsing and manipulation
+- **date helper** - Date formatting and utilities
+
+### ✅ [validation/](./validation/)
+- **email validator** - Email format validation
+- **password checker** - Password strength validation
+- **phone validator** - Phone number format validation
+- **form fields** - Basic form field validation
+- **input sanitizer** - Input sanitization for security
+
+### 🔍 [sorting_searching/](./sorting_searching/)
+- **bubble sort** - Simple bubble sort algorithm
+- **quick sort** - Quick sort implementation
+- **binary search** - Binary search algorithm
+- **linear search** - Linear search with variations
+- **selection sort** - Selection sort algorithm
 
 ### 🏗️ [data_structures/](./data_structures/)
 - **binary search tree** - Binary search tree implementation
+- **linked list** - Linked list data structure
+- **stack** - Stack implementation with examples
+- **queue** - Queue implementation with examples
+- **hash table** - Hash table with collision handling
+- **graph** - Graph with BFS/DFS algorithms
 
 ### 📝 [string_operations/](./string_operations/)
 - **password generator** - Secure password generation
@@ -42,15 +68,25 @@ This directory contains JavaScript examples covering web development, algorithms
 - **recipe tracker** - Recipe management application
 - **record collection** - Music record collection manager
 
+### 🔍 [algorithms/](./algorithms/)
+- **maze generator** - Procedural maze generation
+- **markov chain** - Markov chain implementation
+- **dungeon generator** - Procedural dungeon generation
+- **astar pathfinding** - A* pathfinding algorithm
+- **chunky monkey** - Array chunking algorithm
+- **mutations** - String mutations algorithm
+
 ### 📚 [examples/](./examples/)
 - **script** - Basic JavaScript example
 
 ## 🎯 Learning Objectives
 
 These examples teach:
-- **Web Development** - DOM manipulation, event handling
-- **Algorithm Implementation** - Common algorithms in JavaScript
-- **Data Structures** - JavaScript-specific data structures
+- **Web Development** - DOM manipulation, event handling, API calls
+- **Algorithm Implementation** - Sorting, searching, and algorithmic thinking
+- **Data Structures** - Linked lists, stacks, queues, hash tables, graphs
+- **System Tools** - File handling, logging, storage, utilities
+- **Validation** - Input validation, sanitization, security practices
 - **Functional Programming** - Functional concepts in JS
 - **Async Programming** - Callbacks, promises, async/await
 - **Browser APIs** - Using browser capabilities
@@ -58,17 +94,21 @@ These examples teach:
 
 ## 💡 Key Features
 
-- **Browser-focused** - Examples suitable for web browsers
+- **Simple and Clear** - Easy-to-understand examples for beginners
 - **Modern JavaScript** - ES6+ features and best practices
-- **Interactive applications** - User-engaging programs
-- **Visual demonstrations** - Graphical and animated examples
-- **Real-world use cases** - Practical applications
+- **Practical Applications** - Real-world use cases and utilities
+- **Progressive Learning** - From basic to advanced concepts
+- **Well Organized** - Categorized by functionality and complexity
 
 ## 🚀 Getting Started
 
 1. **Beginners**: Start with **examples/** for basic syntax
-2. **Intermediate**: Explore **string_operations/** and **mathematical/**
-3. **Advanced**: Study **algorithms/** and **games/**
+2. **Web Development**: Explore **web_development/** for DOM and form handling
+3. **System Tools**: Check **system_tools/** for utilities and helpers
+4. **Validation**: Study **validation/** for input validation techniques
+5. **Algorithms**: Practice with **sorting_searching/** and **algorithms/**
+6. **Data Structures**: Learn from **data_structures/** for fundamental structures
+7. **Advanced**: Study **games/** and **applications/** for complex examples
 
 ## 📖 Usage
 

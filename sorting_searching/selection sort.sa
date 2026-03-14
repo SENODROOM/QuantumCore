@@ -1,0 +1,87 @@
+// Simple Selection Sort
+function selectionSort(arr) {
+  const n = arr.length;
+  const sortedArr = [...arr]; // Create copy to avoid modifying original
+  
+  for (let i = 0; i < n - 1; i++) {
+    // Find minimum element in unsorted part
+    let minIndex = i;
+    
+    for (let j = i + 1; j < n; j++) {
+      if (sortedArr[j] < sortedArr[minIndex]) {
+        minIndex = j;
+      }
+    }
+    
+    // Swap minimum element with first element of unsorted part
+    if (minIndex !== i) {
+      [sortedArr[i], sortedArr[minIndex]] = [sortedArr[minIndex], sortedArr[i]];
+    }
+  }
+  
+  return sortedArr;
+}
+
+// Selection sort for descending order
+function selectionSortDescending(arr) {
+  const n = arr.length;
+  const sortedArr = [...arr];
+  
+  for (let i = 0; i < n - 1; i++) {
+    let maxIndex = i;
+    
+    for (let j = i + 1; j < n; j++) {
+      if (sortedArr[j] > sortedArr[maxIndex]) {
+        maxIndex = j;
+      }
+    }
+    
+    if (maxIndex !== i) {
+      [sortedArr[i], sortedArr[maxIndex]] = [sortedArr[maxIndex], sortedArr[i]];
+    }
+  }
+  
+  return sortedArr;
+}
+
+// Get sorting steps (for visualization)
+function selectionSortSteps(arr) {
+  const steps = [];
+  const sortedArr = [...arr];
+  const n = arr.length;
+  
+  for (let i = 0; i < n - 1; i++) {
+    let minIndex = i;
+    
+    for (let j = i + 1; j < n; j++) {
+      if (sortedArr[j] < sortedArr[minIndex]) {
+        minIndex = j;
+      }
+    }
+    
+    if (minIndex !== i) {
+      [sortedArr[i], sortedArr[minIndex]] = [sortedArr[minIndex], sortedArr[i]];
+      steps.push({
+        step: i + 1,
+        array: [...sortedArr],
+        swapped: [i, minIndex]
+      });
+    }
+  }
+  
+  return steps;
+}
+
+// Usage examples
+const numbers = [64, 34, 25, 12, 22, 11, 90];
+console.log('Original:', numbers);
+console.log('Selection sorted:', selectionSort(numbers));
+console.log('Descending:', selectionSortDescending(numbers));
+
+const strings = ['banana', 'apple', 'cherry', 'date'];
+console.log('Strings:', selectionSort(strings));
+
+const steps = selectionSortSteps(numbers);
+console.log('Sorting steps:', steps);
+
+console.log('Selection sort ready!');
