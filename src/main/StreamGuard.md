@@ -21,7 +21,7 @@ struct StreamGuard
 
 ## Line-by-Line Analysis
 
-### **Struct Definition (Line 1)**
+###**
 ```cpp
 struct StreamGuard
 ```
@@ -30,7 +30,7 @@ struct StreamGuard
 - **RAII Pattern**: Constructor acquires, destructor releases resources
 - **Utility Type**: Simple helper class with specific purpose
 
-### **Member Variables (Lines 2-3)**
+###**
 ```cpp
 std::streambuf *oldCout;
 std::streambuf *oldCerr;
@@ -43,7 +43,7 @@ std::streambuf *oldCerr;
 - **Raw Pointers**: Safe to store non-owning pointers to system objects
 - **Purpose**: Remember original buffers for later restoration
 
-### **Constructor (Line 4)**
+###**
 ```cpp
 StreamGuard(std::streambuf *oc, std::streambuf *oe) : oldCout(oc), oldCerr(oe) {}
 ```
@@ -56,7 +56,7 @@ StreamGuard(std::streambuf *oc, std::streambuf *oe) : oldCout(oc), oldCerr(oe) {
 - **Empty Body**: No additional work needed in constructor body
 - **Copy Prevention**: Implicitly deleted copy operations due to pointer members
 
-### **Destructor (Lines 5-9)**
+###**
 ```cpp
 ~StreamGuard()
 {

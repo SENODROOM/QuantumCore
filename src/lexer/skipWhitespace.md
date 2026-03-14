@@ -15,7 +15,7 @@ void Lexer::skipWhitespace()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 void Lexer::skipWhitespace()
 ```
@@ -24,7 +24,7 @@ void Lexer::skipWhitespace()
 - **No Parameters**: Uses current lexer position automatically
 - **State Modification**: Advances position past whitespace characters
 
-### **Whitespace Detection Loop (Line 3)**
+###**
 ```cpp
 while (pos < src.size() && (current() == ' ' || current() == '\t' || current() == '\r'))
 ```
@@ -42,7 +42,7 @@ while (pos < src.size() && (current() == ' ' || current() == '\t' || current() =
 - **Carriage Return (`'\r'`)**: Windows line ending part
 - **Not Newline**: Intentionally excludes `\n` for block detection
 
-### **Position Advancement (Line 4)**
+###**
 ```cpp
     advance();
 ```

@@ -6,20 +6,20 @@
 Parser::Parser(std::vector<Token> tokens) : tokens(std::move(tokens)), pos(0) {}
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
 ### Function Signature
-- **Line 6**: `Parser::Parser(std::vector<Token> tokens)` - Constructor that takes a vector of tokens
+-  `Parser::Parser(std::vector<Token> tokens)` - Constructor that takes a vector of tokens
   - `tokens`: Vector of Token objects produced by the lexer
   - Passed by value to allow move semantics
 
 ### Constructor Initializer List
-- **Line 6**: `: tokens(std::move(tokens)), pos(0)` - Member initializer list
+-  `: tokens(std::move(tokens)), pos(0)` - Member initializer list
   - `tokens(std::move(tokens))` - Efficiently moves token vector into member variable
   - `pos(0)` - Initializes current position to start of token stream
 
 ### Empty Function Body
-- **Line 6**: `{}` - Empty constructor body (all work done in initializer list)
+-  `{}` - Empty constructor body (all work done in initializer list)
 
 ## Summary
 

@@ -24,36 +24,36 @@ QuantumValue Interpreter::evalArrow(ArrowExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 4230)
-- **Line 4230**: `QuantumValue Interpreter::evalArrow(ArrowExpr &e)` - Evaluate arrow operator expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalArrow(ArrowExpr &e)` - Evaluate arrow operator expressions
   - `e`: Reference to ArrowExpr AST node
   - Returns QuantumValue result of arrow operation
 
-### Pointer Evaluation (Lines 4231-4235)
-- **Line 4231**: `{` - Opening brace
-- **Line 4232**: `// ptr->member — dereference pointer then access member` - Comment about arrow operator
-- **Line 4233**: `auto ptrVal = evaluate(*e.object);` - Evaluate pointer expression
-- **Line 4234**: `if (!ptrVal.isPointer())` - Check if result is pointer
-- **Line 4235**: `throw TypeError("Cannot use -> on non-pointer: " + ptrVal.typeName());` - Error for non-pointer
+###
+-  `{` - Opening brace
+-  `// ptr->member — dereference pointer then access member` - Comment about arrow operator
+-  `auto ptrVal = evaluate(*e.object);` - Evaluate pointer expression
+-  `if (!ptrVal.isPointer())` - Check if result is pointer
+-  `throw TypeError("Cannot use -> on non-pointer: " + ptrVal.typeName());` - Error for non-pointer
 
-### Pointer Dereference (Lines 4236-4241)
-- **Line 4236**: Empty line for readability
-- **Line 4237**: `auto ptr = ptrVal.asPointer();` - Get pointer object
-- **Line 4238**: `auto cell = ptr->deref();` - Dereference pointer to get cell
-- **Line 4239**: `if (!cell)` - Check if pointer is null
-- **Line 4240**: `throw RuntimeError("Dereferencing null pointer");` - Error for null pointer
-- **Line 4241**: `auto obj = *cell;` - Get object from cell
+###
+-  Empty line for readability
+-  `auto ptr = ptrVal.asPointer();` - Get pointer object
+-  `auto cell = ptr->deref();` - Dereference pointer to get cell
+-  `if (!cell)` - Check if pointer is null
+-  `throw RuntimeError("Dereferencing null pointer");` - Error for null pointer
+-  `auto obj = *cell;` - Get object from cell
 
-### Member Access (Lines 4242-4248)
-- **Line 4242**: Empty line for readability
-- **Line 4243**: `if (obj.isInstance())` - Check if object is instance
-- **Line 4244**: `{` - Opening brace for instance case
-- **Line 4245**: `return obj.asInstance()->getField(e.member);` - Return instance field
-- **Line 4246**: `}` - Closing brace for instance case
-- **Line 4247**: `throw RuntimeError("Cannot use -> on type " + obj.typeName());` - Error for non-instance types
-- **Line 4248**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `if (obj.isInstance())` - Check if object is instance
+-  `{` - Opening brace for instance case
+-  `return obj.asInstance()->getField(e.member);` - Return instance field
+-  `}` - Closing brace for instance case
+-  `throw RuntimeError("Cannot use -> on type " + obj.typeName());` - Error for non-instance types
+-  `}` - Closing brace for function
 
 ## Summary
 

@@ -24,7 +24,7 @@ static void printBanner()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static void printBanner()
 ```
@@ -33,7 +33,7 @@ static void printBanner()
 - **`printBanner`**: Descriptive name indicating banner display purpose
 - **No Parameters**: Self-contained function that doesn't require external input
 
-### **Color Setup (Line 3)**
+###**
 ```cpp
 std::cout << Colors::CYAN << Colors::BOLD
 ```
@@ -43,7 +43,7 @@ std::cout << Colors::CYAN << Colors::BOLD
 - **Chaining**: Stream operators allow sequential formatting application
 - **Visual Impact**: Creates eye-catching, professional appearance
 
-### **Initial Spacing (Line 4)**
+###**
 ```cpp
 << "\n"
 ```
@@ -51,7 +51,7 @@ std::cout << Colors::CYAN << Colors::BOLD
 - **Layout**: Prevents banner from touching top of terminal
 - **Professional Touch**: Creates breathing room before content
 
-### **ASCII Art Logo (Lines 5-10)**
+###**
 ```cpp
 << "  ██████╗ ██╗   ██╗ █████╗ ███╗   ██╗████████╗██╗   ██╗███╗   ███╗\n"
 << " ██╔═══██╗██║   ██║██╔══██╗████╗  ██║╚══██╔══╝██║   ██║████╗ ████║\n"
@@ -84,7 +84,7 @@ std::cout << Colors::CYAN << Colors::BOLD
 - **Spacing**: Consistent 2-space indentation for alignment
 - **Newlines**: Each line ends with `\n` for proper line breaks
 
-### **Color Reset (Line 11)**
+###**
 ```cpp
 << Colors::RESET
 ```
@@ -93,7 +93,7 @@ std::cout << Colors::CYAN << Colors::BOLD
 - **Clean State**: Returns terminal to default formatting
 - **Good Practice**: Essential for proper terminal behavior
 
-### **Version Information (Lines 12-13)**
+###**
 ```cpp
 << Colors::YELLOW << "  Quantum Language v1.0.0 | The Cybersecurity-Ready Scripting Language\n"
 << Colors::RESET << "\n";
@@ -114,7 +114,7 @@ std::cout << Colors::CYAN << Colors::BOLD
 - **Professional**: Yellow conveys warning/caution while remaining readable
 - **Accessibility**: Good contrast ratio for most terminal themes
 
-#### **Final Reset (Line 13):**
+####:**
 - **`Colors::RESET`**: Ensures subsequent text uses default formatting
 - **`\n`**: Adds trailing newline for proper spacing
 - **Clean Exit**: Leaves terminal in predictable state

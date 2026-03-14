@@ -58,7 +58,7 @@ Token Lexer::readString(char quote)
 
 ## Line-by-Line Analysis
 
-### **Function Signature and Initialization (Lines 1-4)**
+###**
 ```cpp
 Token Lexer::readString(char quote)
 {
@@ -74,7 +74,7 @@ Token Lexer::readString(char quote)
 - **Quote Consumption**: Advances past opening quote to start string content
 - **String Builder**: `str` accumulates the processed string content
 
-### **Main String Processing Loop (Lines 6-35)**
+###**
 ```cpp
 while (pos < src.size() && current() != quote)
 {
@@ -95,7 +95,7 @@ while (pos < src.size() && current() != quote)
 - **Inclusive Processing**: Processes all characters between quotes
 - **Termination**: Stops at closing quote or end of source
 
-### **Escape Sequence Handling (Lines 8-33)**
+###**
 ```cpp
 if (current() == '\\')
 {
@@ -146,7 +146,7 @@ if (current() == '\\')
 - **`\0`**: Null character (0x00)
 - **Unknown**: Pass through unchanged (e.g., `\x`, `\y`)
 
-### **Regular Character Handling (Lines 34-36)**
+###**
 ```cpp
 else
 {
@@ -160,7 +160,7 @@ else
 - **Efficient Processing**: No additional processing needed
 - **Content Preservation**: Original character preserved exactly
 
-### **Error Detection (Lines 38-40)**
+###**
 ```cpp
 if (pos >= src.size())
     throw QuantumError("LexError", "Unterminated string literal", startLine);
@@ -172,7 +172,7 @@ if (pos >= src.size())
 - **Position Information**: Uses starting position for error location
 - **Clear Message**: "Unterminated string literal" is self-explanatory
 
-### **Closing Quote Consumption (Line 42)**
+###**
 ```cpp
 advance(); // skip closing quote
 ```
@@ -183,7 +183,7 @@ advance(); // skip closing quote
 - **Loop Completion**: String processing is complete
 - **Consistency**: Matches opening quote consumption
 
-### **Token Creation (Line 44)**
+###**
 ```cpp
 return Token(TokenType::STRING, str, startLine, startCol);
 ```

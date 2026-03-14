@@ -24,7 +24,7 @@ char Lexer::advance()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 char Lexer::advance()
 ```
@@ -33,7 +33,7 @@ char Lexer::advance()
 - **No Parameters**: Advances by exactly one character
 - **State Modification**: Updates lexer position, line, and column
 
-### **Character Retrieval and Position Update (Line 3)**
+###**
 ```cpp
 char c = src[pos++];
 ```
@@ -42,7 +42,7 @@ char c = src[pos++];
 - **Atomic Operation**: Character retrieval and position advance happen together
 - **Efficient**: Single operation for both retrieval and advancement
 
-### **Newline Handling (Lines 5-9)**
+###**
 ```cpp
 if (c == '\n')
 {
@@ -57,7 +57,7 @@ if (c == '\n')
 - **Column Reset**: Resets column to 1 (start of new line)
 - **1-Based Indexing**: User-friendly line/column numbering
 
-### **Regular Character Handling (Lines 10-13)**
+###**
 ```cpp
 else
 {
@@ -71,7 +71,7 @@ else
 - **Continuation**: Maintains current line number
 - **Consistent Tracking**: Maintains accurate position information
 
-### **Character Return (Line 15)**
+###**
 ```cpp
 return c;
 ```

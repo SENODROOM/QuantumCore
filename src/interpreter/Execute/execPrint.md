@@ -24,38 +24,38 @@ void Interpreter::execPrint(PrintStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 2047)
-- **Line 2047**: `void Interpreter::execPrint(PrintStmt &s)` - Execute print statements
+### Function Signature
+-  `void Interpreter::execPrint(PrintStmt &s)` - Execute print statements
   - `s`: Reference to PrintStmt AST node
   - Returns void as print statements don't produce values
 
-### Empty Print Case (Lines 2048-2054)
-- **Line 2048**: `{` - Opening brace
-- **Line 2049**: `if (s.args.empty())` - Check if no arguments provided
-- **Line 2050**: `{` - Opening brace for empty case
-- **Line 2051**: `std::cout << std::endl;` - Print empty line
-- **Line 2052**: `return;` - Return early
-- **Line 2053**: `}` - Closing brace for empty case
-- **Line 2054**: Empty line for readability
+###
+-  `{` - Opening brace
+-  `if (s.args.empty())` - Check if no arguments provided
+-  `{` - Opening brace for empty case
+-  `std::cout << std::endl;` - Print empty line
+-  `return;` - Return early
+-  `}` - Closing brace for empty case
+-  Empty line for readability
 
-### Output Building (Lines 2055-2063)
-- **Line 2055**: `std::string output;` - Create output string buffer
-- **Line 2056**: `bool first = true;` - Track first argument for spacing
-- **Line 2057**: `for (auto &arg : s.args)` - Loop through all arguments
-- **Line 2058**: `{` - Opening brace for argument loop
-- **Line 2059**: `if (!first)` - Check if not first argument
-- **Line 2060**: `output += " ";` - Add space between arguments
-- **Line 2061**: `output += arg->is<StringLiteral>() ? arg->as<StringLiteral>().value : evaluate(*arg).toString();` - Add argument value
-- **Line 2062**: `first = false;` - Mark as not first for next iteration
-- **Line 2063**: `}` - Closing brace for argument loop
+###
+-  `std::string output;` - Create output string buffer
+-  `bool first = true;` - Track first argument for spacing
+-  `for (auto &arg : s.args)` - Loop through all arguments
+-  `{` - Opening brace for argument loop
+-  `if (!first)` - Check if not first argument
+-  `output += " ";` - Add space between arguments
+-  `output += arg->is<StringLiteral>() ? arg->as<StringLiteral>().value : evaluate(*arg).toString();` - Add argument value
+-  `first = false;` - Mark as not first for next iteration
+-  `}` - Closing brace for argument loop
 
-### Output and Cleanup (Lines 2064-2067)
-- **Line 2064**: Empty line for readability
-- **Line 2065**: `std::cout << output << std::endl;` - Print output with newline
-- **Line 2066**: `std::cout.flush();` - Flush output buffer
-- **Line 2067**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `std::cout << output << std::endl;` - Print output with newline
+-  `std::cout.flush();` - Flush output buffer
+-  `}` - Closing brace for function
 
 ## Summary
 

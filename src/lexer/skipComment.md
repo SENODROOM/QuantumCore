@@ -15,7 +15,7 @@ void Lexer::skipComment()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 void Lexer::skipComment()
 ```
@@ -24,7 +24,7 @@ void Lexer::skipComment()
 - **No Parameters**: Uses current lexer position automatically
 - **State Modification**: Advances position past comment content
 
-### **Comment Skipping Loop (Line 3)**
+###**
 ```cpp
 while (pos < src.size() && current() != '\n')
         advance();

@@ -54,72 +54,72 @@ QuantumValue Interpreter::callFunction(std::shared_ptr<QuantumFunction> fn, std:
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3685)
-- **Line 3685**: `QuantumValue Interpreter::callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)` - Call user-defined functions
+### Function Signature
+-  `QuantumValue Interpreter::callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)` - Call user-defined functions
   - `fn`: Shared pointer to QuantumFunction object
   - `args`: Vector of function arguments
   - Returns QuantumValue result of function call
 
-### Scope Creation (Lines 3686-3687)
-- **Line 3686**: `{` - Opening brace
-- **Line 3687**: `auto scope = std::make_shared<Environment>(fn->closure);` - Create local scope with closure
+###
+-  `{` - Opening brace
+-  `auto scope = std::make_shared<Environment>(fn->closure);` - Create local scope with closure
 
-### Parameter Binding Loop (Lines 3688-3690)
-- **Line 3688**: `for (size_t i = 0; i < fn->params.size(); i++)` - Loop through parameters
-- **Line 3689**: `{` - Opening brace for parameter loop
-- **Line 3690**: `if (i < args.size())` - Check if argument provided
+###
+-  `for (size_t i = 0; i < fn->params.size(); i++)` - Loop through parameters
+-  `{` - Opening brace for parameter loop
+-  `if (i < args.size())` - Check if argument provided
 
-### Argument Processing (Lines 3691-3703)
-- **Line 3691**: `{` - Opening brace for argument case
-- **Line 3692**: `if (fn->paramIsRef[i])` - Check if reference parameter
-- **Line 3693**: `{` - Opening brace for reference case
-- **Line 3694**: `// Reference parameter - store L-value reference` - Comment about reference parameters
-- **Line 3695**: `setLValue(*fn->params[i], args[i], "=");` - Store L-value reference
-- **Line 3696**: `}` - Closing brace for reference case
-- **Line 3697**: `else` - Regular parameter case
-- **Line 3698**: `{` - Opening brace for regular case
-- **Line 3699**: `// Regular parameter - store by value` - Comment about regular parameters
-- **Line 3700**: `scope->define(fn->params[i], args[i]);` - Store parameter by value
-- **Line 3701**: `}` - Closing brace for regular case
-- **Line 3702**: `}` - Closing brace for argument case
+###
+-  `{` - Opening brace for argument case
+-  `if (fn->paramIsRef[i])` - Check if reference parameter
+-  `{` - Opening brace for reference case
+-  `// Reference parameter - store L-value reference` - Comment about reference parameters
+-  `setLValue(*fn->params[i], args[i], "=");` - Store L-value reference
+-  `}` - Closing brace for reference case
+-  `else` - Regular parameter case
+-  `{` - Opening brace for regular case
+-  `// Regular parameter - store by value` - Comment about regular parameters
+-  `scope->define(fn->params[i], args[i]);` - Store parameter by value
+-  `}` - Closing brace for regular case
+-  `}` - Closing brace for argument case
 
-### Default Argument Handling (Lines 3703-3710)
-- **Line 3703**: `else if (fn->defaultArgs[i])` - Check if default argument exists
-- **Line 3704**: `{` - Opening brace for default case
-- **Line 3705**: `// Use default argument` - Comment about default arguments
-- **Line 3706**: `auto defaultValue = evaluate(*fn->defaultArgs[i]);` - Evaluate default expression
-- **Line 3707**: `scope->define(fn->params[i], defaultValue);` - Store default value
-- **Line 3708**: `}` - Closing brace for default case
-- **Line 3709**: `else` - Missing argument case
-- **Line 3710**: `throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");` - Error for missing argument
+###
+-  `else if (fn->defaultArgs[i])` - Check if default argument exists
+-  `{` - Opening brace for default case
+-  `// Use default argument` - Comment about default arguments
+-  `auto defaultValue = evaluate(*fn->defaultArgs[i]);` - Evaluate default expression
+-  `scope->define(fn->params[i], defaultValue);` - Store default value
+-  `}` - Closing brace for default case
+-  `else` - Missing argument case
+-  `throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");` - Error for missing argument
 
-### Argument Count Check (Lines 3711-3714)
-- **Line 3711**: `}` - Closing brace for parameter loop
-- **Line 3712**: `// Check for too many arguments` - Comment about argument count
-- **Line 3713**: `if (args.size() > fn->params.size())` - Check if too many arguments
-- **Line 3714**: `throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));` - Error for too many arguments
+###
+-  `}` - Closing brace for parameter loop
+-  `// Check for too many arguments` - Comment about argument count
+-  `if (args.size() > fn->params.size())` - Check if too many arguments
+-  `throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));` - Error for too many arguments
 
-### Environment Setup (Lines 3715-3718)
-- **Line 3715**: Empty line for readability
-- **Line 3716**: `auto prev = env;` - Save current environment
-- **Line 3717**: `env = scope;` - Set current environment to function scope
-- **Line 3718**: `stepCount_ = 0;` - Reset step counter for infinite loop detection
+###
+-  Empty line for readability
+-  `auto prev = env;` - Save current environment
+-  `env = scope;` - Set current environment to function scope
+-  `stepCount_ = 0;` - Reset step counter for infinite loop detection
 
-### Function Execution (Lines 3719-3730)
-- **Line 3719**: Empty line for readability
-- **Line 3720**: `try` - Start try block for function execution
-- **Line 3721**: `{` - Opening brace for try block
-- **Line 3722**: `execute(*fn->body);` - Execute function body
-- **Line 3723**: `return QuantumValue(); // Implicit return` - Return nil for implicit return
-- **Line 3724**: `}` - Closing brace for try block
-- **Line 3725**: `catch (const ReturnSignal &ret)` - Catch return signals
-- **Line 3726**: `{` - Opening brace for catch block
-- **Line 3727**: `env = prev;` - Restore previous environment
-- **Line 3728**: `return ret.value;` - Return explicit return value
-- **Line 3729**: `}` - Closing brace for catch block
-- **Line 3730**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `try` - Start try block for function execution
+-  `{` - Opening brace for try block
+-  `execute(*fn->body);` - Execute function body
+-  `return QuantumValue(); // Implicit return` - Return nil for implicit return
+-  `}` - Closing brace for try block
+-  `catch (const ReturnSignal &ret)` - Catch return signals
+-  `{` - Opening brace for catch block
+-  `env = prev;` - Restore previous environment
+-  `return ret.value;` - Return explicit return value
+-  `}` - Closing brace for catch block
+-  `}` - Closing brace for function
 
 ## Summary
 

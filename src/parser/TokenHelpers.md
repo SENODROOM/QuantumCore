@@ -41,63 +41,63 @@ void Parser::skipNewlines()
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### current() Function (Line 8)
-- **Line 8**: `Token &Parser::current() { return tokens[pos]; }` - Returns current token
+###
+-  `Token &Parser::current() { return tokens[pos]; }` - Returns current token
   - Returns reference to token at current position
   - Used frequently throughout parsing operations
 
-### peek() Function (Lines 9-13)
-- **Line 9**: `Token &Parser::peek(int offset)` - Look ahead at future tokens
-- **Line 10**: `{` - Opening brace
-- **Line 11**: `size_t p = pos + offset;` - Calculate peek position
-- **Line 12**: `return p < tokens.size() ? tokens[p] : tokens.back();` - Return token or last token if out of bounds
+###
+-  `Token &Parser::peek(int offset)` - Look ahead at future tokens
+-  `{` - Opening brace
+-  `size_t p = pos + offset;` - Calculate peek position
+-  `return p < tokens.size() ? tokens[p] : tokens.back();` - Return token or last token if out of bounds
   - Uses ternary operator for bounds checking
   - Returns last token (EOF) if peek goes beyond end
-- **Line 13**: `}` - Closing brace
+-  `}` - Closing brace
 
-### consume() Function (Line 15)
-- **Line 15**: `Token &Parser::consume() { return tokens[pos++]; }` - Advance and return current token
+###
+-  `Token &Parser::consume() { return tokens[pos++]; }` - Advance and return current token
   - Returns current token and increments position
   - Used to move through token stream during parsing
 
-### expect() Function (Lines 17-22)
-- **Line 17**: `Token &Parser::expect(TokenType t, const std::string &msg)` - Expect specific token type
-- **Line 18**: `{` - Opening brace
-- **Line 19**: `if (current().type != t)` - Check if current token matches expected type
-- **Line 20**: `throw ParseError(msg + " (got '" + current().value + "')", current().line, current().col);` - Throw error with details
+###
+-  `Token &Parser::expect(TokenType t, const std::string &msg)` - Expect specific token type
+-  `{` - Opening brace
+-  `if (current().type != t)` - Check if current token matches expected type
+-  `throw ParseError(msg + " (got '" + current().value + "')", current().line, current().col);` - Throw error with details
   - Includes expected message, actual token value, line and column
-- **Line 21**: `return consume();` - Return and advance if token matches
-- **Line 22**: `}` - Closing brace
+-  `return consume();` - Return and advance if token matches
+-  `}` - Closing brace
 
-### check() Function (Line 24)
-- **Line 24**: `bool Parser::check(TokenType t) const { return tokens[pos].type == t; }` - Check token type without advancing
+###
+-  `bool Parser::check(TokenType t) const { return tokens[pos].type == t; }` - Check token type without advancing
   - Returns true if current token matches type
   - `const` means doesn't modify parser state
 
-### match() Function (Lines 25-33)
-- **Line 25**: `bool Parser::match(TokenType t)` - Check and consume if matches
-- **Line 26**: `{` - Opening brace
-- **Line 27**: `if (check(t))` - Check if token matches
-- **Line 28**: `{` - Opening brace for match case
-- **Line 29**: `consume();` - Consume the matching token
-- **Line 30**: `return true;` - Return success
-- **Line 31**: `}` - Closing brace for match case
-- **Line 32**: `return false;` - Return failure if no match
-- **Line 33**: `}` - Closing brace
+###
+-  `bool Parser::match(TokenType t)` - Check and consume if matches
+-  `{` - Opening brace
+-  `if (check(t))` - Check if token matches
+-  `{` - Opening brace for match case
+-  `consume();` - Consume the matching token
+-  `return true;` - Return success
+-  `}` - Closing brace for match case
+-  `return false;` - Return failure if no match
+-  `}` - Closing brace
 
-### atEnd() Function (Line 34)
-- **Line 34**: `bool Parser::atEnd() const { return tokens[pos].type == TokenType::EOF_TOKEN; }` - Check if at end of token stream
+###
+-  `bool Parser::atEnd() const { return tokens[pos].type == TokenType::EOF_TOKEN; }` - Check if at end of token stream
   - Returns true if current token is EOF marker
   - Used to terminate parsing loops
 
-### skipNewlines() Function (Lines 36-40)
-- **Line 36**: `void Parser::skipNewlines()` - Skip newline tokens
-- **Line 37**: `{` - Opening brace
-- **Line 38**: `while (check(TokenType::NEWLINE))` - Loop while current token is newline
-- **Line 39**: `consume();` - Consume each newline
-- **Line 40**: `}` - Closing brace
+###
+-  `void Parser::skipNewlines()` - Skip newline tokens
+-  `{` - Opening brace
+-  `while (check(TokenType::NEWLINE))` - Loop while current token is newline
+-  `consume();` - Consume each newline
+-  `}` - Closing brace
 
 ## Summary
 

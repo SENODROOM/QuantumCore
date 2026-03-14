@@ -59,80 +59,80 @@ QuantumValue Interpreter::callInstanceMethod(std::shared_ptr<QuantumInstance> in
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3799)
-- **Line 3799**: `QuantumValue Interpreter::callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)` - Call instance methods
+### Function Signature
+-  `QuantumValue Interpreter::callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)` - Call instance methods
   - `inst`: Shared pointer to object instance
   - `fn`: Shared pointer to method function
   - `args`: Vector of method arguments
   - Returns QuantumValue result of method call
 
-### Instance Value Creation (Lines 3800-3802)
-- **Line 3800**: `{` - Opening brace
-- **Line 3801**: `QuantumValue instVal(inst);` - Create QuantumValue wrapper for instance
-- **Line 3802**: `auto scope = std::make_shared<Environment>(fn->closure);` - Create local scope with closure
+###
+-  `{` - Opening brace
+-  `QuantumValue instVal(inst);` - Create QuantumValue wrapper for instance
+-  `auto scope = std::make_shared<Environment>(fn->closure);` - Create local scope with closure
 
-### This Pointer Setup (Lines 3803-3805)
-- **Line 3803**: Empty line for readability
-- **Line 3804**: `// Define 'this' as the instance` - Comment about this pointer
-- **Line 3805**: `scope->define("this", instVal);` - Define this pointer in scope
+###
+-  Empty line for readability
+-  `// Define 'this' as the instance` - Comment about this pointer
+-  `scope->define("this", instVal);` - Define this pointer in scope
 
-### Parameter Binding Loop (Lines 3806-3808)
-- **Line 3806**: Empty line for readability
-- **Line 3807**: `for (size_t i = 0; i < fn->params.size(); i++)` - Loop through parameters
-- **Line 3808**: `{` - Opening brace for parameter loop
+###
+-  Empty line for readability
+-  `for (size_t i = 0; i < fn->params.size(); i++)` - Loop through parameters
+-  `{` - Opening brace for parameter loop
 
-### Argument Processing (Lines 3809-3821)
-- **Line 3809**: `if (i < args.size())` - Check if argument provided
-- **Line 3810**: `{` - Opening brace for argument case
-- **Line 3811**: `if (fn->paramIsRef[i])` - Check if reference parameter
-- **Line 3812**: `{` - Opening brace for reference case
-- **Line 3813**: `// Reference parameter - store L-value reference` - Comment about reference parameters
-- **Line 3814**: `setLValue(*fn->params[i], args[i], "=");` - Store L-value reference
-- **Line 3815**: `}` - Closing brace for reference case
-- **Line 3816**: `else` - Regular parameter case
-- **Line 3817**: `{` - Opening brace for regular case
-- **Line 3818**: `// Regular parameter - store by value` - Comment about regular parameters
-- **Line 3819**: `scope->define(fn->params[i], args[i]);` - Store parameter by value
-- **Line 3820**: `}` - Closing brace for regular case
-- **Line 3821**: `}` - Closing brace for argument case
+###
+-  `if (i < args.size())` - Check if argument provided
+-  `{` - Opening brace for argument case
+-  `if (fn->paramIsRef[i])` - Check if reference parameter
+-  `{` - Opening brace for reference case
+-  `// Reference parameter - store L-value reference` - Comment about reference parameters
+-  `setLValue(*fn->params[i], args[i], "=");` - Store L-value reference
+-  `}` - Closing brace for reference case
+-  `else` - Regular parameter case
+-  `{` - Opening brace for regular case
+-  `// Regular parameter - store by value` - Comment about regular parameters
+-  `scope->define(fn->params[i], args[i]);` - Store parameter by value
+-  `}` - Closing brace for regular case
+-  `}` - Closing brace for argument case
 
-### Default Argument Handling (Lines 3822-3829)
-- **Line 3822**: `else if (fn->defaultArgs[i])` - Check if default argument exists
-- **Line 3823**: `{` - Opening brace for default case
-- **Line 3824**: `// Use default argument` - Comment about default arguments
-- **Line 3825**: `auto defaultValue = evaluate(*fn->defaultArgs[i]);` - Evaluate default expression
-- **Line 3826**: `scope->define(fn->params[i], defaultValue);` - Store default value
-- **Line 3827**: `}` - Closing brace for default case
-- **Line 3828**: `else` - Missing argument case
-- **Line 3829**: `throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");` - Error for missing argument
+###
+-  `else if (fn->defaultArgs[i])` - Check if default argument exists
+-  `{` - Opening brace for default case
+-  `// Use default argument` - Comment about default arguments
+-  `auto defaultValue = evaluate(*fn->defaultArgs[i]);` - Evaluate default expression
+-  `scope->define(fn->params[i], defaultValue);` - Store default value
+-  `}` - Closing brace for default case
+-  `else` - Missing argument case
+-  `throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");` - Error for missing argument
 
-### Argument Count Check (Lines 3830-3833)
-- **Line 3830**: `}` - Closing brace for parameter loop
-- **Line 3831**: `// Check for too many arguments` - Comment about argument count
-- **Line 3832**: `if (args.size() > fn->params.size())` - Check if too many arguments
-- **Line 3833**: `throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));` - Error for too many arguments
+###
+-  `}` - Closing brace for parameter loop
+-  `// Check for too many arguments` - Comment about argument count
+-  `if (args.size() > fn->params.size())` - Check if too many arguments
+-  `throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));` - Error for too many arguments
 
-### Environment Setup (Lines 3834-3837)
-- **Line 3834**: Empty line for readability
-- **Line 3835**: `auto prev = env;` - Save current environment
-- **Line 3836**: `env = scope;` - Set current environment to method scope
-- **Line 3837**: `stepCount_ = 0;` - Reset step counter for infinite loop detection
+###
+-  Empty line for readability
+-  `auto prev = env;` - Save current environment
+-  `env = scope;` - Set current environment to method scope
+-  `stepCount_ = 0;` - Reset step counter for infinite loop detection
 
-### Method Execution (Lines 3838-3849)
-- **Line 3838**: Empty line for readability
-- **Line 3839**: `try` - Start try block for method execution
-- **Line 3840**: `{` - Opening brace for try block
-- **Line 3841**: `execute(*fn->body);` - Execute method body
-- **Line 3842**: `return QuantumValue(); // Implicit return` - Return nil for implicit return
-- **Line 3843**: `}` - Closing brace for try block
-- **Line 3844**: `catch (const ReturnSignal &ret)` - Catch return signals
-- **Line 3845**: `{` - Opening brace for catch block
-- **Line 3846**: `env = prev;` - Restore previous environment
-- **Line 3847**: `return ret.value;` - Return explicit return value
-- **Line 3848**: `}` - Closing brace for catch block
-- **Line 3849**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `try` - Start try block for method execution
+-  `{` - Opening brace for try block
+-  `execute(*fn->body);` - Execute method body
+-  `return QuantumValue(); // Implicit return` - Return nil for implicit return
+-  `}` - Closing brace for try block
+-  `catch (const ReturnSignal &ret)` - Catch return signals
+-  `{` - Opening brace for catch block
+-  `env = prev;` - Restore previous environment
+-  `return ret.value;` - Return explicit return value
+-  `}` - Closing brace for catch block
+-  `}` - Closing brace for function
 
 ## Summary
 

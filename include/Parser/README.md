@@ -83,158 +83,158 @@ private:
 };
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Header Guard and Includes (Lines 1-5)
-- **Line 1**: `#pragma once` - Prevents multiple inclusion of this header file
-- **Line 2**: `#include "Token.h"` - Includes token type definitions
-- **Line 3**: `#include "AST.h"` - Includes Abstract Syntax Tree definitions
-- **Line 4**: `#include <vector>` - Includes vector for storing tokens
-- **Line 5**: `#include <stdexcept>` - Includes standard exception classes
+###
+-  `#pragma once` - Prevents multiple inclusion of this header file
+-  `#include "Token.h"` - Includes token type definitions
+-  `#include "AST.h"` - Includes Abstract Syntax Tree definitions
+-  `#include <vector>` - Includes vector for storing tokens
+-  `#include <stdexcept>` - Includes standard exception classes
 
-### ParseError Class (Lines 7-13)
+###
 
-#### Class Declaration (Line 7)
-- **Line 7**: `class ParseError : public std::runtime_error` - Declares ParseError class inheriting from std::runtime_error
+####
+-  `class ParseError : public std::runtime_error` - Declares ParseError class inheriting from std::runtime_error
 
-#### Public Section (Line 8)
-- **Line 8**: `public:` - Starts the public section
+####
+-  `public:` - Starts the public section
 
-#### Member Variables (Line 9)
-- **Line 9**: `int line, col;` - Stores line and column where the parse error occurred
+####
+-  `int line, col;` - Stores line and column where the parse error occurred
 
-#### Constructor (Lines 10-12)
-- **Line 10**: `ParseError(const std::string &msg, int l, int c)` - Constructor taking error message, line, and column
-- **Line 11**: `: std::runtime_error(msg), line(l), col(c) {}` - Constructor initializer list that:
+####
+-  `ParseError(const std::string &msg, int l, int c)` - Constructor taking error message, line, and column
+-  `: std::runtime_error(msg), line(l), col(c) {}` - Constructor initializer list that:
   - Calls base class constructor with error message
   - Initializes line and column members
-- **Line 12**: Empty line for readability
+-  Empty line for readability
 
-- **Line 13**: `};` - Closing brace for ParseError class
+-  `};` - Closing brace for ParseError class
 
-### Parser Class Declaration (Line 14)
-- **Line 14**: `class Parser` - Declares the Parser class that converts tokens into AST
+###
+-  `class Parser` - Declares the Parser class that converts tokens into AST
 
-### Public Interface (Lines 15-19)
+###
 
-#### Constructor (Line 15)
-- **Line 15**: `public:` - Starts the public section of the Parser class
-- **Line 16**: `explicit Parser(std::vector<Token> tokens);` - Constructor that takes vector of tokens
+####
+-  `public:` - Starts the public section of the Parser class
+-  `explicit Parser(std::vector<Token> tokens);` - Constructor that takes vector of tokens
   - `explicit` prevents implicit conversions
 
-#### Main Parsing Method (Line 17)
-- **Line 17**: `ASTNodePtr parse();` - Main method that parses tokens into an AST node
+####
+-  `ASTNodePtr parse();` - Main method that parses tokens into an AST node
 
-### Private Section (Line 18)
-- **Line 18**: `private:` - Starts the private section of the class
+###
+-  `private:` - Starts the private section of the class
 
-### Private Member Variables (Lines 19-21)
+###
 
-#### Token Storage (Lines 19-21)
-- **Line 19**: `std::vector<Token> tokens;` - Stores the tokens to be parsed
-- **Line 20**: `size_t pos;` - Current position in the token vector
-- **Line 21**: Empty line for readability
+####
+-  `std::vector<Token> tokens;` - Stores the tokens to be parsed
+-  `size_t pos;` - Current position in the token vector
+-  Empty line for readability
 
-### Token Helper Methods (Lines 22-30)
+###
 
-#### Basic Token Access (Lines 22-27)
-- **Line 22**: Comment indicating token helpers section
-- **Line 23**: `Token &current();` - Returns the current token
-- **Line 24**: `Token &peek(int offset = 1);` - Looks ahead at token with optional offset
-- **Line 25**: `Token &consume();` - Consumes and advances to next token
-- **Line 26**: `Token &expect(TokenType t, const std::string &msg);` - Expects a specific token type or throws error
-- **Line 27**: Empty line for readability
+####
+-  Comment indicating token helpers section
+-  `Token &current();` - Returns the current token
+-  `Token &peek(int offset = 1);` - Looks ahead at token with optional offset
+-  `Token &consume();` - Consumes and advances to next token
+-  `Token &expect(TokenType t, const std::string &msg);` - Expects a specific token type or throws error
+-  Empty line for readability
 
-#### Token Checking Methods (Lines 28-30)
-- **Line 28**: `bool check(TokenType t) const;` - Checks if current token matches type
-- **Line 29**: `bool match(TokenType t);` - Matches and consumes if token type matches
-- **Line 30**: `bool atEnd() const;` - Checks if at end of token stream
+####
+-  `bool check(TokenType t) const;` - Checks if current token matches type
+-  `bool match(TokenType t);` - Matches and consumes if token type matches
+-  `bool atEnd() const;` - Checks if at end of token stream
 
-#### Newline Handling (Line 31)
-- **Line 31**: `void skipNewlines();` - Skips newline tokens
-- **Line 32**: Empty line for readability
+####
+-  `void skipNewlines();` - Skips newline tokens
+-  Empty line for readability
 
-### Statement Parsing Methods (Lines 33-54)
+###
 
-#### Basic Statement Parsing (Lines 33-36)
-- **Line 33**: Comment indicating parsing methods section
-- **Line 34**: `ASTNodePtr parseStatement();` - Parses a general statement
-- **Line 35**: `ASTNodePtr parseBlock();` - Parses a block of statements
-- **Line 36**: `ASTNodePtr parseBodyOrStatement(); // block OR single statement (brace-optional)` - Parses block or single statement
+####
+-  Comment indicating parsing methods section
+-  `ASTNodePtr parseStatement();` - Parses a general statement
+-  `ASTNodePtr parseBlock();` - Parses a block of statements
+-  `ASTNodePtr parseBodyOrStatement(); // block OR single statement (brace-optional)` - Parses block or single statement
 
-#### Declaration Parsing (Lines 37-39)
-- **Line 37**: `ASTNodePtr parseVarDecl(bool isConst);` - Parses variable declarations
-- **Line 38**: `ASTNodePtr parseFunctionDecl();` - Parses function declarations
-- **Line 39**: `ASTNodePtr parseClassDecl();` - Parses class declarations
+####
+-  `ASTNodePtr parseVarDecl(bool isConst);` - Parses variable declarations
+-  `ASTNodePtr parseFunctionDecl();` - Parses function declarations
+-  `ASTNodePtr parseClassDecl();` - Parses class declarations
 
-#### Control Flow Parsing (Lines 40-44)
-- **Line 40**: `ASTNodePtr parseIfStmt();` - Parses if statements
-- **Line 41**: `ASTNodePtr parseWhileStmt();` - Parses while loops
-- **Line 42**: `ASTNodePtr parseForStmt();` - Parses for loops
-- **Line 43**: `ASTNodePtr parseReturnStmt();` - Parses return statements
-- **Line 44**: Empty line for readability
+####
+-  `ASTNodePtr parseIfStmt();` - Parses if statements
+-  `ASTNodePtr parseWhileStmt();` - Parses while loops
+-  `ASTNodePtr parseForStmt();` - Parses for loops
+-  `ASTNodePtr parseReturnStmt();` - Parses return statements
+-  Empty line for readability
 
-#### I/O Statement Parsing (Lines 45-48)
-- **Line 45**: `ASTNodePtr parsePrintStmt();` - Parses print statements
-- **Line 46**: `ASTNodePtr parseInputStmt();` - Parses input statements
-- **Line 47**: `ASTNodePtr parseCoutStmt(); // cout << x << y << endl` - Parses C++ cout statements
-- **Line 48**: `ASTNodePtr parseCinStmt();  // cin >> x >> y` - Parses C++ cin statements
+####
+-  `ASTNodePtr parsePrintStmt();` - Parses print statements
+-  `ASTNodePtr parseInputStmt();` - Parses input statements
+-  `ASTNodePtr parseCoutStmt(); // cout << x << y << endl` - Parses C++ cout statements
+-  `ASTNodePtr parseCinStmt();  // cin >> x >> y` - Parses C++ cin statements
 
-#### Other Statement Parsing (Lines 49-54)
-- **Line 49**: `ASTNodePtr parseImportStmt(bool isFrom = false);` - Parses import statements
-- **Line 50**: `ASTNodePtr parseExprStmt();` - Parses expression statements
-- **Line 51**: `ASTNodePtr parseCTypeVarDecl(const std::string &typeHint); // int x = ...  / int* p = ...` - Parses C-style variable declarations
-- **Line 52**: `bool isCTypeKeyword(TokenType t) const;` - Checks if token is a C type keyword
-- **Line 53**: Empty line for readability
-- **Line 54**: Empty line for readability
+####
+-  `ASTNodePtr parseImportStmt(bool isFrom = false);` - Parses import statements
+-  `ASTNodePtr parseExprStmt();` - Parses expression statements
+-  `ASTNodePtr parseCTypeVarDecl(const std::string &typeHint); // int x = ...  / int* p = ...` - Parses C-style variable declarations
+-  `bool isCTypeKeyword(TokenType t) const;` - Checks if token is a C type keyword
+-  Empty line for readability
+-  Empty line for readability
 
-### Expression Parsing Methods (Lines 55-70)
+###
 
-#### Expression Entry Point (Lines 55-57)
-- **Line 55**: Comment indicating Pratt-style precedence parsing
-- **Line 56**: `ASTNodePtr parseExpr();` - Main expression parsing entry point
-- **Line 57**: `ASTNodePtr parseAssignment();` - Parses assignment expressions
+####
+-  Comment indicating Pratt-style precedence parsing
+-  `ASTNodePtr parseExpr();` - Main expression parsing entry point
+-  `ASTNodePtr parseAssignment();` - Parses assignment expressions
 
-#### Logical Expression Parsing (Lines 58-59)
-- **Line 58**: `ASTNodePtr parseOr();` - Parses logical OR expressions
-- **Line 59**: `ASTNodePtr parseAnd();` - Parses logical AND expressions
+####
+-  `ASTNodePtr parseOr();` - Parses logical OR expressions
+-  `ASTNodePtr parseAnd();` - Parses logical AND expressions
 
-#### Bitwise and Comparison Parsing (Lines 60-64)
-- **Line 60**: `ASTNodePtr parseBitwise();` - Parses bitwise operations
-- **Line 61**: `ASTNodePtr parseEquality();` - Parses equality comparisons
-- **Line 62**: `ASTNodePtr parseComparison();` - Parses comparison operations
-- **Line 63**: `ASTNodePtr parseShift();` - Parses bit shift operations
-- **Line 64**: Empty line for readability
+####
+-  `ASTNodePtr parseBitwise();` - Parses bitwise operations
+-  `ASTNodePtr parseEquality();` - Parses equality comparisons
+-  `ASTNodePtr parseComparison();` - Parses comparison operations
+-  `ASTNodePtr parseShift();` - Parses bit shift operations
+-  Empty line for readability
 
-#### Arithmetic Expression Parsing (Lines 65-68)
-- **Line 65**: `ASTNodePtr parseAddSub();` - Parses addition and subtraction
-- **Line 66**: `ASTNodePtr parseMulDiv();` - Parses multiplication and division
-- **Line 67**: `ASTNodePtr parsePower();` - Parses exponentiation
-- **Line 68**: Empty line for readability
+####
+-  `ASTNodePtr parseAddSub();` - Parses addition and subtraction
+-  `ASTNodePtr parseMulDiv();` - Parses multiplication and division
+-  `ASTNodePtr parsePower();` - Parses exponentiation
+-  Empty line for readability
 
-#### Unary and Postfix Parsing (Lines 69-70)
-- **Line 69**: `ASTNodePtr parseUnary();` - Parses unary operations
-- **Line 70**: `ASTNodePtr parsePostfix();` - Parses postfix operations
-- **Line 71**: `ASTNodePtr parsePrimary();` - Parses primary expressions (literals, identifiers)
-- **Line 72**: Empty line for readability
+####
+-  `ASTNodePtr parseUnary();` - Parses unary operations
+-  `ASTNodePtr parsePostfix();` - Parses postfix operations
+-  `ASTNodePtr parsePrimary();` - Parses primary expressions (literals, identifiers)
+-  Empty line for readability
 
-### Literal and Function Parsing (Lines 73-78)
+###
 
-#### Collection Literals (Lines 73-74)
-- **Line 73**: `ASTNodePtr parseArrayLiteral();` - Parses array literals
-- **Line 74**: `ASTNodePtr parseDictLiteral();` - Parses dictionary literals
+####
+-  `ASTNodePtr parseArrayLiteral();` - Parses array literals
+-  `ASTNodePtr parseDictLiteral();` - Parses dictionary literals
 
-#### Function Parsing (Lines 75-78)
-- **Line 75**: `ASTNodePtr parseLambda();` - Parses lambda expressions
-- **Line 76**: `ASTNodePtr parseArrowFunction(std::vector<std::string> params, int ln);` - Parses arrow functions
-- **Line 77**: `std::vector<ASTNodePtr> parseArgList();` - Parses function argument lists
+####
+-  `ASTNodePtr parseLambda();` - Parses lambda expressions
+-  `ASTNodePtr parseArrowFunction(std::vector<std::string> params, int ln);` - Parses arrow functions
+-  `std::vector<ASTNodePtr> parseArgList();` - Parses function argument lists
 
-#### Parameter Parsing (Lines 78-79)
-- **Line 78**: `// Returns param names; populates outIsRef with true for each & (reference) param` - Comment explaining parameter parsing
-- **Line 79**: `std::vector<std::string> parseParamList(std::vector<bool> *outIsRef = nullptr, std::vector<ASTNodePtr> *outDefaultArgs = nullptr);` - Parses function parameter lists with reference and default argument support
+####
+-  `// Returns param names; populates outIsRef with true for each & (reference) param` - Comment explaining parameter parsing
+-  `std::vector<std::string> parseParamList(std::vector<bool> *outIsRef = nullptr, std::vector<ASTNodePtr> *outDefaultArgs = nullptr);` - Parses function parameter lists with reference and default argument support
 
-### Class Closing (Line 80)
-- **Line 80**: `};` - Closing brace for the Parser class
+###
+-  `};` - Closing brace for the Parser class
 
 ## Summary
 

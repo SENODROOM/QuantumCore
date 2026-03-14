@@ -26,51 +26,51 @@ QuantumValue Interpreter::evalUnary(UnaryExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3002)
-- **Line 3002**: `QuantumValue Interpreter::evalUnary(UnaryExpr &e)` - Evaluate unary expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalUnary(UnaryExpr &e)` - Evaluate unary expressions
   - `e`: Reference to UnaryExpr AST node
   - Returns QuantumValue result of unary operation
 
-### Operand Evaluation (Lines 3003-3004)
-- **Line 3003**: `{` - Opening brace
-- **Line 3004**: `auto v = evaluate(*e.operand);` - Evaluate operand expression
+###
+-  `{` - Opening brace
+-  `auto v = evaluate(*e.operand);` - Evaluate operand expression
 
-### Negation Operator (Lines 3005-3007)
-- **Line 3005**: `if (e.op == "-")` - Check for negation operator
-- **Line 3006**: `return QuantumValue(-v.toNum("unary -"));` - Return numeric negation
-- **Line 3007**: Empty line for readability
+###
+-  `if (e.op == "-")` - Check for negation operator
+-  `return QuantumValue(-v.toNum("unary -"));` - Return numeric negation
+-  Empty line for readability
 
-### Logical Not Operator (Lines 3008-3010)
-- **Line 3008**: `if (e.op == "!")` - Check for logical not operator
-- **Line 3009**: `return QuantumValue(!v.isTruthy());` - Return logical negation
-- **Line 3010**: Empty line for readability
+###
+-  `if (e.op == "!")` - Check for logical not operator
+-  `return QuantumValue(!v.isTruthy());` - Return logical negation
+-  Empty line for readability
 
-### Bitwise Not Operator (Lines 3011-3013)
-- **Line 3011**: `if (e.op == "~")` - Check for bitwise not operator
-- **Line 3012**: `return QuantumValue(~(long long)v.toNum("unary ~"));` - Return bitwise complement
-- **Line 3013**: Empty line for readability
+###
+-  `if (e.op == "~")` - Check for bitwise not operator
+-  `return QuantumValue(~(long long)v.toNum("unary ~"));` - Return bitwise complement
+-  Empty line for readability
 
-### Pre-increment Operator (Lines 3014-3019)
-- **Line 3014**: `if (e.op == "++")` - Check for pre-increment operator
-- **Line 3015**: `{` - Opening brace for increment
-- **Line 3016**: `setLValue(*e.operand, v + 1, "=");` - Increment operand and assign
-- **Line 3017**: `return v;` - Return original value (pre-increment semantics)
-- **Line 3018**: `}` - Closing brace for increment
-- **Line 3019**: Empty line for readability
+###
+-  `if (e.op == "++")` - Check for pre-increment operator
+-  `{` - Opening brace for increment
+-  `setLValue(*e.operand, v + 1, "=");` - Increment operand and assign
+-  `return v;` - Return original value (pre-increment semantics)
+-  `}` - Closing brace for increment
+-  Empty line for readability
 
-### Pre-decrement Operator (Lines 3020-3025)
-- **Line 3020**: `if (e.op == "--")` - Check for pre-decrement operator
-- **Line 3021**: `{` - Opening brace for decrement
-- **Line 3022**: `setLValue(*e.operand, v - 1, "=");` - Decrement operand and assign
-- **Line 3023**: `return v;` - Return original value (pre-decrement semantics)
-- **Line 3024**: `}` - Closing brace for decrement
-- **Line 3025**: Empty line for readability
+###
+-  `if (e.op == "--")` - Check for pre-decrement operator
+-  `{` - Opening brace for decrement
+-  `setLValue(*e.operand, v - 1, "=");` - Decrement operand and assign
+-  `return v;` - Return original value (pre-decrement semantics)
+-  `}` - Closing brace for decrement
+-  Empty line for readability
 
-### Error Handling (Lines 3026-3028)
-- **Line 3026**: `throw RuntimeError("Unknown unary op: " + e.op);` - Throw error for unknown operator
-- **Line 3027**: `}` - Closing brace for function
+###
+-  `throw RuntimeError("Unknown unary op: " + e.op);` - Throw error for unknown operator
+-  `}` - Closing brace for function
 
 ## Summary
 

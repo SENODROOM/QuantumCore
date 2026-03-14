@@ -27,7 +27,7 @@ static void collectSaFiles(const fs::path &dir, std::vector<fs::path> &out)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static void collectSaFiles(const fs::path &dir, std::vector<fs::path> &out)
 ```
@@ -37,7 +37,7 @@ static void collectSaFiles(const fs::path &dir, std::vector<fs::path> &out)
 - **`const fs::path &dir`**: Constant reference to directory path (fs = filesystem)
 - **`std::vector<fs::path> &out`**: Reference to output vector for efficient accumulation
 
-### **Directory Validation (Lines 3-5)**
+###**
 ```cpp
 if (!fs::exists(dir) || !fs::is_directory(dir))
     return;
@@ -47,7 +47,7 @@ if (!fs::exists(dir) || !fs::is_directory(dir))
 - **Early Return**: Exits silently for invalid directories
 - **Defensive Programming**: Prevents crashes on invalid paths
 
-### **Directory Iteration (Line 7)**
+###**
 ```cpp
 for (const auto &entry : fs::directory_iterator(dir))
 ```
@@ -56,7 +56,7 @@ for (const auto &entry : fs::directory_iterator(dir))
 - **`entry`**: Directory entry object representing each item
 - **Exception Safe**: Iterator handles filesystem errors gracefully
 
-### **Recursive Directory Handling (Lines 9-12)**
+###**
 ```cpp
 if (entry.is_directory())
 {
@@ -68,7 +68,7 @@ if (entry.is_directory())
 - **Path Propagation**: Passes subdirectory path to recursive call
 - **Depth-First Traversal**: Explores subdirectories completely
 
-### **File Collection (Lines 13-16)**
+###**
 ```cpp
 else if (entry.is_regular_file() && entry.path().extension() == ".sa")
 {

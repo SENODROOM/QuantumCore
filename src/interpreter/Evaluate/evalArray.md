@@ -14,27 +14,27 @@ QuantumValue Interpreter::evalArray(ArrayLiteral &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3995)
-- **Line 3995**: `QuantumValue Interpreter::evalArray(ArrayLiteral &e)` - Evaluate array literal expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalArray(ArrayLiteral &e)` - Evaluate array literal expressions
   - `e`: Reference to ArrayLiteral AST node
   - Returns QuantumValue containing the created array
 
-### Array Creation (Lines 3996-3998)
-- **Line 3996**: `{` - Opening brace
-- **Line 3997**: `auto arr = std::make_shared<Array>();` - Create shared array object
-- **Line 3998**: `for (auto &el : e.elements)` - Loop through array elements
+###
+-  `{` - Opening brace
+-  `auto arr = std::make_shared<Array>();` - Create shared array object
+-  `for (auto &el : e.elements)` - Loop through array elements
 
-### Element Evaluation (Lines 3999-4002)
-- **Line 3999**: `{` - Opening brace for element loop
-- **Line 4000**: `arr->elements.push_back(evaluate(*el));` - Evaluate element and add to array
-- **Line 4001**: `}` - Closing brace for element loop
-- **Line 4002**: Empty line for readability
+###
+-  `{` - Opening brace for element loop
+-  `arr->elements.push_back(evaluate(*el));` - Evaluate element and add to array
+-  `}` - Closing brace for element loop
+-  Empty line for readability
 
-### Return Statement (Lines 4003-4005)
-- **Line 4003**: `return QuantumValue(arr);` - Return array as QuantumValue
-- **Line 4004**: `}` - Closing brace for function
+###
+-  `return QuantumValue(arr);` - Return array as QuantumValue
+-  `}` - Closing brace for function
 
 ## Summary
 

@@ -12,19 +12,19 @@ void Interpreter::execReturn(ReturnStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 2039)
-- **Line 2039**: `void Interpreter::execReturn(ReturnStmt &s)` - Execute return statements
+### Function Signature
+-  `void Interpreter::execReturn(ReturnStmt &s)` - Execute return statements
   - `s`: Reference to ReturnStmt AST node
   - Returns void as return statements don't produce values directly
 
-### Return Value Handling (Lines 2040-2044)
-- **Line 2040**: `{` - Opening brace
-- **Line 2041**: `QuantumValue val;` - Create default return value (nil)
-- **Line 2042**: `if (s.value)` - Check if return value provided
-- **Line 2043**: `val = evaluate(*s.value);` - Evaluate return expression
-- **Line 2044**: `throw ReturnSignal(std::move(val));` - Throw return signal with value
+###
+-  `{` - Opening brace
+-  `QuantumValue val;` - Create default return value (nil)
+-  `if (s.value)` - Check if return value provided
+-  `val = evaluate(*s.value);` - Evaluate return expression
+-  `throw ReturnSignal(std::move(val));` - Throw return signal with value
 
 ## Summary
 

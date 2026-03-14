@@ -12,25 +12,25 @@ void Interpreter::execVarDecl(VarDecl &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1672)
-- **Line 1672**: `void Interpreter::execVarDecl(VarDecl &s)` - Execute variable declarations
+### Function Signature
+-  `void Interpreter::execVarDecl(VarDecl &s)` - Execute variable declarations
   - `s`: Reference to VarDecl AST node
   - Returns void as variable declarations don't produce values
 
-### Variable Initialization (Lines 1673-1676)
-- **Line 1673**: `{` - Opening brace
-- **Line 1674**: `QuantumValue val;` - Create default value (nil)
-- **Line 1675**: `if (s.initializer)` - Check if initializer exists
-- **Line 1676**: `val = evaluate(*s.initializer);` - Evaluate initializer expression
+###
+-  `{` - Opening brace
+-  `QuantumValue val;` - Create default value (nil)
+-  `if (s.initializer)` - Check if initializer exists
+-  `val = evaluate(*s.initializer);` - Evaluate initializer expression
 
-### Variable Definition (Lines 1777-1780)
-- **Line 1777**: `env->define(s.name, std::move(val), s.isConst);` - Define variable in environment
+###
+-  `env->define(s.name, std::move(val), s.isConst);` - Define variable in environment
   - `s.name`: Variable name string
   - `std::move(val)`: Move value for efficiency
   - `s.isConst`: Whether variable is constant
-- **Line 1778**: `}` - Closing brace for function
+-  `}` - Closing brace for function
 
 ## Summary
 

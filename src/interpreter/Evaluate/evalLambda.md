@@ -16,26 +16,26 @@ QuantumValue Interpreter::evalLambda(LambdaExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 4114)
-- **Line 4114**: `QuantumValue Interpreter::evalLambda(LambdaExpr &e)` - Evaluate lambda expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalLambda(LambdaExpr &e)` - Evaluate lambda expressions
   - `e`: Reference to LambdaExpr AST node
   - Returns QuantumValue containing the lambda function
 
-### Function Object Creation (Lines 4115-4122)
-- **Line 4115**: `{` - Opening brace
-- **Line 4116**: `auto fn = std::make_shared<QuantumFunction>();` - Create shared function object
-- **Line 4117**: `fn->name = "<lambda>";` - Set lambda name for debugging
-- **Line 4118**: `fn->params = e.params;` - Copy parameter names
-- **Line 4119**: `fn->paramIsRef = e.paramIsRef;` - Copy reference parameter flags
-- **Line 4120**: `fn->defaultArgs = e.defaultArgs;` - Copy default argument expressions
-- **Line 4121**: `fn->body = e.body;` - Copy lambda body AST node
+###
+-  `{` - Opening brace
+-  `auto fn = std::make_shared<QuantumFunction>();` - Create shared function object
+-  `fn->name = "<lambda>";` - Set lambda name for debugging
+-  `fn->params = e.params;` - Copy parameter names
+-  `fn->paramIsRef = e.paramIsRef;` - Copy reference parameter flags
+-  `fn->defaultArgs = e.defaultArgs;` - Copy default argument expressions
+-  `fn->body = e.body;` - Copy lambda body AST node
 
-### Closure and Return (Lines 4122-4125)
-- **Line 4122**: `fn->closure = env;` - Set closure to current environment
-- **Line 4123**: `return QuantumValue(fn);` - Return lambda as QuantumValue
-- **Line 4124**: `}` - Closing brace for function
+###
+-  `fn->closure = env;` - Set closure to current environment
+-  `return QuantumValue(fn);` - Return lambda as QuantumValue
+-  `}` - Closing brace for function
 
 ## Summary
 

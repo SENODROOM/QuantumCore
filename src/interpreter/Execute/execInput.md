@@ -23,37 +23,37 @@ void Interpreter::execInput(InputStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 2128)
-- **Line 2128**: `void Interpreter::execInput(InputStmt &s)` - Execute input statements
+### Function Signature
+-  `void Interpreter::execInput(InputStmt &s)` - Execute input statements
   - `s`: Reference to InputStmt AST node
   - Returns void as input statements don't produce values
 
-### Prompt Evaluation (Lines 2129-2134)
-- **Line 2129**: `{` - Opening brace
-- **Line 2130**: `// Evaluate the prompt string exactly once` - Comment about prompt evaluation
-- **Line 2131**: `std::string promptStr;` - Create prompt string variable
-- **Line 2132**: `if (s.prompt)` - Check if prompt provided
-- **Line 2133**: `promptStr = evaluate(*s.prompt).toString();` - Evaluate prompt expression
-- **Line 2134**: Empty line for readability
+###
+-  `{` - Opening brace
+-  `// Evaluate the prompt string exactly once` - Comment about prompt evaluation
+-  `std::string promptStr;` - Create prompt string variable
+-  `if (s.prompt)` - Check if prompt provided
+-  `promptStr = evaluate(*s.prompt).toString();` - Evaluate prompt expression
+-  Empty line for readability
 
-### Prompt Display (Lines 2135-2137)
-- **Line 2135**: `// Display prompt` - Comment about prompt display
-- **Line 2136**: `std::cout << promptStr;` - Display prompt to user
-- **Line 2137**: `std::cout.flush();` - Flush output to ensure prompt appears
+###
+-  `// Display prompt` - Comment about prompt display
+-  `std::cout << promptStr;` - Display prompt to user
+-  `std::cout.flush();` - Flush output to ensure prompt appears
 
-### Input Reading (Lines 2138-2141)
-- **Line 2138**: Empty line for readability
-- **Line 2139**: `// Read input` - Comment about input reading
-- **Line 2140**: `std::string line;` - Create input line variable
-- **Line 2141**: `std::getline(std::cin, line);` - Read line from standard input
+###
+-  Empty line for readability
+-  `// Read input` - Comment about input reading
+-  `std::string line;` - Create input line variable
+-  `std::getline(std::cin, line);` - Read line from standard input
 
-### Variable Storage (Lines 2142-2145)
-- **Line 2142**: Empty line for readability
-- **Line 2143**: `// Store in variable` - Comment about variable storage
-- **Line 2144**: `env->define(s.target, QuantumValue(line));` - Store input in target variable
-- **Line 2145**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `// Store in variable` - Comment about variable storage
+-  `env->define(s.target, QuantumValue(line));` - Store input in target variable
+-  `}` - Closing brace for function
 
 ## Summary
 

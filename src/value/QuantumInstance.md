@@ -26,44 +26,44 @@ void QuantumInstance::setField(const std::string &name, QuantumValue val)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### getField() Method (Lines 194-209)
+###
 
 #### Method Signature
-- **Line 194**: `QuantumValue QuantumInstance::getField(const std::string &name) const` - Get instance field or method
+-  `QuantumValue QuantumInstance::getField(const std::string &name) const` - Get instance field or method
   - `name`: Field or method name to retrieve
   - Returns the field value or method as QuantumValue
   - `const` means this method doesn't modify the instance
 
 #### Implementation
-- **Line 195**: `{` - Opening brace
-- **Line 196**: `auto it = fields.find(name);` - Look for field in instance fields map
-- **Line 197**: `if (it != fields.end())` - If field found in instance
-- **Line 198**: `return it->second;` - Return the field value
-- **Line 199**: `// Check methods` - Comment about method lookup
-- **Line 200**: `auto k = klass.get();` - Get pointer to the instance's class
-- **Line 201**: `while (k)` - Loop through class hierarchy (inheritance)
-- **Line 202**: `{` - Opening brace for inheritance loop
-- **Line 203**: `auto mit = k->methods.find(name);` - Look for method in current class
-- **Line 204**: `if (mit != k->methods.end())` - If method found in current class
-- **Line 205**: `return QuantumValue(mit->second);` - Return method as QuantumValue
-- **Line 206**: `k = k->base.get();` - Move to base class (inheritance)
-- **Line 207**: `}` - Closing brace for inheritance loop
-- **Line 208**: `throw NameError("No field/method '" + name + "' on instance of " + klass->name);` - Throw error if not found
-- **Line 209**: `}` - Closing brace
+-  `{` - Opening brace
+-  `auto it = fields.find(name);` - Look for field in instance fields map
+-  `if (it != fields.end())` - If field found in instance
+-  `return it->second;` - Return the field value
+-  `// Check methods` - Comment about method lookup
+-  `auto k = klass.get();` - Get pointer to the instance's class
+-  `while (k)` - Loop through class hierarchy (inheritance)
+-  `{` - Opening brace for inheritance loop
+-  `auto mit = k->methods.find(name);` - Look for method in current class
+-  `if (mit != k->methods.end())` - If method found in current class
+-  `return QuantumValue(mit->second);` - Return method as QuantumValue
+-  `k = k->base.get();` - Move to base class (inheritance)
+-  `}` - Closing brace for inheritance loop
+-  `throw NameError("No field/method '" + name + "' on instance of " + klass->name);` - Throw error if not found
+-  `}` - Closing brace
 
-### setField() Method (Lines 211-214)
+###
 
 #### Method Signature
-- **Line 211**: `void QuantumInstance::setField(const std::string &name, QuantumValue val)` - Set instance field value
+-  `void QuantumInstance::setField(const std::string &name, QuantumValue val)` - Set instance field value
   - `name`: Field name to set
   - `val`: New field value
 
 #### Implementation
-- **Line 212**: `{` - Opening brace
-- **Line 213**: `fields[name] = std::move(val);` - Store field value with efficient move semantics
-- **Line 214**: `}` - Closing brace
+-  `{` - Opening brace
+-  `fields[name] = std::move(val);` - Store field value with efficient move semantics
+-  `}` - Closing brace
 
 ## Summary
 

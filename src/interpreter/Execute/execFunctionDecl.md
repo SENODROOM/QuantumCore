@@ -16,26 +16,26 @@ void Interpreter::execFunctionDecl(FunctionDecl &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1782)
-- **Line 1782**: `void Interpreter::execFunctionDecl(FunctionDecl &s)` - Execute function declarations
+### Function Signature
+-  `void Interpreter::execFunctionDecl(FunctionDecl &s)` - Execute function declarations
   - `s`: Reference to FunctionDecl AST node
   - Returns void as function declarations don't produce values
 
-### Function Object Creation (Lines 1783-1789)
-- **Line 1783**: `{` - Opening brace
-- **Line 1784**: `auto fn = std::make_shared<QuantumFunction>();` - Create shared function object
-- **Line 1785**: `fn->name = s.name;` - Set function name
-- **Line 1786**: `fn->params = s.params;` - Copy parameter names
-- **Line 1787**: `fn->paramIsRef = s.paramIsRef;` - Copy reference parameter flags
-- **Line 1788**: `fn->defaultArgs = s.defaultArgs;` - Copy default argument expressions
-- **Line 1789**: `fn->body = s.body;` - Copy function body AST node
+###
+-  `{` - Opening brace
+-  `auto fn = std::make_shared<QuantumFunction>();` - Create shared function object
+-  `fn->name = s.name;` - Set function name
+-  `fn->params = s.params;` - Copy parameter names
+-  `fn->paramIsRef = s.paramIsRef;` - Copy reference parameter flags
+-  `fn->defaultArgs = s.defaultArgs;` - Copy default argument expressions
+-  `fn->body = s.body;` - Copy function body AST node
 
-### Closure and Registration (Lines 1790-1793)
-- **Line 1790**: `fn->closure = env;` - Set closure to current environment
-- **Line 1791**: `env->define(s.name, QuantumValue(fn));` - Define function in environment
-- **Line 1792**: `}` - Closing brace for function
+###
+-  `fn->closure = env;` - Set closure to current environment
+-  `env->define(s.name, QuantumValue(fn));` - Define function in environment
+-  `}` - Closing brace for function
 
 ## Summary
 

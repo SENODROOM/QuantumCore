@@ -116,7 +116,7 @@ static TestResult testFile(const std::string &path)
 
 ## Line-by-Line Analysis
 
-### **Function Signature and Initialization (Lines 1-8)**
+###**
 ```cpp
 static TestResult testFile(const std::string &path)
 {
@@ -127,7 +127,7 @@ static TestResult testFile(const std::string &path)
 - **Path Storage**: Stores file path for reporting
 - **Default Initialization**: Other members remain default (empty error, line 0)
 
-### **File Reading (Lines 10-18)**
+###**
 ```cpp
 std::ifstream file(path);
 if (!file.is_open())
@@ -145,7 +145,7 @@ file.close();
 - **Source Code Reading**: Efficient iterator-based file reading
 - **Resource Management**: Explicit file close for deterministic cleanup
 
-### **Phase 1: Syntax Validation (Lines 20-35)**
+###**
 ```cpp
 // ── Phase 1: Parse-only — catches all syntax errors.
 try
@@ -171,7 +171,7 @@ catch (const std::exception &e)
 - **Comprehensive Error Capture**: Both language-specific and system errors
 - **Structured Error Information**: Preserves error kind, message, and location
 
-### **Phase 2: Execution Testing Setup (Lines 37-45)**
+###**
 ```cpp
 // ── Phase 2: Execute with output swallowed ────────────────────────────
 std::ostringstream sink;
@@ -192,7 +192,7 @@ auto setErr = [&](const std::string &kind, const std::string &msg, int ln)
 - **Error Filter**: Lambda function filters input-driven errors
 - **Test Isolation**: Prevents test output from affecting console
 
-### **Execution Phase (Lines 47-75)**
+###**
 ```cpp
 try
 {
@@ -219,7 +219,7 @@ try
 - **Main Function Detection**: Checks for and calls main() if present
 - **Nested Exception Handling**: Separate handling for global vs main() errors
 
-### **Exception Handling Strategy (Lines 77-95)**
+###**
 ```cpp
 catch (const QuantumError &e)
 {

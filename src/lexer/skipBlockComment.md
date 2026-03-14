@@ -25,7 +25,7 @@ void Lexer::skipBlockComment()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 void Lexer::skipBlockComment()
 ```
@@ -34,7 +34,7 @@ void Lexer::skipBlockComment()
 - **No Parameters**: Uses current lexer position automatically
 - **State Modification**: Advances position past comment content
 
-### **Precondition Comment (Line 3)**
+###**
 ```cpp
 // We've already consumed '/*' — skip until '*/'
 ```
@@ -45,7 +45,7 @@ void Lexer::skipBlockComment()
 - **Responsibility**: Function only needs to find closing `*/`
 - **Integration**: Works with main tokenization logic
 
-### **Main Processing Loop (Lines 5-13)**
+###**
 ```cpp
 while (pos < src.size())
 {
@@ -71,7 +71,7 @@ while (pos < src.size())
 - **Pattern Matching**: Detects `*/` closing delimiter
 - **Consumption**: Both characters consumed when pattern found
 
-### **Graceful Termination (Lines 15-16)**
+###**
 ```cpp
 // Unterminated block comment — just silently reach EOF
 ```

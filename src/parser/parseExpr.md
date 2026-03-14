@@ -6,15 +6,15 @@
 ASTNodePtr Parser::parseExpr() { return parseAssignment(); }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
 ### Function Signature
-- **Line 2166**: `ASTNodePtr Parser::parseExpr()` - Main expression parsing entry point
+-  `ASTNodePtr Parser::parseExpr()` - Main expression parsing entry point
   - Returns pointer to AST node representing parsed expression
   - Serves as the top-level expression parser
 
 ### Function Body
-- **Line 2166**: `{ return parseAssignment(); }` - Direct delegation to assignment parser
+-  `{ return parseAssignment(); }` - Direct delegation to assignment parser
   - Immediately calls `parseAssignment()` to handle expression parsing
   - Assignment has the lowest precedence in expression hierarchy
 

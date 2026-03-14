@@ -45,65 +45,65 @@ QuantumValue Interpreter::evalNewExpr(NewExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 4261)
-- **Line 4261**: `QuantumValue Interpreter::evalNewExpr(NewExpr &e)` - Evaluate new expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalNewExpr(NewExpr &e)` - Evaluate new expressions
   - `e`: Reference to NewExpr AST node
   - Returns QuantumValue containing the created object
 
-### Primitive Types Registry (Lines 4262-4265)
-- **Line 4262**: `{` - Opening brace
-- **Line 4263**: `static const std::unordered_set<std::string> primitives = {` - Define primitive types set
-- **Line 4264**: `"int", "long", "short", "unsigned", "float", "double", "char", "bool"};` - C++ primitive types
-- **Line 4265**: Empty line for readability
+###
+-  `{` - Opening brace
+-  `static const std::unordered_set<std::string> primitives = {` - Define primitive types set
+-  `"int", "long", "short", "unsigned", "float", "double", "char", "bool"};` - C++ primitive types
+-  Empty line for readability
 
-### Type Name Extraction (Line 4266)
-- **Line 4266**: `std::string typeName = e.type;` - Get type name from expression
+###
+-  `std::string typeName = e.type;` - Get type name from expression
 
-### Primitive Type Handling (Lines 4267-4280)
-- **Line 4267**: `if (primitives.count(typeName))` - Check if type is primitive
-- **Line 4268**: `{` - Opening brace for primitive case
-- **Line 4269**: `// Create primitive value with default initialization` - Comment about primitive creation
-- **Line 4270**: `if (typeName == "int" || typeName == "long" || typeName == "short" || typeName == "unsigned")` - Integer types
-- **Line 4271**: `return QuantumValue(0LL);` - Return zero integer
-- **Line 4272**: `if (typeName == "float" || typeName == "double")` - Float types
-- **Line 4273**: `return QuantumValue(0.0);` - Return zero float
-- **Line 4274**: `if (typeName == "char")` - Character type
-- **Line 4275**: `return QuantumValue(std::string(1, '\0'));` - Return null character
-- **Line 4276**: `if (typeName == "bool")` - Boolean type
-- **Line 4277**: `return QuantumValue(false);` - Return false
-- **Line 4278**: `}` - Closing brace for primitive case
+###
+-  `if (primitives.count(typeName))` - Check if type is primitive
+-  `{` - Opening brace for primitive case
+-  `// Create primitive value with default initialization` - Comment about primitive creation
+-  `if (typeName == "int" || typeName == "long" || typeName == "short" || typeName == "unsigned")` - Integer types
+-  `return QuantumValue(0LL);` - Return zero integer
+-  `if (typeName == "float" || typeName == "double")` - Float types
+-  `return QuantumValue(0.0);` - Return zero float
+-  `if (typeName == "char")` - Character type
+-  `return QuantumValue(std::string(1, '\0'));` - Return null character
+-  `if (typeName == "bool")` - Boolean type
+-  `return QuantumValue(false);` - Return false
+-  `}` - Closing brace for primitive case
 
-### Class Instantiation (Lines 4279-4282)
-- **Line 4279**: Empty line for readability
-- **Line 4280**: `// Treat as class instantiation` - Comment about class creation
-- **Line 4281**: `auto klassVal = evaluate(*e.typeExpr);` - Evaluate class expression
-- **Line 4282**: `if (!klassVal.isClass())` - Check if result is class
+###
+-  Empty line for readability
+-  `// Treat as class instantiation` - Comment about class creation
+-  `auto klassVal = evaluate(*e.typeExpr);` - Evaluate class expression
+-  `if (!klassVal.isClass())` - Check if result is class
 
-### Type Validation (Lines 4283-4285)
-- **Line 4283**: `throw TypeError("Cannot instantiate non-class: " + klassVal.typeName());` - Error for non-class
-- **Line 4284**: Empty line for readability
-- **Line 4285**: `auto klass = klassVal.asClass();` - Get class object
+###
+-  `throw TypeError("Cannot instantiate non-class: " + klassVal.typeName());` - Error for non-class
+-  Empty line for readability
+-  `auto klass = klassVal.asClass();` - Get class object
 
-### Instance Creation (Lines 4286-4290)
-- **Line 4286**: `auto instance = std::make_shared<QuantumInstance>(klass);` - Create instance object
-- **Line 4287**: Empty line for readability
-- **Line 4288**: `// Call constructor if exists` - Comment about constructor call
-- **Line 4289**: `auto ctor = klass->findMethod("<init>");` - Find constructor method
-- **Line 4290**: `if (ctor)` - Check if constructor exists
+###
+-  `auto instance = std::make_shared<QuantumInstance>(klass);` - Create instance object
+-  Empty line for readability
+-  `// Call constructor if exists` - Comment about constructor call
+-  `auto ctor = klass->findMethod("<init>");` - Find constructor method
+-  `if (ctor)` - Check if constructor exists
 
-### Constructor Call (Lines 4291-4299)
-- **Line 4291**: `{` - Opening brace for constructor case
-- **Line 4292**: `std::vector<QuantumValue> args;` - Create arguments vector
-- **Line 4293**: `args.reserve(e.arguments.size());` - Reserve space for arguments
-- **Line 4294**: `for (auto &arg : e.arguments)` - Loop through arguments
-- **Line 4295**: `args.push_back(evaluate(*arg));` - Evaluate and add argument
-- **Line 4296**: `callInstanceMethod(instance, ctor, std::move(args));` - Call constructor
-- **Line 4297**: `}` - Closing brace for constructor case
-- **Line 4298**: Empty line for readability
-- **Line 4299**: `return QuantumValue(instance);` - Return instance value
-- **Line 4300**: `}` - Closing brace for function
+###
+-  `{` - Opening brace for constructor case
+-  `std::vector<QuantumValue> args;` - Create arguments vector
+-  `args.reserve(e.arguments.size());` - Reserve space for arguments
+-  `for (auto &arg : e.arguments)` - Loop through arguments
+-  `args.push_back(evaluate(*arg));` - Evaluate and add argument
+-  `callInstanceMethod(instance, ctor, std::move(args));` - Call constructor
+-  `}` - Closing brace for constructor case
+-  Empty line for readability
+-  `return QuantumValue(instance);` - Return instance value
+-  `}` - Closing brace for function
 
 ## Summary
 

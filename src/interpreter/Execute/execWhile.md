@@ -15,25 +15,25 @@ void Interpreter::execWhile(WhileStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1914)
-- **Line 1914**: `void Interpreter::execWhile(WhileStmt &s)` - Execute while statements
+### Function Signature
+-  `void Interpreter::execWhile(WhileStmt &s)` - Execute while statements
   - `s`: Reference to WhileStmt AST node
   - Returns void as while statements don't produce values
 
-### While Loop (Lines 1915-1924)
-- **Line 1915**: `{` - Opening brace
-- **Line 1916**: `while (evaluate(*s.condition).isTruthy())` - Main while loop condition
+###
+-  `{` - Opening brace
+-  `while (evaluate(*s.condition).isTruthy())` - Main while loop condition
   - `evaluate(*s.condition)`: Evaluate condition expression each iteration
   - `.isTruthy()`: Check if result is truthy
-- **Line 1917**: `{` - Opening brace for loop body
-- **Line 1918**: `execute(*s.body);` - Execute loop body statements
-- **Line 1919**: `stepCount_++;` - Increment step counter for infinite loop detection
-- **Line 1920**: `if (stepCount_ > MAX_STEPS)` - Check for infinite loop
-- **Line 1921**: `throw RuntimeError("Infinite loop detected");` - Throw error for infinite loop
-- **Line 1922**: `}` - Closing brace for loop body
-- **Line 1923**: `}` - Closing brace for function
+-  `{` - Opening brace for loop body
+-  `execute(*s.body);` - Execute loop body statements
+-  `stepCount_++;` - Increment step counter for infinite loop detection
+-  `if (stepCount_ > MAX_STEPS)` - Check for infinite loop
+-  `throw RuntimeError("Infinite loop detected");` - Throw error for infinite loop
+-  `}` - Closing brace for loop body
+-  `}` - Closing brace for function
 
 ## Summary
 

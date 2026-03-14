@@ -282,328 +282,328 @@ static std::string applyFormat(const std::string &fmt, const std::vector<Quantum
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1)
-- **Line 1**: `static std::string applyFormat(const std::string &fmt, const std::vector<QuantumValue> &args, size_t argStart = 1)` - Main format function
+### Function Signature
+-  `static std::string applyFormat(const std::string &fmt, const std::vector<QuantumValue> &args, size_t argStart = 1)` - Main format function
   - `fmt`: Format string with printf-style specifiers
   - `args`: Vector of QuantumValue arguments to format
   - `argStart`: Starting index in args vector (default 1)
   - Returns formatted string
 
-### Initialization (Lines 2-5)
-- **Line 2**: `{` - Opening brace
-- **Line 3**: `std::string out;` - Output string buffer
-- **Line 4**: `size_t argIdx = argStart;` - Current argument index
-- **Line 5**: `size_t i = 0;` - Format string position
+### Initialization
+-  `{` - Opening brace
+-  `std::string out;` - Output string buffer
+-  `size_t argIdx = argStart;` - Current argument index
+-  `size_t i = 0;` - Format string position
 
-### Next Argument Lambda (Lines 7-11)
-- **Line 6**: Empty line for readability
-- **Line 7**: `auto nextArg = [&]() -> QuantumValue` - Lambda function to get next argument
-- **Line 8**: `{` - Opening brace for lambda
-- **Line 9**: `return argIdx < args.size() ? args[argIdx++] : QuantumValue();` - Return next arg or nil
-- **Line 10**: `};` - Closing brace for lambda
-- **Line 11**: Empty line for readability
+### Next Argument Lambda
+-  Empty line for readability
+-  `auto nextArg = [&]() -> QuantumValue` - Lambda function to get next argument
+-  `{` - Opening brace for lambda
+-  `return argIdx < args.size() ? args[argIdx++] : QuantumValue();` - Return next arg or nil
+-  `};` - Closing brace for lambda
+-  Empty line for readability
 
-### Main Format Loop (Lines 12-30)
-- **Line 12**: `while (i < fmt.size())` - Loop through format string
-- **Line 13**: `{` - Opening brace for main loop
-- **Line 14**: `if (fmt[i] != '%')` - Check if not format specifier
-- **Line 15**: `{` - Opening brace for regular character
-- **Line 16**: `out += fmt[i++];` - Add character to output and advance
-- **Line 17**: `continue;` - Continue to next character
-- **Line 18**: `}` - Closing brace for regular character
-- **Line 19**: `++i;` - Skip the % character
-- **Line 20**: `if (i >= fmt.size())` - Check if at end of format string
-- **Line 21**: `break;` - Exit if at end
-- **Line 22**: `if (fmt[i] == '%')` - Check for escaped %%
-- **Line 23**: `{` - Opening brace for escaped %
-- **Line 24**: `out += '%';` - Add literal % to output
-- **Line 25**: `++i;` - Skip second %
-- **Line 26**: `continue;` - Continue to next character
-- **Line 27**: `}` - Closing brace for escaped %
-- **Line 28**: Empty line for readability
-- **Line 29**: `// ── Collect flags ──────────────────────────────────────────────────` - Flags section comment
-- **Line 30**: `bool flagMinus = false, flagPlus = false, flagSpace = false, flagZero = false, flagHash = false;` - Initialize flag variables
+### Main Format Loop
+-  `while (i < fmt.size())` - Loop through format string
+-  `{` - Opening brace for main loop
+-  `if (fmt[i] != '%')` - Check if not format specifier
+-  `{` - Opening brace for regular character
+-  `out += fmt[i++];` - Add character to output and advance
+-  `continue;` - Continue to next character
+-  `}` - Closing brace for regular character
+-  `++i;` - Skip the % character
+-  `if (i >= fmt.size())` - Check if at end of format string
+-  `break;` - Exit if at end
+-  `if (fmt[i] == '%')` - Check for escaped %%
+-  `{` - Opening brace for escaped %
+-  `out += '%';` - Add literal % to output
+-  `++i;` - Skip second %
+-  `continue;` - Continue to next character
+-  `}` - Closing brace for escaped %
+-  Empty line for readability
+-  `// ── Collect flags ──────────────────────────────────────────────────` - Flags section comment
+-  `bool flagMinus = false, flagPlus = false, flagSpace = false, flagZero = false, flagHash = false;` - Initialize flag variables
 
-### Flag Collection Loop (Lines 31-48)
-- **Line 31**: `while (i < fmt.size())` - Loop to collect flags
-- **Line 32**: `{` - Opening brace for flag loop
-- **Line 33**: `char f = fmt[i];` - Get current flag character
-- **Line 34**: `if (f == '-')` - Check for left-align flag
-- **Line 35**: `{` - Opening brace for minus flag
-- **Line 36**: `flagMinus = true;` - Set minus flag
-- **Line 37**: `++i;` - Advance to next character
-- **Line 38**: `}` - Closing brace for minus flag
-- **Line 39**: `else if (f == '+')` - Check for force sign flag
-- **Line 40**: `{` - Opening brace for plus flag
-- **Line 41**: `flagPlus = true;` - Set plus flag
-- **Line 42**: `++i;` - Advance to next character
-- **Line 43**: `}` - Closing brace for plus flag
-- **Line 44**: `else if (f == ' ')` - Check for space flag
-- **Line 45**: `{` - Opening brace for space flag
-- **Line 46**: `flagSpace = true;` - Set space flag
-- **Line 47**: `++i;` - Advance to next character
-- **Line 48**: `}` - Closing brace for space flag
+### Flag Collection Loop
+-  `while (i < fmt.size())` - Loop to collect flags
+-  `{` - Opening brace for flag loop
+-  `char f = fmt[i];` - Get current flag character
+-  `if (f == '-')` - Check for left-align flag
+-  `{` - Opening brace for minus flag
+-  `flagMinus = true;` - Set minus flag
+-  `++i;` - Advance to next character
+-  `}` - Closing brace for minus flag
+-  `else if (f == '+')` - Check for force sign flag
+-  `{` - Opening brace for plus flag
+-  `flagPlus = true;` - Set plus flag
+-  `++i;` - Advance to next character
+-  `}` - Closing brace for plus flag
+-  `else if (f == ' ')` - Check for space flag
+-  `{` - Opening brace for space flag
+-  `flagSpace = true;` - Set space flag
+-  `++i;` - Advance to next character
+-  `}` - Closing brace for space flag
 
-### More Flag Collection (Lines 49-65)
-- **Line 49**: `else if (f == '0')` - Check for zero-pad flag
-- **Line 50**: `{` - Opening brace for zero flag
-- **Line 51**: `flagZero = true;` - Set zero flag
-- **Line 52**: `++i;` - Advance to next character
-- **Line 53**: `}` - Closing brace for zero flag
-- **Line 54**: `else if (f == '#')` - Check for hash flag
-- **Line 55**: `{` - Opening brace for hash flag
-- **Line 56**: `flagHash = true;` - Set hash flag
-- **Line 57**: `++i;` - Advance to next character
-- **Line 58**: `}` - Closing brace for hash flag
-- **Line 59**: `else` - Not a flag character
-- **Line 60**: `break;` - Exit flag collection loop
-- **Line 61**: `}` - Closing brace for flag loop
-- **Line 62**: Empty line for readability
-- **Line 63**: `// ── Width ──────────────────────────────────────────────────────────` - Width section comment
-- **Line 64**: `int width = 0;` - Initialize width
-- **Line 65**: `while (i < fmt.size() && std::isdigit(fmt[i]))` - Loop for width digits
+###
+-  `else if (f == '0')` - Check for zero-pad flag
+-  `{` - Opening brace for zero flag
+-  `flagZero = true;` - Set zero flag
+-  `++i;` - Advance to next character
+-  `}` - Closing brace for zero flag
+-  `else if (f == '#')` - Check for hash flag
+-  `{` - Opening brace for hash flag
+-  `flagHash = true;` - Set hash flag
+-  `++i;` - Advance to next character
+-  `}` - Closing brace for hash flag
+-  `else` - Not a flag character
+-  `break;` - Exit flag collection loop
+-  `}` - Closing brace for flag loop
+-  Empty line for readability
+-  `// ── Width ──────────────────────────────────────────────────────────` - Width section comment
+-  `int width = 0;` - Initialize width
+-  `while (i < fmt.size() && std::isdigit(fmt[i]))` - Loop for width digits
 
-### Width and Precision Parsing (Lines 66-80)
-- **Line 66**: `width = width * 10 + (fmt[i++] - '0');` - Parse width number
-- **Line 67**: Empty line for readability
-- **Line 68**: `// ── Precision ─────────────────────────────────────────────────────` - Precision section comment
-- **Line 69**: `int prec = -1;` - Initialize precision (-1 = not specified)
-- **Line 70**: `if (i < fmt.size() && fmt[i] == '.')` - Check for precision specifier
-- **Line 71**: `{` - Opening brace for precision
-- **Line 72**: `++i;` - Skip the dot
-- **Line 73**: `prec = 0;` - Initialize precision
-- **Line 74**: `while (i < fmt.size() && std::isdigit(fmt[i]))` - Loop for precision digits
-- **Line 75**: `prec = prec * 10 + (fmt[i++] - '0');` - Parse precision number
-- **Line 76**: `}` - Closing brace for precision
-- **Line 77**: Empty line for readability
-- **Line 78**: `if (i >= fmt.size())` - Check if at end of format string
-- **Line 79**: `break;` - Exit if at end
-- **Line 80**: `char conv = fmt[i++];` - Get conversion character and advance
+###
+-  `width = width * 10 + (fmt[i++] - '0');` - Parse width number
+-  Empty line for readability
+-  `// ── Precision ─────────────────────────────────────────────────────` - Precision section comment
+-  `int prec = -1;` - Initialize precision (-1 = not specified)
+-  `if (i < fmt.size() && fmt[i] == '.')` - Check for precision specifier
+-  `{` - Opening brace for precision
+-  `++i;` - Skip the dot
+-  `prec = 0;` - Initialize precision
+-  `while (i < fmt.size() && std::isdigit(fmt[i]))` - Loop for precision digits
+-  `prec = prec * 10 + (fmt[i++] - '0');` - Parse precision number
+-  `}` - Closing brace for precision
+-  Empty line for readability
+-  `if (i >= fmt.size())` - Check if at end of format string
+-  `break;` - Exit if at end
+-  `char conv = fmt[i++];` - Get conversion character and advance
 
-### Conversion Setup (Lines 81-89)
-- **Line 81**: `QuantumValue arg = nextArg();` - Get next argument
-- **Line 82**: Empty line for readability
-- **Line 83**: `// ── Pad helper ────────────────────────────────────────────────────` - Pad helper comment
-- **Line 84**: `auto pad = [&](std::string s, bool numericSign = false) -> std::string` - Lambda for padding
-- **Line 85**: `{` - Opening brace for pad lambda
-- **Line 86**: `if (width > 0 && (int)s.size() < width)` - Check if padding needed
-- **Line 87**: `{` - Opening brace for padding
-- **Line 88**: `int pad = width - (int)s.size();` - Calculate padding amount
-- **Line 89**: `if (flagMinus)` - Check for left-align
+###
+-  `QuantumValue arg = nextArg();` - Get next argument
+-  Empty line for readability
+-  `// ── Pad helper ────────────────────────────────────────────────────` - Pad helper comment
+-  `auto pad = [&](std::string s, bool numericSign = false) -> std::string` - Lambda for padding
+-  `{` - Opening brace for pad lambda
+-  `if (width > 0 && (int)s.size() < width)` - Check if padding needed
+-  `{` - Opening brace for padding
+-  `int pad = width - (int)s.size();` - Calculate padding amount
+-  `if (flagMinus)` - Check for left-align
 
-### Padding Logic (Lines 90-100)
-- **Line 90**: `s += std::string(pad, ' ');` - Add right padding
-- **Line 91**: `else if (flagZero && numericSign)` - Check for zero-pad with numeric sign
-- **Line 92**: `s = std::string(pad, '0') + s;` - Add left zero padding
-- **Line 93**: `else` - Default padding
-- **Line 94**: `s = std::string(pad, ' ') + s;` - Add left space padding
-- **Line 95**: `}` - Closing brace for padding
-- **Line 96**: `return s;` - Return padded string
-- **Line 97**: `};` - Closing brace for pad lambda
-- **Line 98**: Empty line for readability
-- **Line 99**: `char buf[256];` - Buffer for snprintf
-- **Line 100**: `switch (conv)` - Switch on conversion character
+###
+-  `s += std::string(pad, ' ');` - Add right padding
+-  `else if (flagZero && numericSign)` - Check for zero-pad with numeric sign
+-  `s = std::string(pad, '0') + s;` - Add left zero padding
+-  `else` - Default padding
+-  `s = std::string(pad, ' ') + s;` - Add left space padding
+-  `}` - Closing brace for padding
+-  `return s;` - Return padded string
+-  `};` - Closing brace for pad lambda
+-  Empty line for readability
+-  `char buf[256];` - Buffer for snprintf
+-  `switch (conv)` - Switch on conversion character
 
-### Switch Statement Start (Lines 101-105)
-- **Line 101**: `{` - Opening brace for switch
-- **Line 102**: Empty line for readability
-- **Line 103**: `// ── Integer specifiers ────────────────────────────────────────────` - Integer section comment
-- **Line 104**: `case 'd':` - Decimal integer case
-- **Line 105**: `case 'i':` - Integer case (alias for d)
+###
+-  `{` - Opening brace for switch
+-  Empty line for readability
+-  `// ── Integer specifiers ────────────────────────────────────────────` - Integer section comment
+-  `case 'd':` - Decimal integer case
+-  `case 'i':` - Integer case (alias for d)
 
-### Integer Formatting (Lines 106-130)
-- **Line 106**: `{` - Opening brace for integer case
-- **Line 107**: `long long n = arg.isNumber() ? (long long)arg.asNumber() : 0LL;` - Convert to integer
-- **Line 108**: `std::string s;` - String for formatted result
-- **Line 109**: `if (prec >= 0)` - Check if precision specified
-- **Line 110**: `{` - Opening brace for precision case
-- **Line 111**: `// precision on integers = minimum digits` - Comment about integer precision
-- **Line 112**: `std::snprintf(buf, sizeof(buf), ("%0*lld"), prec, std::abs(n));` - Format with precision
-- **Line 113**: `s = buf;` - Copy to string
-- **Line 114**: `if (n < 0)` - Check if negative
-- **Line 115**: `s = "-" + s;` - Add negative sign
-- **Line 116**: `else if (flagPlus)` - Check for force sign
-- **Line 117**: `s = "+" + s;` - Add plus sign
-- **Line 118**: `else if (flagSpace)` - Check for space flag
-- **Line 119**: `s = " " + s;` - Add space
-- **Line 120**: `}` - Closing brace for precision case
-- **Line 121**: `else` - No precision specified
-- **Line 122**: `{` - Opening brace for no precision
-- **Line 123**: `std::snprintf(buf, sizeof(buf), "%lld", n);` - Format normally
-- **Line 124**: `s = buf;` - Copy to string
-- **Line 125**: `if (n >= 0 && flagPlus)` - Check for positive with force sign
-- **Line 126**: `s = "+" + s;` - Add plus sign
-- **Line 127**: `else if (n >= 0 && flagSpace)` - Check for positive with space flag
-- **Line 128**: `s = " " + s;` - Add space
-- **Line 129**: `}` - Closing brace for no precision
-- **Line 130**: `out += pad(s, true);` - Add padded result to output
+###
+-  `{` - Opening brace for integer case
+-  `long long n = arg.isNumber() ? (long long)arg.asNumber() : 0LL;` - Convert to integer
+-  `std::string s;` - String for formatted result
+-  `if (prec >= 0)` - Check if precision specified
+-  `{` - Opening brace for precision case
+-  `// precision on integers = minimum digits` - Comment about integer precision
+-  `std::snprintf(buf, sizeof(buf), ("%0*lld"), prec, std::abs(n));` - Format with precision
+-  `s = buf;` - Copy to string
+-  `if (n < 0)` - Check if negative
+-  `s = "-" + s;` - Add negative sign
+-  `else if (flagPlus)` - Check for force sign
+-  `s = "+" + s;` - Add plus sign
+-  `else if (flagSpace)` - Check for space flag
+-  `s = " " + s;` - Add space
+-  `}` - Closing brace for precision case
+-  `else` - No precision specified
+-  `{` - Opening brace for no precision
+-  `std::snprintf(buf, sizeof(buf), "%lld", n);` - Format normally
+-  `s = buf;` - Copy to string
+-  `if (n >= 0 && flagPlus)` - Check for positive with force sign
+-  `s = "+" + s;` - Add plus sign
+-  `else if (n >= 0 && flagSpace)` - Check for positive with space flag
+-  `s = " " + s;` - Add space
+-  `}` - Closing brace for no precision
+-  `out += pad(s, true);` - Add padded result to output
 
-### Integer Completion (Lines 131-140)
-- **Line 131**: `break;` - Exit case
-- **Line 132**: `}` - Closing brace for integer case
-- **Line 133**: `case 'u':` - Unsigned integer case
-- **Line 134**: `{` - Opening brace for unsigned case
-- **Line 135**: `unsigned long long n = arg.isNumber() ? (unsigned long long)(long long)arg.asNumber() : 0ULL;` - Convert to unsigned
-- **Line 136**: `std::snprintf(buf, sizeof(buf), "%llu", n);` - Format unsigned
-- **Line 137**: `out += pad(std::string(buf), true);` - Add padded result
-- **Line 138**: `break;` - Exit case
-- **Line 139**: `}` - Closing brace for unsigned case
-- **Line 140**: Empty line for readability
+###
+-  `break;` - Exit case
+-  `}` - Closing brace for integer case
+-  `case 'u':` - Unsigned integer case
+-  `{` - Opening brace for unsigned case
+-  `unsigned long long n = arg.isNumber() ? (unsigned long long)(long long)arg.asNumber() : 0ULL;` - Convert to unsigned
+-  `std::snprintf(buf, sizeof(buf), "%llu", n);` - Format unsigned
+-  `out += pad(std::string(buf), true);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for unsigned case
+-  Empty line for readability
 
-### Float Specifiers (Lines 141-185)
-- **Line 141**: `// ── Float specifiers ──────────────────────────────────────────────` - Float section comment
-- **Line 142**: `case 'f':` - Float decimal case
-- **Line 143**: `case 'F':` - Float case (alias for f)
-- **Line 144**: `{` - Opening brace for float case
-- **Line 145**: `double d = arg.isNumber() ? arg.asNumber() : 0.0;` - Convert to double
-- **Line 146**: `std::string spec = "%";` - Start format spec
-- **Line 147**: `if (flagPlus)` - Check for force sign
-- **Line 148**: `spec += '+';` - Add plus to spec
-- **Line 149**: `else if (flagSpace)` - Check for space flag
-- **Line 150**: `spec += ' ';` - Add space to spec
-- **Line 151**: `if (prec >= 0)` - Check for precision
-- **Line 152**: `spec += "." + std::to_string(prec);` - Add precision to spec
-- **Line 153**: `spec += 'f';` - Add f conversion
-- **Line 154**: `std::snprintf(buf, sizeof(buf), spec.c_str(), d);` - Format with spec
-- **Line 155**: `out += pad(std::string(buf), true);` - Add padded result
-- **Line 156**: `break;` - Exit case
-- **Line 157**: `}` - Closing brace for float case
+###
+-  `// ── Float specifiers ──────────────────────────────────────────────` - Float section comment
+-  `case 'f':` - Float decimal case
+-  `case 'F':` - Float case (alias for f)
+-  `{` - Opening brace for float case
+-  `double d = arg.isNumber() ? arg.asNumber() : 0.0;` - Convert to double
+-  `std::string spec = "%";` - Start format spec
+-  `if (flagPlus)` - Check for force sign
+-  `spec += '+';` - Add plus to spec
+-  `else if (flagSpace)` - Check for space flag
+-  `spec += ' ';` - Add space to spec
+-  `if (prec >= 0)` - Check for precision
+-  `spec += "." + std::to_string(prec);` - Add precision to spec
+-  `spec += 'f';` - Add f conversion
+-  `std::snprintf(buf, sizeof(buf), spec.c_str(), d);` - Format with spec
+-  `out += pad(std::string(buf), true);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for float case
 
-### Scientific Notation (Lines 158-175)
-- **Line 158**: `case 'e':` - Scientific notation lowercase
-- **Line 159**: `case 'E':` - Scientific notation uppercase
-- **Line 160**: `{` - Opening brace for scientific case
-- **Line 161**: `double d = arg.isNumber() ? arg.asNumber() : 0.0;` - Convert to double
-- **Line 162**: `std::string spec = "%";` - Start format spec
-- **Line 163**: `if (prec >= 0)` - Check for precision
-- **Line 164**: `spec += "." + std::to_string(prec);` - Add precision to spec
-- **Line 165**: `spec += conv;` - Add conversion character
-- **Line 166**: `std::snprintf(buf, sizeof(buf), spec.c_str(), d);` - Format with spec
-- **Line 167**: `out += pad(std::string(buf), true);` - Add padded result
-- **Line 168**: `break;` - Exit case
-- **Line 169**: `}` - Closing brace for scientific case
+###
+-  `case 'e':` - Scientific notation lowercase
+-  `case 'E':` - Scientific notation uppercase
+-  `{` - Opening brace for scientific case
+-  `double d = arg.isNumber() ? arg.asNumber() : 0.0;` - Convert to double
+-  `std::string spec = "%";` - Start format spec
+-  `if (prec >= 0)` - Check for precision
+-  `spec += "." + std::to_string(prec);` - Add precision to spec
+-  `spec += conv;` - Add conversion character
+-  `std::snprintf(buf, sizeof(buf), spec.c_str(), d);` - Format with spec
+-  `out += pad(std::string(buf), true);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for scientific case
 
-### General Float (Lines 170-185)
-- **Line 170**: `case 'g':` - General float lowercase
-- **Line 171**: `case 'G':` - General float uppercase
-- **Line 172**: `{` - Opening brace for general case
-- **Line 173**: `double d = arg.isNumber() ? arg.asNumber() : 0.0;` - Convert to double
-- **Line 174**: `std::string spec = "%";` - Start format spec
-- **Line 175**: `if (prec >= 0)` - Check for precision
-- **Line 176**: `spec += "." + std::to_string(prec);` - Add precision to spec
-- **Line 177**: `spec += conv;` - Add conversion character
-- **Line 178**: `std::snprintf(buf, sizeof(buf), spec.c_str(), d);` - Format with spec
-- **Line 179**: `out += pad(std::string(buf), true);` - Add padded result
-- **Line 180**: `break;` - Exit case
-- **Line 181**: `}` - Closing brace for general case
-- **Line 182**: Empty line for readability
+###
+-  `case 'g':` - General float lowercase
+-  `case 'G':` - General float uppercase
+-  `{` - Opening brace for general case
+-  `double d = arg.isNumber() ? arg.asNumber() : 0.0;` - Convert to double
+-  `std::string spec = "%";` - Start format spec
+-  `if (prec >= 0)` - Check for precision
+-  `spec += "." + std::to_string(prec);` - Add precision to spec
+-  `spec += conv;` - Add conversion character
+-  `std::snprintf(buf, sizeof(buf), spec.c_str(), d);` - Format with spec
+-  `out += pad(std::string(buf), true);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for general case
+-  Empty line for readability
 
-### String and Character (Lines 183-200)
-- **Line 183**: `// ── String specifier ─────────────────────────────────────────────` - String section comment
-- **Line 184**: `case 's':` - String case
-- **Line 185**: `{` - Opening brace for string case
-- **Line 186**: `std::string s = arg.toString();` - Convert argument to string
-- **Line 187**: `if (prec >= 0 && (int)s.size() > prec)` - Check if precision truncation needed
-- **Line 188**: `s = s.substr(0, prec); // truncate to precision` - Truncate to precision
-- **Line 189**: `out += pad(s, false);` - Add padded result
-- **Line 190**: `break;` - Exit case
-- **Line 191**: `}` - Closing brace for string case
-- **Line 192**: Empty line for readability
-- **Line 193**: `// ── Char specifier ────────────────────────────────────────────────` - Char section comment
-- **Line 194**: `case 'c':` - Character case
-- **Line 195**: `{` - Opening brace for char case
-- **Line 196**: `char c = arg.isString() && !arg.asString().empty()` - Get character from string or number
-- **Line 197**: `? arg.asString()[0]` - First character of string
-- **Line 198**: `: (char)(arg.isNumber() ? (int)arg.asNumber() : 0);` - Or numeric cast to char
-- **Line 199**: `out += pad(std::string(1, c), false);` - Add padded character
-- **Line 200**: `break;` - Exit case
+###
+-  `// ── String specifier ─────────────────────────────────────────────` - String section comment
+-  `case 's':` - String case
+-  `{` - Opening brace for string case
+-  `std::string s = arg.toString();` - Convert argument to string
+-  `if (prec >= 0 && (int)s.size() > prec)` - Check if precision truncation needed
+-  `s = s.substr(0, prec); // truncate to precision` - Truncate to precision
+-  `out += pad(s, false);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for string case
+-  Empty line for readability
+-  `// ── Char specifier ────────────────────────────────────────────────` - Char section comment
+-  `case 'c':` - Character case
+-  `{` - Opening brace for char case
+-  `char c = arg.isString() && !arg.asString().empty()` - Get character from string or number
+-  `? arg.asString()[0]` - First character of string
+-  `: (char)(arg.isNumber() ? (int)arg.asNumber() : 0);` - Or numeric cast to char
+-  `out += pad(std::string(1, c), false);` - Add padded character
+-  `break;` - Exit case
 
-### Hexadecimal Formatting (Lines 201-225)
-- **Line 201**: `}` - Closing brace for char case
-- **Line 202**: Empty line for readability
-- **Line 203**: `// ── Hex specifiers ────────────────────────────────────────────────` - Hex section comment
-- **Line 204**: `case 'x':` - Hexadecimal lowercase case
-- **Line 205**: `case 'X':` - Hexadecimal uppercase case
-- **Line 206**: `{` - Opening brace for hex case
-- **Line 207**: `unsigned long long n = (unsigned long long)(long long)(arg.isNumber() ? arg.asNumber() : 0.0);` - Convert to unsigned
-- **Line 208**: `std::string spec = "%";` - Start format spec
-- **Line 209**: `if (flagHash)` - Check for hash flag
-- **Line 210**: `spec += '#';` - Add hash to spec
-- **Line 211**: `if (prec >= 0)` - Check for precision
-- **Line 212**: `spec += "." + std::to_string(prec);` - Add precision to spec
-- **Line 213**: `spec += (conv == 'x') ? "llx" : "llX";` - Add conversion specifier
-- **Line 214**: `std::snprintf(buf, sizeof(buf), spec.c_str(), n);` - Format with spec
-- **Line 215**: `std::string s = buf;` - Copy to string
-- **Line 216**: `// prefix 0x/0X if not already there (flagHash adds it)` - Comment about prefix
-- **Line 217**: `if (flagHash && n != 0 && s.substr(0, 2) != "0x" && s.substr(0, 2) != "0X")` - Check if prefix needed
-- **Line 218**: `s = (conv == 'x' ? "0x" : "0X") + s;` - Add prefix
-- **Line 219**: `out += pad(s, true);` - Add padded result
-- **Line 220**: `break;` - Exit case
-- **Line 221**: `}` - Closing brace for hex case
-- **Line 222**: Empty line for readability
+###
+-  `}` - Closing brace for char case
+-  Empty line for readability
+-  `// ── Hex specifiers ────────────────────────────────────────────────` - Hex section comment
+-  `case 'x':` - Hexadecimal lowercase case
+-  `case 'X':` - Hexadecimal uppercase case
+-  `{` - Opening brace for hex case
+-  `unsigned long long n = (unsigned long long)(long long)(arg.isNumber() ? arg.asNumber() : 0.0);` - Convert to unsigned
+-  `std::string spec = "%";` - Start format spec
+-  `if (flagHash)` - Check for hash flag
+-  `spec += '#';` - Add hash to spec
+-  `if (prec >= 0)` - Check for precision
+-  `spec += "." + std::to_string(prec);` - Add precision to spec
+-  `spec += (conv == 'x') ? "llx" : "llX";` - Add conversion specifier
+-  `std::snprintf(buf, sizeof(buf), spec.c_str(), n);` - Format with spec
+-  `std::string s = buf;` - Copy to string
+-  `// prefix 0x/0X if not already there (flagHash adds it)` - Comment about prefix
+-  `if (flagHash && n != 0 && s.substr(0, 2) != "0x" && s.substr(0, 2) != "0X")` - Check if prefix needed
+-  `s = (conv == 'x' ? "0x" : "0X") + s;` - Add prefix
+-  `out += pad(s, true);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for hex case
+-  Empty line for readability
 
-### Octal and Binary (Lines 223-255)
-- **Line 223**: `// ── Octal specifier ───────────────────────────────────────────────` - Octal section comment
-- **Line 224**: `case 'o':` - Octal case
-- **Line 225**: `{` - Opening brace for octal case
-- **Line 226**: `unsigned long long n = (unsigned long long)(long long)(arg.isNumber() ? arg.asNumber() : 0.0);` - Convert to unsigned
-- **Line 227**: `std::snprintf(buf, sizeof(buf), flagHash ? "%#llo" : "%llo", n);` - Format with or without prefix
-- **Line 228**: `out += pad(std::string(buf), true);` - Add padded result
-- **Line 229**: `break;` - Exit case
-- **Line 230**: `}` - Closing brace for octal case
-- **Line 231**: Empty line for readability
-- **Line 232**: `// ── Binary specifier (non-standard, Quantum extension) ────────────` - Binary section comment
-- **Line 233**: `case 'b':` - Binary case
-- **Line 234**: `{` - Opening brace for binary case
-- **Line 235**: `long long n = arg.isNumber() ? (long long)arg.asNumber() : 0LL;` - Convert to integer
-- **Line 236**: `if (n == 0)` - Check for zero
-- **Line 237**: `{` - Opening brace for zero case
-- **Line 238**: `out += pad(flagHash ? "0b0" : "0", true);` - Output zero with optional prefix
-- **Line 239**: `}` - Closing brace for zero case
-- **Line 240**: `else` - Non-zero case
-- **Line 241**: `{` - Opening brace for non-zero case
-- **Line 242**: `std::string bits;` - String for binary digits
-- **Line 243**: `unsigned long long u = (unsigned long long)n;` - Convert to unsigned
-- **Line 244**: `while (u)` - Loop while bits remain
-- **Line 245**: `{` - Opening brace for bit loop
-- **Line 246**: `bits = (char)('0' + (u & 1)) + bits;` - Extract bit and prepend
-- **Line 247**: `u >>= 1;` - Shift right to next bit
-- **Line 248**: `}` - Closing brace for bit loop
-- **Line 249**: `if (flagHash)` - Check for hash flag
-- **Line 250**: `bits = "0b" + bits;` - Add binary prefix
-- **Line 251**: `out += pad(bits, true);` - Add padded result
-- **Line 252**: `}` - Closing brace for non-zero case
-- **Line 253**: `break;` - Exit case
-- **Line 254**: `}` - Closing brace for binary case
+###
+-  `// ── Octal specifier ───────────────────────────────────────────────` - Octal section comment
+-  `case 'o':` - Octal case
+-  `{` - Opening brace for octal case
+-  `unsigned long long n = (unsigned long long)(long long)(arg.isNumber() ? arg.asNumber() : 0.0);` - Convert to unsigned
+-  `std::snprintf(buf, sizeof(buf), flagHash ? "%#llo" : "%llo", n);` - Format with or without prefix
+-  `out += pad(std::string(buf), true);` - Add padded result
+-  `break;` - Exit case
+-  `}` - Closing brace for octal case
+-  Empty line for readability
+-  `// ── Binary specifier (non-standard, Quantum extension) ────────────` - Binary section comment
+-  `case 'b':` - Binary case
+-  `{` - Opening brace for binary case
+-  `long long n = arg.isNumber() ? (long long)arg.asNumber() : 0LL;` - Convert to integer
+-  `if (n == 0)` - Check for zero
+-  `{` - Opening brace for zero case
+-  `out += pad(flagHash ? "0b0" : "0", true);` - Output zero with optional prefix
+-  `}` - Closing brace for zero case
+-  `else` - Non-zero case
+-  `{` - Opening brace for non-zero case
+-  `std::string bits;` - String for binary digits
+-  `unsigned long long u = (unsigned long long)n;` - Convert to unsigned
+-  `while (u)` - Loop while bits remain
+-  `{` - Opening brace for bit loop
+-  `bits = (char)('0' + (u & 1)) + bits;` - Extract bit and prepend
+-  `u >>= 1;` - Shift right to next bit
+-  `}` - Closing brace for bit loop
+-  `if (flagHash)` - Check for hash flag
+-  `bits = "0b" + bits;` - Add binary prefix
+-  `out += pad(bits, true);` - Add padded result
+-  `}` - Closing brace for non-zero case
+-  `break;` - Exit case
+-  `}` - Closing brace for binary case
 
-### Quantum Extensions (Lines 255-275)
-- **Line 255**: Empty line for readability
-- **Line 256**: `// ── Boolean specifier (Quantum extension) ─────────────────────────` - Boolean section comment
-- **Line 257**: `case 'B':` - Boolean case
-- **Line 258**: `{` - Opening brace for boolean case
-- **Line 259**: `out += pad(arg.isTruthy() ? "true" : "false", false);` - Output truthiness as string
-- **Line 260**: `break;` - Exit case
-- **Line 261**: `}` - Closing brace for boolean case
-- **Line 262**: Empty line for readability
-- **Line 263**: `// ── Type name specifier (Quantum extension) ───────────────────────` - Type name section comment
-- **Line 264**: `case 't':` - Type name case
-- **Line 265**: `{` - Opening brace for type name case
-- **Line 266**: `out += pad(arg.typeName(), false);` - Output type name
-- **Line 267**: `break;` - Exit case
-- **Line 268**: `}` - Closing brace for type name case
+###
+-  Empty line for readability
+-  `// ── Boolean specifier (Quantum extension) ─────────────────────────` - Boolean section comment
+-  `case 'B':` - Boolean case
+-  `{` - Opening brace for boolean case
+-  `out += pad(arg.isTruthy() ? "true" : "false", false);` - Output truthiness as string
+-  `break;` - Exit case
+-  `}` - Closing brace for boolean case
+-  Empty line for readability
+-  `// ── Type name specifier (Quantum extension) ───────────────────────` - Type name section comment
+-  `case 't':` - Type name case
+-  `{` - Opening brace for type name case
+-  `out += pad(arg.typeName(), false);` - Output type name
+-  `break;` - Exit case
+-  `}` - Closing brace for type name case
 
-### Default Case and Function End (Lines 269-280)
-- **Line 269**: Empty line for readability
-- **Line 270**: `default:` - Default case for unknown specifiers
-- **Line 271**: `out += '%';` - Add literal percent
-- **Line 272**: `out += conv;` - Add unknown specifier
-- **Line 273**: `break;` - Exit case
-- **Line 274**: `}` - Closing brace for switch
-- **Line 275**: `}` - Closing brace for main loop
-- **Line 276**: `return out;` - Return formatted string
-- **Line 277**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `default:` - Default case for unknown specifiers
+-  `out += '%';` - Add literal percent
+-  `out += conv;` - Add unknown specifier
+-  `break;` - Exit case
+-  `}` - Closing brace for switch
+-  `}` - Closing brace for main loop
+-  `return out;` - Return formatted string
+-  `}` - Closing brace for function
 
 ## Summary
 
@@ -628,7 +628,7 @@ The `applyFormat()` function is a comprehensive printf-style formatting engine f
 - **-**: Left-align output
 - **+**: Force sign for positive numbers
 - **space**: Space for positive numbers
-- **0**: Zero-pad numeric values
+-  Zero-pad numeric values
 - **#: Alternative format (0x, 0X, 0b prefixes)
 
 ### Design Benefits

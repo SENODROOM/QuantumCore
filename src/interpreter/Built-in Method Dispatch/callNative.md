@@ -9,21 +9,21 @@ QuantumValue Interpreter::callNative(std::shared_ptr<QuantumNative> fn, std::vec
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3794)
-- **Line 3794**: `QuantumValue Interpreter::callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args)` - Call native functions
+### Function Signature
+-  `QuantumValue Interpreter::callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args)` - Call native functions
   - `fn`: Shared pointer to QuantumNative function object
   - `args`: Vector of QuantumValue arguments
   - Returns QuantumValue result of the native function
 
-### Function Body (Lines 3795-3797)
-- **Line 3795**: `{` - Opening brace
-- **Line 3796**: `return fn->fn(std::move(args));` - Call the native function
+###
+-  `{` - Opening brace
+-  `return fn->fn(std::move(args));` - Call the native function
   - `fn->fn`: Access the function pointer within QuantumNative
   - `std::move(args)`: Move arguments for efficiency
   - Returns the result from the native function
-- **Line 3797**: `}` - Closing brace for function
+-  `}` - Closing brace for function
 
 ## Summary
 

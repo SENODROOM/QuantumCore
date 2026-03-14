@@ -30,7 +30,7 @@ static bool isInputDrivenError(const std::string &msg)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static bool isInputDrivenError(const std::string &msg)
 ```
@@ -39,7 +39,7 @@ static bool isInputDrivenError(const std::string &msg)
 - **`isInputDrivenError`**: Descriptive name indicating input error detection
 - **`const std::string &msg`**: Constant reference to error message for efficiency
 
-### **Error Pattern Matching (Lines 3-16)**
+###**
 ```cpp
 if (msg.find("got string") != std::string::npos)
     return true;
@@ -66,7 +66,7 @@ if (msg.find("empty input") != std::string::npos)
 - **Multiple Patterns**: Covers various input error scenarios
 - **npos Check**: `std::string::npos` indicates "not found"
 
-### **Default Return (Line 18)**
+###**
 ```cpp
 return false;
 ```

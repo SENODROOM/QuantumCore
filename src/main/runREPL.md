@@ -58,7 +58,7 @@ static void runREPL()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static void runREPL()
 ```
@@ -67,7 +67,7 @@ static void runREPL()
 - **`runREPL`**: Descriptive name indicating Read-Eval-Print Loop functionality
 - **No Parameters**: Self-contained function that manages its own state
 
-### **Initial Setup (Lines 3-6)**
+###**
 ```cpp
 printBanner();
 std::cout << Colors::GREEN << "  REPL Mode — type 'exit' or Ctrl+D to quit\n"
@@ -80,7 +80,7 @@ int lineNum = 1;
 
 **Setup Analysis:**
 
-#### **Banner Display (Line 3):**
+####:**
 ```cpp
 printBanner();
 ```
@@ -88,7 +88,7 @@ printBanner();
 - **Visual Impact**: Creates professional first impression
 - **Context Setting**: Establishes interactive session beginning
 
-#### **Mode Announcement (Lines 4-6):**
+####:**
 ```cpp
 std::cout << Colors::GREEN << "  REPL Mode — type 'exit' or Ctrl+D to quit\n"
           << Colors::RESET << "\n";
@@ -98,7 +98,7 @@ std::cout << Colors::GREEN << "  REPL Mode — type 'exit' or Ctrl+D to quit\n"
 - **User Guidance**: Helps new users understand how to exit
 - **`Colors::RESET`**: Clears formatting for subsequent output
 
-#### **State Initialization (Lines 7-9):**
+####:**
 ```cpp
 Interpreter interp;
 std::string line;
@@ -108,7 +108,7 @@ int lineNum = 1;
 - **`std::string line`**: Buffer for user input storage
 - **`int lineNum = 1`**: Line counter starting from 1 for user-friendly numbering
 
-### **Main REPL Loop (Lines 11-47)**
+###**
 ```cpp
 while (true)
 {
@@ -118,7 +118,7 @@ while (true)
 
 **Loop Structure Analysis:**
 
-#### **Infinite Loop Design (Line 11):**
+####:**
 ```cpp
 while (true)
 ```
@@ -126,7 +126,7 @@ while (true)
 - **Control Flow**: Exit conditions handled inside loop
 - **Session Management**: Maintains interactive state until user quits
 
-#### **Prompt Display (Line 13):**
+####:**
 ```cpp
 std::cout << Colors::CYAN << "quantum[" << lineNum++ << "]> " << Colors::RESET;
 ```
@@ -142,7 +142,7 @@ std::cout << Colors::CYAN << "quantum[" << lineNum++ << "]> " << Colors::RESET;
 - **Visual Distinction**: Cyan color separates prompts from output
 - **Standard Format**: Familiar shell-like prompt syntax
 
-#### **Input Handling (Lines 14-18):**
+####:**
 ```cpp
 if (!std::getline(std::cin, line))
     break;
@@ -154,7 +154,7 @@ if (line.empty())
 
 **Input Analysis:**
 
-##### **EOF Detection (Lines 14-15):**
+#####:**
 ```cpp
 if (!std::getline(std::cin, line))
     break;
@@ -164,7 +164,7 @@ if (!std::getline(std::cin, line))
 - **Stream State**: Checks input stream failure condition
 - **Graceful Exit**: Clean termination without error messages
 
-##### **Exit Commands (Lines 16-17):**
+#####:**
 ```cpp
 if (line == "exit" || line == "quit")
     break;
@@ -184,7 +184,7 @@ if (line.empty())
 - **Efficiency**: Avoids unnecessary compilation of empty input
 - **Loop Continuation**: Continues to next iteration
 
-### **Compilation Pipeline (Lines 20-26)**
+###**
 ```cpp
 try
 {
@@ -198,7 +198,7 @@ try
 
 **Pipeline Analysis:**
 
-#### **Lexical Analysis (Line 22):**
+####:**
 ```cpp
 Lexer lexer(line);
 ```
@@ -207,7 +207,7 @@ Lexer lexer(line);
 - **Line-based**: Each REPL line processed independently
 - **Error Handling**: Lexer errors caught by outer try-catch
 
-#### **Tokenization (Line 23):**
+####:**
 ```cpp
 auto tokens = lexer.tokenize();
 ```
@@ -216,7 +216,7 @@ auto tokens = lexer.tokenize();
 - **Move Semantics**: Tokens can be efficiently moved to parser
 - **Intermediate Step**: Converts text to structured tokens
 
-#### **Parsing (Lines 24-25):**
+####:**
 ```cpp
 Parser parser(std::move(tokens));
 auto ast = parser.parse();
@@ -226,7 +226,7 @@ auto ast = parser.parse();
 - **AST Generation**: Creates Abstract Syntax Tree from tokens
 - **Structured Output**: Tree representation of code structure
 
-#### **Execution (Line 26):**
+####:**
 ```cpp
 interp.execute(*ast);
 ```
@@ -235,7 +235,7 @@ interp.execute(*ast);
 - **Pointer Dereference**: `*ast` accesses AST node content
 - **Immediate Results**: Produces output or side effects
 
-### **Error Handling (Lines 27-45)**
+###**
 ```cpp
 catch (const ParseError &e)
 {
@@ -256,7 +256,7 @@ catch (const std::exception &e)
 
 **Error Handling Analysis:**
 
-#### **ParseError Handling (Lines 28-30):**
+####:**
 ```cpp
 catch (const ParseError &e)
 {
@@ -268,7 +268,7 @@ catch (const ParseError &e)
 - **Color Coding**: Red for error visibility
 - **Clear Format**: `[ParseError]` prefix for easy identification
 
-#### **QuantumError Handling (Lines 31-37):**
+####:**
 ```cpp
 catch (const QuantumError &e)
 {
@@ -283,7 +283,7 @@ catch (const QuantumError &e)
 - **Conditional Line**: Only shows line number if available
 - **Consistent Format**: Brackets and color coding
 
-#### **Generic Exception Handling (Lines 38-40):**
+####:**
 ```cpp
 catch (const std::exception &e)
 {
@@ -295,7 +295,7 @@ catch (const std::exception &e)
 - **Simple Format**: Generic `[Error]` prefix
 - **Complete Coverage**: Ensures all exceptions are handled
 
-### **Session Termination (Lines 47-49)**
+###**
 ```cpp
 std::cout << Colors::YELLOW << "\n  Goodbye! 👋\n"
           << Colors::RESET;

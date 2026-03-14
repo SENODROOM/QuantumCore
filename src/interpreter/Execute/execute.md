@@ -36,56 +36,56 @@ void Interpreter::execute(ASTNode &node)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1547)
-- **Line 1547**: `void Interpreter::execute(ASTNode &node)` - Main statement execution dispatcher
+### Function Signature
+-  `void Interpreter::execute(ASTNode &node)` - Main statement execution dispatcher
   - `node`: Reference to AST node representing a statement
   - Returns void as statements don't produce values
 
-### std::visit Pattern (Lines 1548-1549)
-- **Line 1548**: `{` - Opening brace
-- **Line 1549**: `std::visit([&](auto &n)` - Use visitor pattern to handle different statement types
+###
+-  `{` - Opening brace
+-  `std::visit([&](auto &n)` - Use visitor pattern to handle different statement types
   - `std::visit` applies lambda to the active type in the variant
   - `&` captures by reference to access member functions
   - `auto &n` gets reference to the actual statement type
 
-### Type Deduction (Line 1550)
-- **Line 1550**: `{` - Opening brace for lambda
-- **Line 1551**: `using T = std::decay_t<decltype(n)>;` - Get the actual type of the statement
+###
+-  `{` - Opening brace for lambda
+-  `using T = std::decay_t<decltype(n)>;` - Get the actual type of the statement
   - Removes references and const qualifiers
   - Used for compile-time type checking
 
-### Statement Type Dispatch (Lines 1552-1569)
-- **Line 1552**: `if constexpr (std::is_same_v<T, BlockStmt>)` - Check if block statement
-- **Line 1553**: `execBlock(n);` - Execute block statement
-- **Line 1554**: `else if constexpr (std::is_same_v<T, VarDecl>)` - Check if variable declaration
-- **Line 1555**: `execVarDecl(n);` - Execute variable declaration
-- **Line 1556**: `else if constexpr (std::is_same_v<T, FunctionDecl>)` - Check if function declaration
-- **Line 1557**: `execFunctionDecl(n);` - Execute function declaration
-- **Line 1558**: `else if constexpr (std::is_same_v<T, ClassDecl>)` - Check if class declaration
-- **Line 1559**: `execClassDecl(n);` - Execute class declaration
-- **Line 1560**: `else if constexpr (std::is_same_v<T, IfStmt>)` - Check if if statement
-- **Line 1561**: `execIf(n);` - Execute if statement
-- **Line 1562**: `else if constexpr (std::is_same_v<T, WhileStmt>)` - Check if while statement
-- **Line 1563**: `execWhile(n);` - Execute while statement
-- **Line 1564**: `else if constexpr (std::is_same_v<T, ForStmt>)` - Check if for statement
-- **Line 1565**: `execFor(n);` - Execute for statement
-- **Line 1566**: `else if constexpr (std::is_same_v<T, ReturnStmt>)` - Check if return statement
-- **Line 1567**: `execReturn(n);` - Execute return statement
-- **Line 1568**: `else if constexpr (std::is_same_v<T, PrintStmt>)` - Check if print statement
-- **Line 1569**: `execPrint(n);` - Execute print statement
+###
+-  `if constexpr (std::is_same_v<T, BlockStmt>)` - Check if block statement
+-  `execBlock(n);` - Execute block statement
+-  `else if constexpr (std::is_same_v<T, VarDecl>)` - Check if variable declaration
+-  `execVarDecl(n);` - Execute variable declaration
+-  `else if constexpr (std::is_same_v<T, FunctionDecl>)` - Check if function declaration
+-  `execFunctionDecl(n);` - Execute function declaration
+-  `else if constexpr (std::is_same_v<T, ClassDecl>)` - Check if class declaration
+-  `execClassDecl(n);` - Execute class declaration
+-  `else if constexpr (std::is_same_v<T, IfStmt>)` - Check if if statement
+-  `execIf(n);` - Execute if statement
+-  `else if constexpr (std::is_same_v<T, WhileStmt>)` - Check if while statement
+-  `execWhile(n);` - Execute while statement
+-  `else if constexpr (std::is_same_v<T, ForStmt>)` - Check if for statement
+-  `execFor(n);` - Execute for statement
+-  `else if constexpr (std::is_same_v<T, ReturnStmt>)` - Check if return statement
+-  `execReturn(n);` - Execute return statement
+-  `else if constexpr (std::is_same_v<T, PrintStmt>)` - Check if print statement
+-  `execPrint(n);` - Execute print statement
 
-### More Statement Types (Lines 1570-1578)
-- **Line 1570**: `else if constexpr (std::is_same_v<T, InputStmt>)` - Check if input statement
-- **Line 1571**: `execInput(n);` - Execute input statement
-- **Line 1572**: `else if constexpr (std::is_same_v<T, ImportStmt>)` - Check if import statement
-- **Line 1573**: `execImport(n);` - Execute import statement
-- **Line 1574**: `else if constexpr (std::is_same_v<T, ExprStmt>)` - Check if expression statement
-- **Line 1575**: `execExprStmt(n);` - Execute expression statement
+###
+-  `else if constexpr (std::is_same_v<T, InputStmt>)` - Check if input statement
+-  `execInput(n);` - Execute input statement
+-  `else if constexpr (std::is_same_v<T, ImportStmt>)` - Check if import statement
+-  `execImport(n);` - Execute import statement
+-  `else if constexpr (std::is_same_v<T, ExprStmt>)` - Check if expression statement
+-  `execExprStmt(n);` - Execute expression statement
 - **Line 1576`: Empty line for readability
-- **Line 1577**: `}, node.node);` - Close lambda and apply to AST node variant
-- **Line 1578**: `}` - Closing brace for function
+-  `}, node.node);` - Close lambda and apply to AST node variant
+-  `}` - Closing brace for function
 
 ## Summary
 

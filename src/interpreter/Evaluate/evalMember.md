@@ -26,41 +26,41 @@ QuantumValue Interpreter::evalMember(MemberExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3907)
-- **Line 3907**: `QuantumValue Interpreter::evalMember(MemberExpr &e)` - Evaluate member access expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalMember(MemberExpr &e)` - Evaluate member access expressions
   - `e`: Reference to MemberExpr AST node
   - Returns QuantumValue result of member access
 
-### Object Evaluation (Lines 3908-3912)
-- **Line 3908**: `{` - Opening brace
-- **Line 3909**: `auto obj = evaluate(*e.object);` - Evaluate object expression
-- **Line 3910**: `if (obj.isPointer())` - Check if object is a pointer
-- **Line 3911**: `{` - Opening brace for pointer case
-- **Line 3912**: `obj = obj.asPointer()->deref();` - Dereference pointer
+###
+-  `{` - Opening brace
+-  `auto obj = evaluate(*e.object);` - Evaluate object expression
+-  `if (obj.isPointer())` - Check if object is a pointer
+-  `{` - Opening brace for pointer case
+-  `obj = obj.asPointer()->deref();` - Dereference pointer
 
-### Instance Field Access (Lines 3913-3917)
-- **Line 3913**: `}` - Closing brace for pointer case
-- **Line 3914**: `if (obj.isInstance())` - Check if object is instance
-- **Line 3915**: `{` - Opening brace for instance case
-- **Line 3916**: `return obj.asInstance()->getField(e.member);` - Return instance field
-- **Line 3917**: `}` - Closing brace for instance case
+###
+-  `}` - Closing brace for pointer case
+-  `if (obj.isInstance())` - Check if object is instance
+-  `{` - Opening brace for instance case
+-  `return obj.asInstance()->getField(e.member);` - Return instance field
+-  `}` - Closing brace for instance case
 
-### Class Method Access (Lines 3918-3925)
-- **Line 3918**: `if (obj.isClass())` - Check if object is class
-- **Line 3919**: `{` - Opening brace for class case
-- **Line 3920**: `auto klass = obj.asClass();` - Get class reference
-- **Line 3921**: `auto method = klass->findMethod(e.member);` - Find method in class
-- **Line 3922**: `if (method)` - Check if method found
-- **Line 3923**: `return QuantumValue(method);` - Return method function
-- **Line 3924**: `throw TypeError("No method '" + e.member + "' on " + obj.typeName());` - Error for missing method
-- **Line 3925**: `}` - Closing brace for class case
+###
+-  `if (obj.isClass())` - Check if object is class
+-  `{` - Opening brace for class case
+-  `auto klass = obj.asClass();` - Get class reference
+-  `auto method = klass->findMethod(e.member);` - Find method in class
+-  `if (method)` - Check if method found
+-  `return QuantumValue(method);` - Return method function
+-  `throw TypeError("No method '" + e.member + "' on " + obj.typeName());` - Error for missing method
+-  `}` - Closing brace for class case
 
-### Error Handling (Lines 3926-3929)
-- **Line 3926**: Empty line for readability
-- **Line 3927**: `throw TypeError("No member '" + e.member + "' on " + obj.typeName());` - Error for non-member types
-- **Line 3928**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `throw TypeError("No member '" + e.member + "' on " + obj.typeName());` - Error for non-member types
+-  `}` - Closing brace for function
 
 ## Summary
 

@@ -21,34 +21,34 @@ QuantumValue Interpreter::evalIdentifier(Identifier &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 2668)
-- **Line 2668**: `QuantumValue Interpreter::evalIdentifier(Identifier &e)` - Evaluate identifier expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalIdentifier(Identifier &e)` - Evaluate identifier expressions
   - `e`: Reference to Identifier AST node
   - Returns QuantumValue result of identifier lookup
 
-### Environment Lookup (Lines 2669-2674)
-- **Line 2669**: `{` - Opening brace
-- **Line 2670**: `// Try regular env lookup first` - Comment about lookup strategy
-- **Line 2671**: `try` - Start try block for environment lookup
-- **Line 2672**: `{` - Opening brace for try block
-- **Line 2673**: `return env->get(e.name);` - Try to get variable from environment
-- **Line 2674**: `}` - Closing brace for try block
+###
+-  `{` - Opening brace
+-  `// Try regular env lookup first` - Comment about lookup strategy
+-  `try` - Start try block for environment lookup
+-  `{` - Opening brace for try block
+-  `return env->get(e.name);` - Try to get variable from environment
+-  `}` - Closing brace for try block
 
-### Error Handling (Lines 2675-2681)
-- **Line 2675**: `catch (const NameError &)` - Catch name errors from environment
-- **Line 2676**: `{` - Opening brace for catch block
-- **Line 2677**: `// Check if it's a native function (e.g., print, len, etc.)` - Comment about native function check
-- **Line 2678**: `auto native = env->getNative(e.name);` - Try to get native function
-- **Line 2679**: `if (native)` - Check if native function found
-- **Line 2680**: `return QuantumValue(native);` - Return native function value
-- **Line 2681**: `}` - Closing brace for catch block
+###
+-  `catch (const NameError &)` - Catch name errors from environment
+-  `{` - Opening brace for catch block
+-  `// Check if it's a native function (e.g., print, len, etc.)` - Comment about native function check
+-  `auto native = env->getNative(e.name);` - Try to get native function
+-  `if (native)` - Check if native function found
+-  `return QuantumValue(native);` - Return native function value
+-  `}` - Closing brace for catch block
 
-### Final Error (Lines 2682-2684)
-- **Line 2682**: `throw NameError("Undefined variable: '" + e.name + "'");` - Throw error for undefined identifier
-- **Line 2683**: `}` - Closing brace for catch block
-- **Line 2684**: `}` - Closing brace for function
+###
+-  `throw NameError("Undefined variable: '" + e.name + "'");` - Throw error for undefined identifier
+-  `}` - Closing brace for catch block
+-  `}` - Closing brace for function
 
 ## Summary
 

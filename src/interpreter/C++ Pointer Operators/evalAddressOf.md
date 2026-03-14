@@ -59,70 +59,70 @@ QuantumValue Interpreter::evalAddressOf(AddressOfExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 4128)
-- **Line 4128**: `QuantumValue Interpreter::evalAddressOf(AddressOfExpr &e)` - Evaluate address-of expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalAddressOf(AddressOfExpr &e)` - Evaluate address-of expressions
   - `e`: Reference to AddressOfExpr AST node
   - Returns QuantumValue containing a QuantumPointer
 
-### Variable Address (Lines 4129-4138)
-- **Line 4129**: `{` - Opening brace
-- **Line 4130**: `// &var — returns a live shared pointer to the variable's cell` - Comment about variable addressing
-- **Line 4131**: `if (e.operand->is<Identifier>())` - Check if operand is identifier
-- **Line 4132**: `{` - Opening brace for identifier case
-- **Line 4133**: `auto &name = e.operand->as<Identifier>().name;` - Get variable name
-- **Line 4134**: `auto cell = env->getCell(name);` - Get variable's cell from environment
-- **Line 4135**: `if (!cell)` - Check if variable exists
-- **Line 4136**: `throw NameError("Undefined variable: '" + name + "'");` - Throw error for undefined variable
-- **Line 4137**: `return QuantumValue(std::make_shared<QuantumPointer>(cell, 0));` - Create and return pointer
-- **Line 4138**: `}` - Closing brace for identifier case
+###
+-  `{` - Opening brace
+-  `// &var — returns a live shared pointer to the variable's cell` - Comment about variable addressing
+-  `if (e.operand->is<Identifier>())` - Check if operand is identifier
+-  `{` - Opening brace for identifier case
+-  `auto &name = e.operand->as<Identifier>().name;` - Get variable name
+-  `auto cell = env->getCell(name);` - Get variable's cell from environment
+-  `if (!cell)` - Check if variable exists
+-  `throw NameError("Undefined variable: '" + name + "'");` - Throw error for undefined variable
+-  `return QuantumValue(std::make_shared<QuantumPointer>(cell, 0));` - Create and return pointer
+-  `}` - Closing brace for identifier case
 
-### Field Address (Lines 4139-4155)
-- **Line 4139**: `// &obj.field — get address of field` - Comment about field addressing
-- **Line 4140**: `if (e.operand->is<MemberExpr>())` - Check if operand is member expression
-- **Line 4141**: `{` - Opening brace for member case
-- **Line 4142**: `auto &member = e.operand->as<MemberExpr>();` - Get member expression
-- **Line 4143**: `auto obj = evaluate(*member.object);` - Evaluate object expression
-- **Line 4144**: `if (obj.isPointer())` - Check if object is a pointer
-- **Line 4145**: `{` - Opening brace for pointer handling
-- **Line 4146**: `obj = obj.asPointer()->deref();` - Dereference pointer
-- **Line 4147**: `}` - Closing brace for pointer handling
-- **Line 4148**: `if (obj.isInstance())` - Check if object is instance
-- **Line 4149**: `{` - Opening brace for instance case
-- **Line 4150**: `auto instance = obj.asInstance();` - Get instance object
-- **Line 4151**: `auto cell = instance->getFieldCell(member.member);` - Get field's cell
-- **Line 4152**: `return QuantumValue(std::make_shared<QuantumPointer>(cell, 0));` - Create and return pointer
-- **Line 4153**: `}` - Closing brace for instance case
-- **Line 4154**: `throw TypeError("Cannot take address of field on " + obj.typeName());` - Error for non-instance
-- **Line 4155**: `}` - Closing brace for member case
+###
+-  `// &obj.field — get address of field` - Comment about field addressing
+-  `if (e.operand->is<MemberExpr>())` - Check if operand is member expression
+-  `{` - Opening brace for member case
+-  `auto &member = e.operand->as<MemberExpr>();` - Get member expression
+-  `auto obj = evaluate(*member.object);` - Evaluate object expression
+-  `if (obj.isPointer())` - Check if object is a pointer
+-  `{` - Opening brace for pointer handling
+-  `obj = obj.asPointer()->deref();` - Dereference pointer
+-  `}` - Closing brace for pointer handling
+-  `if (obj.isInstance())` - Check if object is instance
+-  `{` - Opening brace for instance case
+-  `auto instance = obj.asInstance();` - Get instance object
+-  `auto cell = instance->getFieldCell(member.member);` - Get field's cell
+-  `return QuantumValue(std::make_shared<QuantumPointer>(cell, 0));` - Create and return pointer
+-  `}` - Closing brace for instance case
+-  `throw TypeError("Cannot take address of field on " + obj.typeName());` - Error for non-instance
+-  `}` - Closing brace for member case
 
-### Array Element Address (Lines 4156-4177)
-- **Line 4156**: `// &ptr[index] — get address of array element` - Comment about array element addressing
-- **Line 4157**: `if (e.operand->is<IndexExpr>())` - Check if operand is index expression
-- **Line 4158**: `{` - Opening brace for index case
-- **Line 4159**: `auto &index = e.operand->as<IndexExpr>();` - Get index expression
-- **Line 4160**: `auto obj = evaluate(*index.object);` - Evaluate object expression
-- **Line 4161**: `auto idx = evaluate(*index.index);` - Evaluate index expression
-- **Line 4162**: `if (obj.isPointer())` - Check if object is a pointer
-- **Line 4163**: `{` - Opening brace for pointer handling
-- **Line 4164**: `obj = obj.asPointer()->deref();` - Dereference pointer
-- **Line 4165**: `}` - Closing brace for pointer handling
-- **Line 4166**: `if (obj.isArray())` - Check if object is array
-- **Line 4167**: `{` - Opening brace for array case
-- **Line 4168**: `auto arr = obj.asArray();` - Get array object
-- **Line 4169**: `long long i = idx.isNumber() ? (long long)idx.asNumber() : 0;` - Convert index to integer
-- **Line 4170**: `if (i < 0 || i >= (long long)arr->size())` - Check bounds
-- **Line 4171**: `throw IndexError("Array index out of bounds");` - Throw error for out of bounds
-- **Line 4172**: `auto cell = arr->getCell(i);` - Get array element's cell
-- **Line 4173**: `return QuantumValue(std::make_shared<QuantumPointer>(cell, 0));` - Create and return pointer
-- **Line 4174**: `}` - Closing brace for array case
-- **Line 4175**: `throw TypeError("Cannot take address of index on " + obj.typeName());` - Error for non-array
-- **Line 4176**: `}` - Closing brace for index case
+###
+-  `// &ptr[index] — get address of array element` - Comment about array element addressing
+-  `if (e.operand->is<IndexExpr>())` - Check if operand is index expression
+-  `{` - Opening brace for index case
+-  `auto &index = e.operand->as<IndexExpr>();` - Get index expression
+-  `auto obj = evaluate(*index.object);` - Evaluate object expression
+-  `auto idx = evaluate(*index.index);` - Evaluate index expression
+-  `if (obj.isPointer())` - Check if object is a pointer
+-  `{` - Opening brace for pointer handling
+-  `obj = obj.asPointer()->deref();` - Dereference pointer
+-  `}` - Closing brace for pointer handling
+-  `if (obj.isArray())` - Check if object is array
+-  `{` - Opening brace for array case
+-  `auto arr = obj.asArray();` - Get array object
+-  `long long i = idx.isNumber() ? (long long)idx.asNumber() : 0;` - Convert index to integer
+-  `if (i < 0 || i >= (long long)arr->size())` - Check bounds
+-  `throw IndexError("Array index out of bounds");` - Throw error for out of bounds
+-  `auto cell = arr->getCell(i);` - Get array element's cell
+-  `return QuantumValue(std::make_shared<QuantumPointer>(cell, 0));` - Create and return pointer
+-  `}` - Closing brace for array case
+-  `throw TypeError("Cannot take address of index on " + obj.typeName());` - Error for non-array
+-  `}` - Closing brace for index case
 
-### Error Handling (Lines 4177-4179)
-- **Line 4177**: `throw TypeError("Cannot take address of expression");` - Default error case
-- **Line 4178**: `}` - Closing brace for function
+###
+-  `throw TypeError("Cannot take address of expression");` - Default error case
+-  `}` - Closing brace for function
 
 ## Summary
 

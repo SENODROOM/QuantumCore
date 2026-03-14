@@ -161,7 +161,7 @@ Token Lexer::readIdentifierOrKeyword()
 
 ## Line-by-Line Analysis
 
-### **Function Signature and Initialization (Lines 1-5)**
+###**
 ```cpp
 Token Lexer::readIdentifierOrKeyword()
 {
@@ -177,7 +177,7 @@ Token Lexer::readIdentifierOrKeyword()
 - **Identifier Building**: `id` string accumulates the identifier text
 - **Character Collection**: Continues while characters are alphanumeric or underscore
 
-### **Raw String Processing (Lines 7-19)**
+###**
 ```cpp
 // Raw string prefix: r"..." or r'...' — literal string with no escape sequences
 if ((id == "r" || id == "R") && pos < src.size() && (current() == '"' || current() == '\''))
@@ -202,7 +202,7 @@ if ((id == "r" || id == "R") && pos < src.size() && (current() == '"' || current
 - **Quote Support**: Works with both single and double quotes
 - **Direct Return**: Returns STRING token immediately
 
-### **F-String Processing (Lines 21-89)**
+###**
 ```cpp
 // f-string prefix: f"..." or f'...'  — treat like a backtick template literal
 if ((id == "f" || id == "F") && pos < src.size() && (current() == '"' || current() == '\''))
@@ -219,7 +219,7 @@ if ((id == "f" || id == "F") && pos < src.size() && (current() == '"' || current
 - **Template Conversion**: Converts to backtick template format
 - **Pending Tokens**: Stores processed tokens for later emission
 
-### **Keyword Lookup (Lines 91-94)**
+###**
 ```cpp
 auto it = keywords.find(id);
 TokenType type = (it != keywords.end()) ? it->second : TokenType::IDENTIFIER;
@@ -231,7 +231,7 @@ TokenType type = (it != keywords.end()) ? it->second : TokenType::IDENTIFIER;
 - **Case Sensitive**: Keyword matching is case-sensitive
 - **Efficient**: Constant-time lookup for all keywords
 
-### **Macro Expansion (Lines 96-112)**
+###**
 ```cpp
 // C preprocessor macro expansion: if this identifier was #defined, substitute it
 auto dit = defines_.find(id);
@@ -254,7 +254,7 @@ if (dit != defines_.end() && !dit->second.empty())
 - **Multi-Token Macros**: Pending token mechanism for complex macros
 - **C Compatibility**: Supports C-style #define macros
 
-### **Token Creation (Line 114)**
+###**
 ```cpp
 return Token(type, id, startLine, startCol);
 ```

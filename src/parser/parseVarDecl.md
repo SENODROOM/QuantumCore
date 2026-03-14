@@ -35,52 +35,52 @@ ASTNodePtr Parser::parseVarDecl(bool isConst)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature and Initialization (Lines 900-904)
-- **Line 900**: `ASTNodePtr Parser::parseVarDecl(bool isConst)` - Parse variable declarations
+###
+-  `ASTNodePtr Parser::parseVarDecl(bool isConst)` - Parse variable declarations
   - `isConst`: Whether this is a constant declaration
-- **Line 901**: `{` - Opening brace
-- **Line 902**: `int ln = current().line;` - Store current line number for AST nodes
-- **Line 903**: `std::string name;` - Variable name string
-- **Line 904**: `ASTNodePtr init;` - Optional initializer expression
+-  `{` - Opening brace
+-  `int ln = current().line;` - Store current line number for AST nodes
+-  `std::string name;` - Variable name string
+-  `ASTNodePtr init;` - Optional initializer expression
 
-### Destructuring Pattern Handling (Lines 905-910)
-- **Line 905**: `// Handle destructuring: [a, b] = array or {x, y} = object` - Comment about destructuring
-- **Line 906**: `if (check(TokenType::LBRACKET) || check(TokenType::LBRACE)) {` - Check for destructuring patterns
-- **Line 907**: `auto pattern = parseExpr(); // Parse array or object pattern` - Parse the pattern
-- **Line 908**: `expect(TokenType::ASSIGN, "Expected '=' after destructuring pattern");` - Expect assignment
-- **Line 909**: `init = parseExpr();` - Parse initialization expression
-- **Line 910**: `return std::make_unique<ASTNode>(VarDecl{isConst, "", std::move(init), "", false}, ln);` - Create destructuring declaration
+###
+-  `// Handle destructuring: [a, b] = array or {x, y} = object` - Comment about destructuring
+-  `if (check(TokenType::LBRACKET) || check(TokenType::LBRACE)) {` - Check for destructuring patterns
+-  `auto pattern = parseExpr(); // Parse array or object pattern` - Parse the pattern
+-  `expect(TokenType::ASSIGN, "Expected '=' after destructuring pattern");` - Expect assignment
+-  `init = parseExpr();` - Parse initialization expression
+-  `return std::make_unique<ASTNode>(VarDecl{isConst, "", std::move(init), "", false}, ln);` - Create destructuring declaration
   - Empty name for destructuring (pattern contains variable names)
   - `false` for isPointer (not a pointer declaration)
 
-### Simple Variable Name (Lines 911-913)
-- **Line 911**: `// Simple variable name` - Comment about simple case
-- **Line 912**: `name = expect(TokenType::IDENTIFIER, "Expected variable name").value;` - Parse variable name
+###
+-  `// Simple variable name` - Comment about simple case
+-  `name = expect(TokenType::IDENTIFIER, "Expected variable name").value;` - Parse variable name
   - `expect()` throws error if not an identifier
   - `.value` extracts the string value from token
 
-### Type Annotation Handling (Lines 914-917)
-- **Line 914**: `// Optional type annotation: x: int = 5` - Comment about type hints
-- **Line 915**: `std::string typeHint;` - Type hint string
-- **Line 916**: `if (match(TokenType::COLON)) {` - Check for type annotation colon
-- **Line 917**: `typeHint = expect(TokenType::IDENTIFIER, "Expected type name").value;` - Parse type name
+###
+-  `// Optional type annotation: x: int = 5` - Comment about type hints
+-  `std::string typeHint;` - Type hint string
+-  `if (match(TokenType::COLON)) {` - Check for type annotation colon
+-  `typeHint = expect(TokenType::IDENTIFIER, "Expected type name").value;` - Parse type name
 
-### Optional Initializer (Lines 918-921)
-- **Line 918**: `// Optional initializer` - Comment about initialization
-- **Line 919**: `if (match(TokenType::ASSIGN)) {` - Check for assignment operator
-- **Line 920**: `init = parseExpr();` - Parse initialization expression
-- **Line 921**: `}` - Closing brace for initializer handling
+###
+-  `// Optional initializer` - Comment about initialization
+-  `if (match(TokenType::ASSIGN)) {` - Check for assignment operator
+-  `init = parseExpr();` - Parse initialization expression
+-  `}` - Closing brace for initializer handling
 
-### Return Statement (Lines 922-923)
-- **Line 922**: `return std::make_unique<ASTNode>(VarDecl{isConst, name, std::move(init), typeHint, false}, ln);` - Create variable declaration AST node
+###
+-  `return std::make_unique<ASTNode>(VarDecl{isConst, name, std::move(init), typeHint, false}, ln);` - Create variable declaration AST node
   - `isConst`: Constant flag from parameter
   - `name`: Variable name (or empty for destructuring)
   - `std::move(init)`: Optional initializer (moved for efficiency)
   - `typeHint`: Optional type annotation
   - `false`: isPointer flag (not a pointer declaration)
-- **Line 923**: `}` - Closing brace for function
+-  `}` - Closing brace for function
 
 ## Summary
 

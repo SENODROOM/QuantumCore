@@ -19,34 +19,34 @@ void Interpreter::execBlock(BlockStmt &s, std::shared_ptr<Environment> scope)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1637)
-- **Line 1637**: `void Interpreter::execBlock(BlockStmt &s, std::shared_ptr<Environment> scope)` - Execute block statements
+### Function Signature
+-  `void Interpreter::execBlock(BlockStmt &s, std::shared_ptr<Environment> scope)` - Execute block statements
   - `s`: Reference to BlockStmt containing statements to execute
   - `scope`: Optional environment for the block (null for new scope)
   - Returns void as blocks don't produce values
 
-### Environment Setup (Lines 1638-1642)
-- **Line 1638**: `{` - Opening brace
-- **Line 1639**: `auto prev = env;` - Save current environment
-- **Line 1640**: `env = scope ? scope : std::make_shared<Environment>(prev);` - Set new environment
+###
+-  `{` - Opening brace
+-  `auto prev = env;` - Save current environment
+-  `env = scope ? scope : std::make_shared<Environment>(prev);` - Set new environment
   - If scope provided, use it; otherwise create new environment with previous as parent
-- **Line 1641**: `stepCount_ = 0;` - Reset step counter for infinite loop detection
+-  `stepCount_ = 0;` - Reset step counter for infinite loop detection
 - **Line 1642`: Empty line for readability
 
-### Statement Execution Loop (Lines 1643-1649)
-- **Line 1643**: `for (auto &stmt : s.statements)` - Loop through all statements in block
-- **Line 1644**: `{` - Opening brace for loop
-- **Line 1645**: `execute(*stmt);` - Execute each statement
-- **Line 1646**: `stepCount_++;` - Increment step counter
-- **Line 1647**: `if (stepCount_ > MAX_STEPS)` - Check for infinite loop
-- **Line 1648**: `throw RuntimeError("Infinite loop detected");` - Throw error for infinite loop
-- **Line 1649**: `}` - Closing brace for loop
+###
+-  `for (auto &stmt : s.statements)` - Loop through all statements in block
+-  `{` - Opening brace for loop
+-  `execute(*stmt);` - Execute each statement
+-  `stepCount_++;` - Increment step counter
+-  `if (stepCount_ > MAX_STEPS)` - Check for infinite loop
+-  `throw RuntimeError("Infinite loop detected");` - Throw error for infinite loop
+-  `}` - Closing brace for loop
 
-### Environment Restoration (Lines 1650-1651)
-- **Line 1650**: `env = prev;` - Restore previous environment
-- **Line 1651**: `}` - Closing brace for function
+###
+-  `env = prev;` - Restore previous environment
+-  `}` - Closing brace for function
 
 ## Summary
 

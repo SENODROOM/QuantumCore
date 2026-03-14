@@ -43,7 +43,7 @@ Token Lexer::readNumber()
 
 ## Line-by-Line Analysis
 
-### **Function Signature and Initialization (Lines 1-5)**
+###**
 ```cpp
 Token Lexer::readNumber()
 {
@@ -58,7 +58,7 @@ Token Lexer::readNumber()
 - **String Accumulator**: `num` string builds the numeric literal text
 - **Decimal Point Flag**: `hasDot` tracks whether a decimal point was encountered
 
-### **Hexadecimal Number Detection (Lines 7-13)**
+###**
 ```cpp
 if (current() == '0' && (peek() == 'x' || peek() == 'X'))
 {
@@ -81,7 +81,7 @@ if (current() == '0' && (peek() == 'x' || peek() == 'X'))
 - **Full Range**: Supports all 16 hexadecimal digits
 - **Error Prevention**: Stops gracefully on invalid digits
 
-### **Decimal and Floating-Point Processing (Lines 14-26)**
+###**
 ```cpp
 else
 {
@@ -109,7 +109,7 @@ else
 - **Graceful Termination**: Stops at invalid characters
 - **Position Tracking**: Maintains accurate position throughout
 
-### **C-Style Suffix Stripping (Lines 27-31)**
+###**
 ```cpp
 // Strip C integer/float suffixes: LL, ULL, LU, L, U, F, f (e.g. 1000000007LL, 3.14f)
 while (pos < src.size() && (current() == 'L' || current() == 'l' ||
@@ -132,7 +132,7 @@ while (pos < src.size() && (current() == 'L' || current() == 'l' ||
 - **`ULL`, `ull`**: Unsigned long long
 - **`F`, `f`**: Float
 
-### **Token Creation (Line 33)**
+###**
 ```cpp
 return Token(TokenType::NUMBER, num, startLine, startCol);
 ```

@@ -15,7 +15,7 @@ char Lexer::peek(int offset) const
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 char Lexer::peek(int offset) const
 ```
@@ -24,7 +24,7 @@ char Lexer::peek(int offset) const
 - **`int offset`**: Number of characters to look ahead (default = 1)
 - **`const`**: Read-only function, doesn't modify lexer state
 
-### **Position Calculation (Line 3)**
+###**
 ```cpp
 size_t p = pos + offset;
 ```
@@ -33,7 +33,7 @@ size_t p = pos + offset;
 - **Type Conversion**: Handles signed to unsigned conversion safely
 - **Bounds Preparation**: Prepares for bounds checking
 
-### **Bounds-Safe Access (Line 4)**
+###**
 ```cpp
 return p < src.size() ? src[p] : '\0';
 ```

@@ -13,7 +13,7 @@ char Lexer::current() const
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 char Lexer::current() const
 ```
@@ -22,7 +22,7 @@ char Lexer::current() const
 - **`const`**: Read-only function, doesn't modify lexer state
 - **No Parameters**: Uses current lexer position automatically
 
-### **Bounds-Safe Access (Line 3)**
+###**
 ```cpp
 return pos < src.size() ? src[pos] : '\0';
 ```

@@ -29,7 +29,7 @@ static void printHelp(const char *prog)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static void printHelp(const char *prog)
 ```
@@ -38,7 +38,7 @@ static void printHelp(const char *prog)
 - **`printHelp`**: Descriptive name indicating help display purpose
 - **`const char *prog`**: Program name from command line arguments (argv[0])
 
-### **Usage Section Header (Lines 3-5)**
+###**
 ```cpp
 std::cout << Colors::BOLD << "Usage:\n"
           << Colors::RESET
@@ -48,7 +48,7 @@ std::cout << Colors::BOLD << "Usage:\n"
 - **Color Reset**: `Colors::RESET` prevents color bleeding
 - **Visual Separation**: Newline creates space for content
 
-### **Command Usage Examples (Lines 6-12)**
+###**
 ```cpp
 << "  " << prog << " <file.sa>              Run a Quantum script\n"
 << "  " << prog << "                         Start interactive REPL\n"
@@ -73,7 +73,7 @@ std::cout << Colors::BOLD << "Usage:\n"
 5. **Default Testing**: `--test examples` - Test default directory
 6. **Custom Testing**: `--test <dir>` - Test specific directory
 
-### **File Extension Section (Lines 14-17)**
+###**
 ```cpp
 << Colors::BOLD << "File extension:\n"
 << Colors::RESET
@@ -84,7 +84,7 @@ std::cout << Colors::BOLD << "Usage:\n"
 - **User Guidance**: Prevents confusion about file types
 - **Visual Separation**: Double newline creates section break
 
-### **Examples Section (Lines 19-23)**
+###**
 ```cpp
 << Colors::BOLD << "Examples:\n"
 << Colors::RESET

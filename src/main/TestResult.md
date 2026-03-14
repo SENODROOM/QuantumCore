@@ -18,7 +18,7 @@ struct TestResult
 
 ## Line-by-Line Analysis
 
-### **Struct Definition (Line 1)**
+###**
 ```cpp
 struct TestResult
 ```
@@ -26,9 +26,9 @@ struct TestResult
 - **`TestResult`**: Descriptive name indicating test result storage
 - **Plain Old Data**: Simple data container without complex behavior
 
-### **Member Variables (Lines 2-6)**
+###**
 
-#### **path Member (Line 2)**
+####**
 ```cpp
 std::string path;   // display path (relative)
 ```
@@ -38,7 +38,7 @@ std::string path;   // display path (relative)
 - **Usage**: Displayed in test reports and error messages
 - **Rationale**: Relative paths are more readable in reports
 
-#### **source Member (Line 3)**
+####**
 ```cpp
 std::string source; // full file source code
 ```
@@ -48,7 +48,7 @@ std::string source; // full file source code
 - **Usage**: Error reporting, code analysis, test result documentation
 - **Rationale**: Enables detailed error context and reporting
 
-#### **error Member (Line 4)**
+####**
 ```cpp
 std::string error;  // "" on pass, error description on fail
 ```
@@ -58,7 +58,7 @@ std::string error;  // "" on pass, error description on fail
 - **Failure State**: Contains detailed error description
 - **Rationale**: Simple boolean logic through string emptiness
 
-#### **line Member (Line 5)**
+####**
 ```cpp
 int line = 0;       // error line number (0 if no line info)
 ```
@@ -68,7 +68,7 @@ int line = 0;       // error line number (0 if no line info)
 - **Usage**: Error location reporting and source code highlighting
 - **Rationale**: 1-based line numbering is standard in editors
 
-#### **col Member (Line 6)**
+####**
 ```cpp
 int col = 0;        // error column number (0 if no column info)
 ```

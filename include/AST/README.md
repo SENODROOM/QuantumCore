@@ -310,69 +310,69 @@ struct ASTNode
 };
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Header Guard and Includes (Lines 1-5)
-- **Line 1**: `#pragma once` - Prevents the header from being included multiple times
-- **Line 2**: `#include <memory>` - Includes smart pointers like `unique_ptr`
-- **Line 3**: `#include <string>` - Includes string functionality
-- **Line 4**: `#include <vector>` - Includes dynamic array functionality
-- **Line 5**: `#include <variant>` - Includes variant type for storing different types
+###
+-  `#pragma once` - Prevents the header from being included multiple times
+-  `#include <memory>` - Includes smart pointers like `unique_ptr`
+-  `#include <string>` - Includes string functionality
+-  `#include <vector>` - Includes dynamic array functionality
+-  `#include <variant>` - Includes variant type for storing different types
 
-### Forward Declarations (Lines 7-9)
-- **Line 7**: Comment indicating forward declarations section
-- **Line 8**: `struct ASTNode;` - Forward declares the ASTNode structure
-- **Line 9**: `using ASTNodePtr = std::unique_ptr<ASTNode>;` - Creates a type alias for unique pointer to ASTNode
+###
+-  Comment indicating forward declarations section
+-  `struct ASTNode;` - Forward declares the ASTNode structure
+-  `using ASTNodePtr = std::unique_ptr<ASTNode>;` - Creates a type alias for unique pointer to ASTNode
 
-### Expression Types Section (Lines 11-109)
+###
 
-#### Literal Types (Lines 13-27)
+####
 - **Lines 13-16**: `NumberLiteral` struct - Holds numeric values as double
 - **Lines 17-20**: `StringLiteral` struct - Holds text values
 - **Lines 21-24**: `BoolLiteral` struct - Holds true/false values
 - **Lines 25-27**: `NilLiteral` struct - Represents null/empty values
 
-#### Identifier and Basic Expressions (Lines 29-44)
+####
 - **Lines 29-32**: `Identifier` struct - Represents variable names
 - **Lines 34-38**: `BinaryExpr` struct - Binary operations like `a + b`
 - **Lines 40-44**: `UnaryExpr` struct - Unary operations like `-a`
 
-#### Assignment and Function Calls (Lines 46-57)
+####
 - **Lines 46-51**: `AssignExpr` struct - Assignment operations like `x = 5`
 - **Lines 53-57**: `CallExpr` struct - Function calls like `func(arg1, arg2)`
 
-#### Indexing and Slicing (Lines 59-72)
+####
 - **Lines 59-63**: `IndexExpr` struct - Array/object access like `arr[0]`
 - **Lines 65-72**: `SliceExpr` struct - Python-style slicing like `arr[1:5:2]`
 
-#### Member Access and Collections (Lines 74-95)
+####
 - **Lines 74-78**: `MemberExpr` struct - Object member access like `obj.property`
 - **Lines 80-83**: `ArrayLiteral` struct - Array literals like `[1, 2, 3]`
 - **Lines 85-88**: `DictLiteral` struct - Dictionary literals like `{"key": "value"}`
 - **Lines 90-95**: `LambdaExpr` struct - Anonymous functions
 
-#### Advanced Expressions (Lines 97-109)
+####
 - **Lines 97-102**: `TernaryExpr` struct - Conditional expressions like `condition ? true : false`
 - **Lines 104-109**: `SuperExpr` struct - Super class constructor/method calls
 
-### C++ Pointer Expression Types (Lines 110-129)
+###
 - **Lines 112-116**: `AddressOfExpr` struct - `&var` operator
 - **Lines 118-122**: `DerefExpr` struct - `*ptr` operator
 - **Lines 124-129**: `ArrowExpr` struct - `ptr->member` operator
 
-### Statement Types Section (Lines 131-268)
+###
 
-#### Variable and Function Declarations (Lines 133-149)
+####
 - **Lines 133-140**: `VarDecl` struct - Variable declarations with type hints
 - **Lines 142-149**: `FunctionDecl` struct - Function definitions
 
-#### Control Flow Statements (Lines 151-176)
+####
 - **Lines 151-154**: `ReturnStmt` struct - Return statements
 - **Lines 156-162**: `IfStmt` struct - Conditional statements
 - **Lines 164-168**: `WhileStmt` struct - While loops
 - **Lines 170-176**: `ForStmt` struct - For loops with tuple unpacking support
 
-#### Special Statements (Lines 178-226)
+####
 - **Lines 178-185**: `ListComp` struct - List comprehensions
 - **Lines 187-190**: `TupleLiteral` struct - Tuple literals
 - **Lines 192-195**: `BlockStmt` struct - Code blocks
@@ -382,21 +382,21 @@ struct ASTNode
 - **Lines 217-222**: `BreakStmt` and `ContinueStmt` structs - Loop control
 - **Lines 223-226**: `RaiseStmt` struct - Exception throwing
 
-#### Exception Handling (Lines 228-240)
+####
 - **Lines 228-233**: `ExceptClause` struct - Exception handlers
 - **Lines 235-240**: `TryStmt` struct - Try-catch-finally blocks
 
-#### Import and Class Statements (Lines 242-268)
+####
 - **Lines 242-251**: `ImportStmt` struct - Module imports
 - **Lines 253-260**: `ClassDecl` struct - Class definitions
 - **Lines 262-268**: `NewExpr` struct - Object instantiation
 
-### ASTNode Variant (Lines 270-305)
+###
 
-#### NodeVariant Type Definition (Lines 272-287)
+####
 - **Lines 272-287**: `using NodeVariant = std::variant<...>` - Union type that can hold any AST node type
 
-#### ASTNode Structure (Lines 289-305)
+####
 - **Lines 289-292**: `ASTNode` struct with node variant and line number
 - **Lines 294-295**: Constructor template that forwards any node type
 - **Lines 297-298**: `as()` method template for type-safe access

@@ -12,28 +12,28 @@ Interpreter::Interpreter()
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 332)
-- **Line 332**: `Interpreter::Interpreter()` - Constructor for the Interpreter class
+### Function Signature
+-  `Interpreter::Interpreter()` - Constructor for the Interpreter class
   - Initializes the interpreter with a global environment and native functions
 
-### Constructor Body (Lines 333-339)
-- **Line 333**: `{` - Opening brace for constructor
-- **Line 334**: `globals = std::make_shared<Environment>();` - Create global environment
+###
+-  `{` - Opening brace for constructor
+-  `globals = std::make_shared<Environment>();` - Create global environment
   - `std::make_shared` creates a smart pointer to Environment
   - `globals` stores the top-level environment for the interpreter
-- **Line 335**: `env = globals;` - Set current environment to global
+-  `env = globals;` - Set current environment to global
   - `env` tracks the current scope during execution
   - Initially set to global environment
-- **Line 336**: `stepCount_ = 0;` - Initialize step counter
+-  `stepCount_ = 0;` - Initialize step counter
   - Used for infinite loop detection and debugging
   - Prevents endless loops from hanging the interpreter
-- **Line 337**: Empty line for readability
-- **Line 338**: `registerNatives();` - Register built-in native functions
+-  Empty line for readability
+-  `registerNatives();` - Register built-in native functions
   - Adds all standard library functions to the global environment
   - Includes math, string, I/O, and other core functions
-- **Line 339**: `}` - Closing brace for constructor
+-  `}` - Closing brace for constructor
 
 ## Summary
 

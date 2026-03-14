@@ -17,40 +17,40 @@ ASTNodePtr Parser::parse()
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 42)
-- **Line 42**: `ASTNodePtr Parser::parse()` - Main parsing entry point
+### Function Signature
+-  `ASTNodePtr Parser::parse()` - Main parsing entry point
   - Returns pointer to AST node containing the entire program
   - Creates top-level block for all statements
 
-### Block Creation (Lines 43-45)
-- **Line 43**: `{` - Opening brace
-- **Line 44**: `auto block = std::make_unique<ASTNode>(BlockStmt{}, 0);` - Create AST node for program block
+###
+-  `{` - Opening brace
+-  `auto block = std::make_unique<ASTNode>(BlockStmt{}, 0);` - Create AST node for program block
   - `BlockStmt{}` creates empty block statement structure
   - `0` indicates line number (program start)
   - `std::make_unique` creates smart pointer for memory management
-- **Line 45**: `auto &stmts = block->as<BlockStmt>().statements;` - Get reference to statements vector
+-  `auto &stmts = block->as<BlockStmt>().statements;` - Get reference to statements vector
   - `as<BlockStmt>()` safely casts to BlockStmt type
   - `statements` is the vector that will hold all program statements
 
-### Initial Cleanup (Line 46)
-- **Line 46**: `skipNewlines();` - Skip leading whitespace/newlines
+###
+-  `skipNewlines();` - Skip leading whitespace/newlines
   - Ensures parsing starts at first actual statement
 
-### Main Parsing Loop (Lines 47-51)
-- **Line 47**: `while (!atEnd())` - Loop until end of token stream
-- **Line 48**: `{` - Opening brace for loop body
-- **Line 49**: `stmts.push_back(parseStatement());` - Parse each statement and add to block
+###
+-  `while (!atEnd())` - Loop until end of token stream
+-  `{` - Opening brace for loop body
+-  `stmts.push_back(parseStatement());` - Parse each statement and add to block
   - `parseStatement()` handles individual statement types
   - `push_back()` adds parsed statement to program block
-- **Line 50**: `skipNewlines();` - Skip whitespace between statements
-- **Line 51**: `}` - Closing brace for loop body
+-  `skipNewlines();` - Skip whitespace between statements
+-  `}` - Closing brace for loop body
 
-### Return Result (Line 52)
-- **Line 52**: `return block;` - Return completed AST
+###
+-  `return block;` - Return completed AST
   - Returns smart pointer to root of program AST
-- **Line 53**: `}` - Closing brace for function
+-  `}` - Closing brace for function
 
 ## Summary
 

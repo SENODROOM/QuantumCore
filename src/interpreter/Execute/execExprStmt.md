@@ -9,17 +9,17 @@ void Interpreter::execExprStmt(ExprStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 2566)
-- **Line 2566**: `void Interpreter::execExprStmt(ExprStmt &s)` - Execute expression statements
+### Function Signature
+-  `void Interpreter::execExprStmt(ExprStmt &s)` - Execute expression statements
   - `s`: Reference to ExprStmt AST node
   - Returns void as expression statements don't produce values
 
-### Expression Evaluation (Lines 2567-2569)
-- **Line 2567**: `{` - Opening brace
-- **Line 2568**: `evaluate(*s.expr);` - Evaluate the expression
-- **Line 2569**: `}` - Closing brace for function
+###
+-  `{` - Opening brace
+-  `evaluate(*s.expr);` - Evaluate the expression
+-  `}` - Closing brace for function
 
 ## Summary
 

@@ -97,101 +97,101 @@ QuantumValue Interpreter::evalBinary(BinaryExpr &e)
 
 ### Short-Circuit Operators
 - `{` - Opening brace
-- **Line 2712**: `// Short-circuit for and/or/?? (nullish coalescing)` - Comment about short-circuit logic
-- **Line 2713**: `if (e.op == "and")` - Check for logical AND
-- **Line 2714**: `{` - Opening brace for AND
-- **Line 2715**: `auto left = evaluate(*e.left);` - Evaluate left operand
-- **Line 2716**: `if (!left.isTruthy())` - Check if left is falsy
-- **Line 2717**: `return left;` - Return left (short-circuit)
-- **Line 2718**: `return evaluate(*e.right);` - Evaluate and return right
-- **Line 2719**: `}` - Closing brace for AND
-- **Line 2720**: `if (e.op == "or")` - Check for logical OR
-- **Line 2721**: `{` - Opening brace for OR
-- **Line 2722**: `auto left = evaluate(*e.left);` - Evaluate left operand
-- **Line 2723**: `if (left.isTruthy())` - Check if left is truthy
-- **Line 2724**: `return left;` - Return left (short-circuit)
-- **Line 2725**: `return evaluate(*e.right);` - Evaluate and return right
-- **Line 2726**: `}` - Closing brace for OR
-- **Line 2727**: `if (e.op == "??")` - Check for nullish coalescing
-- **Line 2728**: `{` - Opening brace for nullish coalescing
-- **Line 2729**: `auto left = evaluate(*e.left);` - Evaluate left operand
-- **Line 2730**: `if (!left.isNil())` - Check if left is not nil
+- `// Short-circuit for and/or/?? (nullish coalescing)` - Comment about short-circuit logic
+- `if (e.op == "and")` - Check for logical AND
+- `{` - Opening brace for AND
+- `auto left = evaluate(*e.left);` - Evaluate left operand
+- `if (!left.isTruthy())` - Check if left is falsy
+- `return left;` - Return left (short-circuit)
+- `return evaluate(*e.right);` - Evaluate and return right
+- `}` - Closing brace for AND
+- `if (e.op == "or")` - Check for logical OR
+- `{` - Opening brace for OR
+- `auto left = evaluate(*e.left);` - Evaluate left operand
+- `if (left.isTruthy())` - Check if left is truthy
+- `return left;` - Return left (short-circuit)
+- `return evaluate(*e.right);` - Evaluate and return right
+- `}` - Closing brace for OR
+- `if (e.op == "??")` - Check for nullish coalescing
+- `{` - Opening brace for nullish coalescing
+- `auto left = evaluate(*e.left);` - Evaluate left operand
+- `if (!left.isNil())` - Check if left is not nil
 
-### More Short-Circuit (Lines 2731-2737)
-- **Line 2731**: `return left;` - Return left (not nil)
-- **Line 2732**: `return evaluate(*e.right);` - Evaluate and return right
-- **Line 2733**: `}` - Closing brace for nullish coalescing
-- **Line 2734**: Empty line for readability
-- **Line 2735**: `auto left = evaluate(*e.left);` - Evaluate left operand (non-short-circuit ops)
-- **Line 2736**: `auto right = evaluate(*e.right);` - Evaluate right operand
-- **Line 2737**: `const std::string &op = e.op;` - Get operator string reference
+### More Short-Circuit
+- `return left;` - Return left (not nil)
+- `return evaluate(*e.right);` - Evaluate and return right
+- `}` - Closing brace for nullish coalescing
+- Empty line for readability
+- `auto left = evaluate(*e.left);` - Evaluate left operand (non-short-circuit ops)
+- `auto right = evaluate(*e.right);` - Evaluate right operand
+- `const std::string &op = e.op;` - Get operator string reference
 
-### Arithmetic Operators (Lines 2739-2750)
-- **Line 2738**: Empty line for readability
-- **Line 2739**: `// Arithmetic operators` - Comment section
-- **Line 2740**: `if (op == "+")` - Check for addition
-- **Line 2741**: `return left + right;` - Perform addition
-- **Line 2742**: `if (op == "-")` - Check for subtraction
-- **Line 2743**: `return left - right;` - Perform subtraction
-- **Line 2744**: `if (op == "*")` - Check for multiplication
-- **Line 2745**: `return left * right;` - Perform multiplication
-- **Line 2746**: `if (op == "/")` - Check for division
-- **Line 2747**: `return left / right;` - Perform division
-- **Line 2748**: `if (op == "%")` - Check for modulo
-- **Line 2749**: `return left % right;` - Perform modulo
-- **Line 2750**: `if (op == "**")` - Check for exponentiation
+### Arithmetic Operators
+- Empty line for readability
+- `// Arithmetic operators` - Comment section
+- `if (op == "+")` - Check for addition
+- `return left + right;` - Perform addition
+- `if (op == "-")` - Check for subtraction
+- `return left - right;` - Perform subtraction
+- `if (op == "*")` - Check for multiplication
+- `return left * right;` - Perform multiplication
+- `if (op == "/")` - Check for division
+- `return left / right;` - Perform division
+- `if (op == "%")` - Check for modulo
+- `return left % right;` - Perform modulo
+- `if (op == "**")` - Check for exponentiation
 
-### More Arithmetic (Lines 2751-2765)
-- **Line 2751**: `return left.pow(right);` - Perform exponentiation
-- **Line 2752**: Empty line for readability
-- **Line 2753**: `// Comparison operators` - Comment section
-- **Line 2754**: `if (op == "==")` - Check for equality
-- **Line 2755**: `return QuantumValue(left == right);` - Compare equality
-- **Line 2756**: `if (op == "!=")` - Check for inequality
-- **Line 2757**: `return QuantumValue(left != right);` - Compare inequality
-- **Line 2758**: `if (op == "<")` - Check for less than
-- **Line 2759**: `return QuantumValue(left < right);` - Compare less than
-- **Line 2760**: `if (op == "<=")` - Check for less than or equal
-- **Line 2761**: `return QuantumValue(left <= right);` - Compare less than or equal
-- **Line 2762**: `if (op == ">")` - Check for greater than
-- **Line 2763**: `return QuantumValue(left > right);` - Compare greater than
-- **Line 2764**: `if (op == ">=")` - Check for greater than or equal
-- **Line 2765**: `return QuantumValue(left >= right);` - Compare greater than or equal
+### More Arithmetic
+- `return left.pow(right);` - Perform exponentiation
+- Empty line for readability
+- `// Comparison operators` - Comment section
+- `if (op == "==")` - Check for equality
+- `return QuantumValue(left == right);` - Compare equality
+- `if (op == "!=")` - Check for inequality
+- `return QuantumValue(left != right);` - Compare inequality
+- `if (op == "<")` - Check for less than
+- `return QuantumValue(left < right);` - Compare less than
+- `if (op == "<=")` - Check for less than or equal
+- `return QuantumValue(left <= right);` - Compare less than or equal
+- `if (op == ">")` - Check for greater than
+- `return QuantumValue(left > right);` - Compare greater than
+- `if (op == ">=")` - Check for greater than or equal
+- `return QuantumValue(left >= right);` - Compare greater than or equal
 
-### Logical Operators (Lines 2766-2773)
-- **Line 2766**: Empty line for readability
-- **Line 2767**: `// Logical operators` - Comment section
-- **Line 2768**: `if (op == "&&")` - Check for logical AND
-- **Line 2769**: `return QuantumValue(left.isTruthy() && right.isTruthy());` - Logical AND
-- **Line 2770**: `if (op == "||")` - Check for logical OR
-- **Line 2771**: `return QuantumValue(left.isTruthy() || right.isTruthy());` - Logical OR
+### Logical Operators
+- Empty line for readability
+- `// Logical operators` - Comment section
+- `if (op == "&&")` - Check for logical AND
+- `return QuantumValue(left.isTruthy() && right.isTruthy());` - Logical AND
+- `if (op == "||")` - Check for logical OR
+- `return QuantumValue(left.isTruthy() || right.isTruthy());` - Logical OR
 
-### Bitwise Operators (Lines 2772-2783)
-- **Line 2772**: Empty line for readability
-- **Line 2773**: `// Bitwise operators` - Comment section
-- **Line 2774**: `if (op == "&")` - Check for bitwise AND
-- **Line 2775**: `return left & right;` - Bitwise AND
-- **Line 2776**: `if (op == "|")` - Check for bitwise OR
-- **Line 2777**: `return left | right;` - Bitwise OR
-- **Line 2778**: `if (op == "^")` - Check for bitwise XOR
-- **Line 2779**: `return left ^ right;` - Bitwise XOR
-- **Line 2780**: `if (op == "<<")` - Check for left shift
-- **Line 2781**: `return left << right;` - Left shift
-- **Line 2782**: `if (op == ">>")` - Check for right shift
-- **Line 2783**: `return left >> right;` - Right shift
+### Bitwise Operators
+- Empty line for readability
+- `// Bitwise operators` - Comment section
+- `if (op == "&")` - Check for bitwise AND
+- `return left & right;` - Bitwise AND
+- `if (op == "|")` - Check for bitwise OR
+- `return left | right;` - Bitwise OR
+- `if (op == "^")` - Check for bitwise XOR
+- `return left ^ right;` - Bitwise XOR
+- `if (op == "<<")` - Check for left shift
+- `return left << right;` - Left shift
+- `if (op == ">>")` - Check for right shift
+- `return left >> right;` - Right shift
 
-### Special Operators (Lines 2784-2791)
-- **Line 2784**: Empty line for readability
-- **Line 2785**: `// Special operators` - Comment section
-- **Line 2786**: `if (op == "in")` - Check for membership test
-- **Line 2787**: `return QuantumValue(right.contains(left));` - Test if left is in right
-- **Line 2788**: `if (op == "is")` - Check for type comparison
-- **Line 2789**: `return QuantumValue(left.typeName() == right.typeName());` - Compare types
+### Special Operators
+- Empty line for readability
+- `// Special operators` - Comment section
+- `if (op == "in")` - Check for membership test
+- `return QuantumValue(right.contains(left));` - Test if left is in right
+- `if (op == "is")` - Check for type comparison
+- `return QuantumValue(left.typeName() == right.typeName());` - Compare types
 
-### Error Handling (Lines 2792-2794)
-- **Line 2790**: Empty line for readability
-- **Line 2791**: `throw RuntimeError("Unknown operator: " + op);` - Throw error for unknown operator
-- **Line 2792**: `}` - Closing brace for function
+### Error Handling
+- Empty line for readability
+- `throw RuntimeError("Unknown operator: " + op);` - Throw error for unknown operator
+- `}` - Closing brace for function
 
 ## Summary
 

@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 int main(int argc, char *argv[])
 ```
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 - **`argv`**: Argument vector - array of C-style strings
 - **Standard Entry Point**: Conforms to C/C++ standard
 
-### **Cross-Platform Console Setup (Lines 3-7)**
+###**
 ```cpp
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 - **Input Console**: `SetConsoleCP(CP_UTF8)` for input
 - **Unicode Compatibility**: Ensures proper character display
 
-### **REPL Mode (Lines 9-13)**
+###**
 ```cpp
 if (argc == 1)
 {
@@ -98,7 +98,7 @@ if (argc == 1)
 - **Success Return**: Returns 0 after REPL completion
 - **Default Behavior**: REPL is the default interactive mode
 
-### **Help Command (Lines 15-21)**
+###**
 ```cpp
 if (arg == "--help" || arg == "-h")
 {
@@ -112,7 +112,7 @@ if (arg == "--help" || arg == "-h")
 - **Help Content**: Displays usage information
 - **Successful Exit**: Returns 0 after showing help
 
-### **Aura Display (Lines 23-29)**
+###**
 ```cpp
 if (arg == "--aura")
 {
@@ -126,7 +126,7 @@ if (arg == "--aura")
 - **Marketing Feature**: Demonstrates project capabilities
 - **User Engagement**: Impressive visual presentation
 
-### **Version Information (Lines 31-37)**
+###**
 ```cpp
 if (arg == "--version" || arg == "-v")
 {
@@ -141,7 +141,7 @@ if (arg == "--version" || arg == "-v")
 - **Runtime Information**: Specifies interpreter type
 - **Author Attribution**: Credits the developer
 
-### **Syntax Check Command (Lines 39-43)**
+###**
 ```cpp
 if (arg == "--check" && argc >= 3)
 {
@@ -153,7 +153,7 @@ if (arg == "--check" && argc >= 3)
 - **Direct Return**: Passes exit code from checkFile
 - **Development Tool**: Useful for IDE integration
 
-### **Test Command (Lines 45-53)**
+###**
 ```cpp
 if (arg == "--test")
 {
@@ -168,7 +168,7 @@ if (arg == "--test")
 - **Optional Argument**: Directory parameter is optional
 - **Exit Code**: Returns test suite exit code
 
-### **File Execution (Lines 55-57)**
+###**
 ```cpp
 runFile(arg);
 return 0;

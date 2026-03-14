@@ -90,7 +90,7 @@ static void runFile(const std::string &path)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static void runFile(const std::string &path)
 ```
@@ -99,7 +99,7 @@ static void runFile(const std::string &path)
 - **`runFile`**: Descriptive name indicating file execution purpose
 - **`const std::string &path`**: Constant reference to file path for efficiency
 
-### **File Opening (Lines 3-9)**
+###**
 ```cpp
 std::ifstream file(path);
 if (!file.is_open())
@@ -117,7 +117,7 @@ if (!file.is_open())
 - **Early Return**: Graceful exit on file access failure
 - **Color Coding**: Red bold text for error visibility
 
-### **Source Code Reading (Lines 11-15)**
+###**
 ```cpp
 std::string source((std::istreambuf_iterator<char>(file)),
                   std::istreambuf_iterator<char>());
@@ -130,7 +130,7 @@ file.close();
 - **Automatic String Construction**: String built from iterator range
 - **Resource Management**: Explicit file close for deterministic cleanup
 
-### **Parse-Execute Phase (Lines 17-26)**
+###**
 ```cpp
 try
 {
@@ -151,7 +151,7 @@ try
 - **Interpreter Object**: Fresh interpreter for each file
 - **AST Dereference**: `*ast` since parse() returns unique_ptr
 
-### **Main Function Detection (Lines 28-38)**
+###**
 ```cpp
 // If there's a main() function, call it
 try
@@ -175,7 +175,7 @@ try
 - **Call Construction**: Builds CallExpr AST node dynamically
 - **Execution**: Evaluates the constructed call expression
 
-### **Return Signal Handling (Lines 40-43)**
+###**
 ```cpp
 catch (const ReturnSignal &)
 {
@@ -188,7 +188,7 @@ catch (const ReturnSignal &)
 - **Silent Catching**: Normal program termination, not an error
 - **No Logging**: Return from main() is expected behavior
 
-### **NameError Handling (Lines 45-58)**
+###**
 ```cpp
 catch (const NameError &e)
 {
@@ -213,7 +213,7 @@ catch (const NameError &e)
 - **Error Reporting**: Full error details for real NameErrors
 - **Line Information**: Includes line number when available
 
-### **QuantumError Handling (Lines 60-67)**
+###**
 ```cpp
 catch (const QuantumError &e)
 {
@@ -232,7 +232,7 @@ catch (const QuantumError &e)
 - **Consistent Formatting**: Same error display format as other errors
 - **Line Context**: Provides location information for debugging
 
-### **Top-Level Exception Handling (Lines 69-76)**
+###**
 ```cpp
 catch (const QuantumError &e)
 {

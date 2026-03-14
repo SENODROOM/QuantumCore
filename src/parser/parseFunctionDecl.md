@@ -46,65 +46,65 @@ ASTNodePtr Parser::parseFunctionDecl()
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature and Initialization (Lines 949-952)
-- **Line 949**: `ASTNodePtr Parser::parseFunctionDecl()` - Parse function declarations
-- **Line 950**: `{` - Opening brace
-- **Line 951**: `int ln = current().line;` - Store current line number for AST nodes
-- **Line 952**: Empty line for readability
+###
+-  `ASTNodePtr Parser::parseFunctionDecl()` - Parse function declarations
+-  `{` - Opening brace
+-  `int ln = current().line;` - Store current line number for AST nodes
+-  Empty line for readability
 
-### Function Name Parsing (Lines 953-957)
-- **Line 953**: `// Function name (optional for anonymous functions)` - Comment about optional names
-- **Line 954**: `std::string name;` - Function name string
-- **Line 955**: `if (check(TokenType::IDENTIFIER)) {` - Check for function name
-- **Line 956**: `name = consume().value;` - Consume and store function name
-- **Line 957**: `}` - Closing brace
+###
+-  `// Function name (optional for anonymous functions)` - Comment about optional names
+-  `std::string name;` - Function name string
+-  `if (check(TokenType::IDENTIFIER)) {` - Check for function name
+-  `name = consume().value;` - Consume and store function name
+-  `}` - Closing brace
 
-### Parameter Parsing Setup (Lines 958-964)
-- **Line 958**: `// Parse parameters` - Comment about parameter parsing
-- **Line 959**: `expect(TokenType::LPAREN, "Expected '(' after function name");` - Expect opening parenthesis
-- **Line 960**: `std::vector<std::string> params;` - Parameter names vector
-- **Line 961**: `std::vector<bool> paramIsRef;` - Reference parameter flags
-- **Line 962**: `std::vector<ASTNodePtr> defaultArgs;` - Default argument expressions
-- **Line 963**: Empty line for readability
-- **Line 964**: `if (!check(TokenType::RPAREN)) {` - Check if there are parameters
+###
+-  `// Parse parameters` - Comment about parameter parsing
+-  `expect(TokenType::LPAREN, "Expected '(' after function name");` - Expect opening parenthesis
+-  `std::vector<std::string> params;` - Parameter names vector
+-  `std::vector<bool> paramIsRef;` - Reference parameter flags
+-  `std::vector<ASTNodePtr> defaultArgs;` - Default argument expressions
+-  Empty line for readability
+-  `if (!check(TokenType::RPAREN)) {` - Check if there are parameters
 
-### Parameter List Parsing (Lines 965-967)
-- **Line 965**: `params = parseParamList(&paramIsRef, &defaultArgs);` - Parse parameter list
+###
+-  `params = parseParamList(&paramIsRef, &defaultArgs);` - Parse parameter list
   - Passes pointers to fill reference flags and default arguments
   - Returns vector of parameter names
-- **Line 966**: `}` - Closing brace for parameter check
-- **Line 967**: Empty line for readability
+-  `}` - Closing brace for parameter check
+-  Empty line for readability
 
-### Parameter List Completion (Line 968)
-- **Line 968**: `expect(TokenType::RPAREN, "Expected ')' after parameters");` - Expect closing parenthesis
+###
+-  `expect(TokenType::RPAREN, "Expected ')' after parameters");` - Expect closing parenthesis
 
-### Return Type Annotation (Lines 969-973)
-- **Line 969**: `// Parse return type annotation (optional)` - Comment about return type
-- **Line 970**: `std::string returnType;` - Return type string
-- **Line 971**: `if (match(TokenType::COLON)) {` - Check for type annotation colon
-- **Line 972**: `returnType = expect(TokenType::IDENTIFIER, "Expected return type").value;` - Parse return type
-- **Line 973**: `}` - Closing brace for return type
+###
+-  `// Parse return type annotation (optional)` - Comment about return type
+-  `std::string returnType;` - Return type string
+-  `if (match(TokenType::COLON)) {` - Check for type annotation colon
+-  `returnType = expect(TokenType::IDENTIFIER, "Expected return type").value;` - Parse return type
+-  `}` - Closing brace for return type
 
-### Function Body Parsing (Line 974)
-- **Line 974**: `auto body = parseBodyOrStatement();` - Parse function body
+###
+-  `auto body = parseBodyOrStatement();` - Parse function body
   - Handles both block `{}` and single statement bodies
   - Supports brace-optional syntax
 
-### Function Declaration Creation (Lines 975-982)
-- **Line 975**: `// Create function declaration` - Comment about AST creation
-- **Line 976**: `FunctionDecl fd;` - Create function declaration structure
-- **Line 977**: `fd.name = name;` - Set function name
-- **Line 978**: `fd.params = params;` - Set parameter names
-- **Line 979**: `fd.paramIsRef = paramIsRef;` - Set reference parameter flags
-- **Line 980**: `fd.defaultArgs = defaultArgs;` - Set default arguments
-- **Line 981**: `fd.body = std::move(body);` - Set function body (moved for efficiency)
+###
+-  `// Create function declaration` - Comment about AST creation
+-  `FunctionDecl fd;` - Create function declaration structure
+-  `fd.name = name;` - Set function name
+-  `fd.params = params;` - Set parameter names
+-  `fd.paramIsRef = paramIsRef;` - Set reference parameter flags
+-  `fd.defaultArgs = defaultArgs;` - Set default arguments
+-  `fd.body = std::move(body);` - Set function body (moved for efficiency)
 
-### Return Statement (Lines 983-984)
-- **Line 983**: `return std::make_unique<ASTNode>(std::move(fd), ln);` - Create and return AST node
+###
+-  `return std::make_unique<ASTNode>(std::move(fd), ln);` - Create and return AST node
   - `std::move(fd)` transfers ownership of function declaration
-- **Line 984**: `}` - Closing brace for function
+-  `}` - Closing brace for function
 
 ## Summary
 

@@ -598,7 +598,7 @@ std::vector<Token> Lexer::tokenize()
 
 ## Line-by-Line Analysis
 
-### **Function Initialization (Lines 1-4)**
+###**
 ```cpp
 std::vector<Token> Lexer::tokenize()
 {
@@ -611,7 +611,7 @@ std::vector<Token> Lexer::tokenize()
 - **Two-Phase Approach**: Raw tokenization followed by post-processing
 - **Memory Preparation**: Container ready for token accumulation
 
-### **Main Tokenization Loop (Lines 6-10)**
+###**
 ```cpp
 while (pos < src.size())
 {
@@ -629,7 +629,7 @@ while (pos < src.size())
 - **Early Exit**: Breaks if whitespace skipping reaches end
 - **Position Recording**: Captures start position for token creation
 
-### **Newline Handling (Lines 12-18)**
+###**
 ```cpp
 if (c == '\n')
 {
@@ -645,7 +645,7 @@ if (c == '\n')
 - **Loop Continuation**: Skips to next iteration
 - **Indentation Support**: Essential for Python-style block detection
 
-### **Preprocessor Directive Handling (Lines 20-114)**
+###**
 ```cpp
 if (c == '#')
 {
@@ -660,7 +660,7 @@ if (c == '#')
 - **Macro Definition**: Handles #define with token replacement
 - **Macro Expansion**: Simple one-level macro expansion support
 
-### **Token Type Recognition (Lines 116-154)**
+###**
 ```cpp
 if (std::isdigit(c))
 {
@@ -691,7 +691,7 @@ if (std::isalpha(c) || c == '_')
 - **Templates**: Backtick starts template literal
 - **Identifiers**: Letter/underscore starts identifier or keyword
 
-### **Operator Parsing (Lines 156-540)**
+###**
 ```cpp
 // Operators & delimiters
 advance();
@@ -715,7 +715,7 @@ case '/':
 - **Assignment Operators**: +=, -=, *=, /=, etc.
 - **Optional Chaining**: ?. and ?? operators
 
-### **EOF Token Addition (Lines 542-544)**
+###**
 ```cpp
 rawTokens.emplace_back(TokenType::EOF_TOKEN, "", line, col);
 ```
@@ -726,7 +726,7 @@ rawTokens.emplace_back(TokenType::EOF_TOKEN, "", line, col);
 - **Parser Signal**: Indicates end of token stream to parser
 - **Completion**: Raw tokenization phase complete
 
-### **Python Indentation Processing (Lines 546-690)**
+###**
 ```cpp
 // ── Python-style INDENT/DEDENT post-processing ───────────────────────────
 // Scan for COLON + NEWLINE + more-indented line → inject INDENT/DEDENT tokens.
@@ -738,7 +738,7 @@ rawTokens.emplace_back(TokenType::EOF_TOKEN, "", line, col);
 - **Colon Detection**: Look for ':' followed by indented newline
 - **Stack Management**: Track current indentation levels
 
-### **Final Token Return (Line 692)**
+###**
 ```cpp
 return tokens;
 ```

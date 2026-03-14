@@ -12,7 +12,7 @@ Lexer::Lexer(const std::string &source)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 Lexer::Lexer(const std::string &source)
 ```
@@ -21,7 +21,7 @@ Lexer::Lexer(const std::string &source)
 - **Efficient Parameter**: Reference avoids copying the entire source string
 - **Explicit Constructor**: `explicit` keyword prevents implicit conversions
 
-### **Member Initializer List (Line 2)**
+###**
 ```cpp
     : src(source), pos(0), line(1), col(1) {}
 ```

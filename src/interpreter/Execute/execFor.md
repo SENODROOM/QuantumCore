@@ -84,101 +84,101 @@ void Interpreter::execFor(ForStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1935)
-- **Line 1935**: `void Interpreter::execFor(ForStmt &s)` - Execute for statements
+### Function Signature
+-  `void Interpreter::execFor(ForStmt &s)` - Execute for statements
   - `s`: Reference to ForStmt AST node
   - Returns void as for statements don't produce values
 
-### Iterable Evaluation (Lines 1936-1939)
-- **Line 1936**: `{` - Opening brace
-- **Line 1937**: `auto iter = evaluate(*s.iterable);` - Evaluate iterable expression
-- **Line 1938**: `bool hasTuple = !s.var2.empty();` - Check if tuple unpacking
-- **Line 1939**: Empty line for readability
+###
+-  `{` - Opening brace
+-  `auto iter = evaluate(*s.iterable);` - Evaluate iterable expression
+-  `bool hasTuple = !s.var2.empty();` - Check if tuple unpacking
+-  Empty line for readability
 
-### Array Iteration (Lines 1940-1955)
-- **Line 1940**: `if (iter.isArray())` - Check if iterable is array
-- **Line 1941**: `{` - Opening brace for array case
-- **Line 1942**: `auto arr = iter.asArray();` - Get array reference
-- **Line 1943**: `for (size_t i = 0; i < arr->size(); i++)` - Loop through array indices
-- **Line 1944**: `{` - Opening brace for array loop
-- **Line 1945**: `if (hasTuple)` - Check if tuple unpacking
-- **Line 1946**: `{` - Opening brace for tuple case
-- **Line 1947**: `env->define(s.var1, QuantumValue((double)i));` - Define index variable
-- **Line 1948**: `env->define(s.var2, arr->elements[i]);` - Define value variable
-- **Line 1949**: `}` - Closing brace for tuple case
-- **Line 1950**: `else` - Single variable case
-- **Line 1951**: `{` - Opening brace for single case
-- **Line 1952**: `env->define(s.var1, arr->elements[i]);` - Define iteration variable
-- **Line 1953**: `}` - Closing brace for single case
-- **Line 1954**: `execBlock(*s.body, nullptr);` - Execute loop body
-- **Line 1955**: `}` - Closing brace for array loop
+###
+-  `if (iter.isArray())` - Check if iterable is array
+-  `{` - Opening brace for array case
+-  `auto arr = iter.asArray();` - Get array reference
+-  `for (size_t i = 0; i < arr->size(); i++)` - Loop through array indices
+-  `{` - Opening brace for array loop
+-  `if (hasTuple)` - Check if tuple unpacking
+-  `{` - Opening brace for tuple case
+-  `env->define(s.var1, QuantumValue((double)i));` - Define index variable
+-  `env->define(s.var2, arr->elements[i]);` - Define value variable
+-  `}` - Closing brace for tuple case
+-  `else` - Single variable case
+-  `{` - Opening brace for single case
+-  `env->define(s.var1, arr->elements[i]);` - Define iteration variable
+-  `}` - Closing brace for single case
+-  `execBlock(*s.body, nullptr);` - Execute loop body
+-  `}` - Closing brace for array loop
 
-### String Iteration (Lines 1956-1972)
-- **Line 1956**: `}` - Closing brace for array case
-- **Line 1957**: `else if (iter.isString())` - Check if iterable is string
-- **Line 1958**: `{` - Opening brace for string case
-- **Line 1959**: `std::string str = iter.asString();` - Get string reference
-- **Line 1960**: `for (size_t i = 0; i < str.size(); i++)` - Loop through string indices
-- **Line 1961**: `{` - Opening brace for string loop
-- **Line 1962**: `if (hasTuple)` - Check if tuple unpacking
-- **Line 1963**: `{` - Opening brace for tuple case
-- **Line 1964**: `env->define(s.var1, QuantumValue((double)i));` - Define index variable
-- **Line 1965**: `env->define(s.var2, QuantumValue(std::string(1, str[i])));` - Define character variable
-- **Line 1966**: `}` - Closing brace for tuple case
-- **Line 1967**: `else` - Single variable case
-- **Line 1968**: `{` - Opening brace for single case
-- **Line 1969**: `env->define(s.var1, QuantumValue(std::string(1, str[i])));` - Define character variable
-- **Line 1970**: `}` - Closing brace for single case
-- **Line 1971**: `execBlock(*s.body, nullptr);` - Execute loop body
-- **Line 1972**: `}` - Closing brace for string loop
+###
+-  `}` - Closing brace for array case
+-  `else if (iter.isString())` - Check if iterable is string
+-  `{` - Opening brace for string case
+-  `std::string str = iter.asString();` - Get string reference
+-  `for (size_t i = 0; i < str.size(); i++)` - Loop through string indices
+-  `{` - Opening brace for string loop
+-  `if (hasTuple)` - Check if tuple unpacking
+-  `{` - Opening brace for tuple case
+-  `env->define(s.var1, QuantumValue((double)i));` - Define index variable
+-  `env->define(s.var2, QuantumValue(std::string(1, str[i])));` - Define character variable
+-  `}` - Closing brace for tuple case
+-  `else` - Single variable case
+-  `{` - Opening brace for single case
+-  `env->define(s.var1, QuantumValue(std::string(1, str[i])));` - Define character variable
+-  `}` - Closing brace for single case
+-  `execBlock(*s.body, nullptr);` - Execute loop body
+-  `}` - Closing brace for string loop
 
-### Dictionary Iteration (Lines 1973-1990)
-- **Line 1973**: `}` - Closing brace for string case
-- **Line 1974**: `else if (iter.isDict())` - Check if iterable is dictionary
-- **Line 1975**: `{` - Opening brace for dict case
-- **Line 1976**: `auto dict = iter.asDict();` - Get dictionary reference
-- **Line 1977**: `size_t index = 0;` - Initialize index counter
-- **Line 1978**: `for (auto &[key, val] : *dict)` - Loop through dictionary pairs
-- **Line 1979**: `{` - Opening brace for dict loop
-- **Line 1980**: `if (hasTuple)` - Check if tuple unpacking
-- **Line 1981**: `{` - Opening brace for tuple case
-- **Line 1982**: `env->define(s.var1, QuantumValue(key));` - Define key variable
-- **Line 1983**: `env->define(s.var2, val);` - Define value variable
-- **Line 1984**: `}` - Closing brace for tuple case
-- **Line 1985**: `else` - Single variable case
-- **Line 1986**: `{` - Opening brace for single case
-- **Line 1987**: `env->define(s.var1, val);` - Define value variable
-- **Line 1988**: `}` - Closing brace for single case
-- **Line 1989**: `execBlock(*s.body, nullptr);` - Execute loop body
-- **Line 1990**: `}` - Closing brace for dict loop
+###
+-  `}` - Closing brace for string case
+-  `else if (iter.isDict())` - Check if iterable is dictionary
+-  `{` - Opening brace for dict case
+-  `auto dict = iter.asDict();` - Get dictionary reference
+-  `size_t index = 0;` - Initialize index counter
+-  `for (auto &[key, val] : *dict)` - Loop through dictionary pairs
+-  `{` - Opening brace for dict loop
+-  `if (hasTuple)` - Check if tuple unpacking
+-  `{` - Opening brace for tuple case
+-  `env->define(s.var1, QuantumValue(key));` - Define key variable
+-  `env->define(s.var2, val);` - Define value variable
+-  `}` - Closing brace for tuple case
+-  `else` - Single variable case
+-  `{` - Opening brace for single case
+-  `env->define(s.var1, val);` - Define value variable
+-  `}` - Closing brace for single case
+-  `execBlock(*s.body, nullptr);` - Execute loop body
+-  `}` - Closing brace for dict loop
 
-### Generic Iteration (Lines 1991-2010)
-- **Line 1991**: `}` - Closing brace for dict case
-- **Line 1992**: `else` - Generic iterable case
-- **Line 1993**: `{` - Opening brace for generic case
-- **Line 1994**: `// Generic iteration using iterator interface` - Comment about generic iteration
-- **Line 1995**: `auto it = iter.begin();` - Get iterator begin
-- **Line 1996**: `auto end = iter.end();` - Get iterator end
-- **Line 1997**: `size_t index = 0;` - Initialize index counter
-- **Line 1998**: `for (; it != end; ++it, ++index)` - Loop through iterator
-- **Line 1999**: `{` - Opening brace for generic loop
-- **Line 2000**: `if (hasTuple)` - Check if tuple unpacking
-- **Line 2001**: `{` - Opening brace for tuple case
-- **Line 2002**: `env->define(s.var1, QuantumValue((double)index));` - Define index variable
-- **Line 2003**: `env->define(s.var2, *it);` - Define value variable
-- **Line 2004**: `}` - Closing brace for tuple case
-- **Line 2005**: `else` - Single variable case
-- **Line 2006**: `{` - Opening brace for single case
-- **Line 2007**: `env->define(s.var1, *it);` - Define iteration variable
-- **Line 2008**: `}` - Closing brace for single case
-- **Line 2009**: `execBlock(*s.body, nullptr);` - Execute loop body
-- **Line 2010**: `}` - Closing brace for generic loop
+###
+-  `}` - Closing brace for dict case
+-  `else` - Generic iterable case
+-  `{` - Opening brace for generic case
+-  `// Generic iteration using iterator interface` - Comment about generic iteration
+-  `auto it = iter.begin();` - Get iterator begin
+-  `auto end = iter.end();` - Get iterator end
+-  `size_t index = 0;` - Initialize index counter
+-  `for (; it != end; ++it, ++index)` - Loop through iterator
+-  `{` - Opening brace for generic loop
+-  `if (hasTuple)` - Check if tuple unpacking
+-  `{` - Opening brace for tuple case
+-  `env->define(s.var1, QuantumValue((double)index));` - Define index variable
+-  `env->define(s.var2, *it);` - Define value variable
+-  `}` - Closing brace for tuple case
+-  `else` - Single variable case
+-  `{` - Opening brace for single case
+-  `env->define(s.var1, *it);` - Define iteration variable
+-  `}` - Closing brace for single case
+-  `execBlock(*s.body, nullptr);` - Execute loop body
+-  `}` - Closing brace for generic loop
 
-### Function End (Lines 2011-2012)
-- **Line 2011**: `}` - Closing brace for generic case
-- **Line 2012**: `}` - Closing brace for function
+###
+-  `}` - Closing brace for generic case
+-  `}` - Closing brace for function
 
 ## Summary
 

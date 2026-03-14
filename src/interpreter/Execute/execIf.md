@@ -12,26 +12,26 @@ void Interpreter::execIf(IfStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1906)
-- **Line 1906**: `void Interpreter::execIf(IfStmt &s)` - Execute if statements
+### Function Signature
+- `void Interpreter::execIf(IfStmt &s)` - Execute if statements
   - `s`: Reference to IfStmt AST node
   - Returns void as if statements don't produce values
 
-### Condition Evaluation (Lines 1907-1908)
-- **Line 1907**: `{` - Opening brace
-- **Line 1908**: `if (evaluate(*s.condition).isTruthy())` - Evaluate condition and check truthiness
+### Condition Evaluation
+- `{` - Opening brace
+- `if (evaluate(*s.condition).isTruthy())` - Evaluate condition and check truthiness
   - `evaluate(*s.condition)`: Evaluate the condition expression
   - `.isTruthy()`: Check if result is truthy (not nil, not false, not empty)
 
-### Then Branch Execution (Line 1909)
-- **Line 1909**: `execute(*s.thenBranch);` - Execute then branch if condition is truthy
+### Then Branch Execution
+- `execute(*s.thenBranch);` - Execute then branch if condition is truthy
 
-### Else Branch Execution (Lines 1910-1912)
-- **Line 1910**: `else if (s.elseBranch)` - Check if else branch exists
-- **Line 1911**: `execute(*s.elseBranch);` - Execute else branch if condition is falsy
-- **Line 1912**: `}` - Closing brace for function
+### Else Branch Execution
+- `else if (s.elseBranch)` - Check if else branch exists
+- `execute(*s.elseBranch);` - Execute else branch if condition is falsy
+- `}` - Closing brace for function
 
 ## Summary
 

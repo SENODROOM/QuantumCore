@@ -14,25 +14,25 @@ QuantumValue Interpreter::evalDict(DictLiteral &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 4026)
-- **Line 4026**: `QuantumValue Interpreter::evalDict(DictLiteral &e)` - Evaluate dictionary literal expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalDict(DictLiteral &e)` - Evaluate dictionary literal expressions
   - `e`: Reference to DictLiteral AST node
   - Returns QuantumValue containing the created dictionary
 
-### Dictionary Creation (Lines 4027-4030)
-- **Line 4027**: `{` - Opening brace
-- **Line 4028**: `auto dict = std::make_shared<Dict>();` - Create shared dictionary object
-- **Line 4029**: `for (auto &[k, v] : e.pairs)` - Loop through key-value pairs
-- **Line 4030**: `{` - Opening brace for pair loop
+###
+-  `{` - Opening brace
+-  `auto dict = std::make_shared<Dict>();` - Create shared dictionary object
+-  `for (auto &[k, v] : e.pairs)` - Loop through key-value pairs
+-  `{` - Opening brace for pair loop
 
-### Pair Processing (Lines 4031-4034)
-- **Line 4031**: `dict->set(evaluate(*k), evaluate(*v));` - Evaluate key and value, store in dictionary
-- **Line 4032**: `}` - Closing brace for pair loop
-- **Line 4033**: Empty line for readability
-- **Line 4034**: `return QuantumValue(dict);` - Return dictionary as QuantumValue
-- **Line 4035**: `}` - Closing brace for function
+###
+-  `dict->set(evaluate(*k), evaluate(*v));` - Evaluate key and value, store in dictionary
+-  `}` - Closing brace for pair loop
+-  Empty line for readability
+-  `return QuantumValue(dict);` - Return dictionary as QuantumValue
+-  `}` - Closing brace for function
 
 ## Summary
 

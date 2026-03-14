@@ -11,25 +11,25 @@ std::shared_ptr<QuantumNative> QuantumValue::asNative() const
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 221)
-- **Line 221**: `std::shared_ptr<QuantumNative> QuantumValue::asNative() const` - Member function that returns the value as a native function
+### Function Signature
+-  `std::shared_ptr<QuantumNative> QuantumValue::asNative() const` - Member function that returns the value as a native function
   - Returns a shared pointer to the native function
   - `const` means this function doesn't modify the QuantumValue object
 
-### Function Body (Lines 222-226)
-- **Line 222**: `{` - Opening brace for function body
-- **Line 223**: `if (!isNative())` - Check if the value is not a native function
+###
+-  `{` - Opening brace for function body
+-  `if (!isNative())` - Check if the value is not a native function
   - Calls the `isNative()` method to verify the type
   - `!` negates the result, so this executes if it's NOT a native function
-- **Line 224**: `throw RuntimeError("Value is not a native function");` - Throw runtime error if type mismatch
+-  `throw RuntimeError("Value is not a native function");` - Throw runtime error if type mismatch
   - Creates a RuntimeError with descriptive message
   - This prevents unsafe type casting
-- **Line 225**: `return std::get<std::shared_ptr<QuantumNative>>(data);` - Extract and return the native function
+-  `return std::get<std::shared_ptr<QuantumNative>>(data);` - Extract and return the native function
   - `std::get` safely extracts the value from the variant (we know it's the correct type due to the check)
   - Returns the shared pointer to the QuantumNative function
-- **Line 226**: `}` - Closing brace for function body
+-  `}` - Closing brace for function body
 
 ## Summary
 

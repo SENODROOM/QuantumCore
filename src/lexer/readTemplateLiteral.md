@@ -135,7 +135,7 @@ void Lexer::readTemplateLiteral(std::vector<Token> &out, int startLine, int star
 
 ## Line-by-Line Analysis
 
-### **Function Signature and Initialization (Lines 1-3)**
+###**
 ```cpp
 void Lexer::readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol)
 {
@@ -148,7 +148,7 @@ void Lexer::readTemplateLiteral(std::vector<Token> &out, int startLine, int star
 - **Position Parameters**: Starting position for token creation
 - **Backtick Consumption**: Advances past opening backtick
 
-### **Part Structure Definition (Lines 6-12)**
+###**
 ```cpp
 // Collect alternating: text segment, then expression source string
 // We'll build a list of parts: {isExpr, content}
@@ -166,7 +166,7 @@ std::vector<Part> parts;
 - **Alternating Pattern**: Text and expression parts alternate
 - **Collection**: Vector stores all parts for processing
 
-### **Main Template Processing Loop (Lines 14-69)**
+###**
 ```cpp
 std::string seg;
 while (pos < src.size() && current() != '`')
@@ -192,7 +192,7 @@ while (pos < src.size() && current() != '`')
 - **Three Processing Paths**: Escape sequences, expressions, regular text
 - **Part Creation**: Creates Part objects when switching between text/expression
 
-### **Escape Sequence Handling (Lines 16-38)**
+###**
 ```cpp
 if (current() == '\\')
 {
@@ -229,7 +229,7 @@ if (current() == '\\')
 - **Switch Statement**: Maps escape codes to actual characters
 - **Template-Specific**: Includes `$` and `` ` `` escape codes
 
-### **Expression Processing (Lines 40-61)**
+###**
 ```cpp
 else if (current() == '$' && pos + 1 < src.size() && src[pos + 1] == '{')
 {
@@ -266,7 +266,7 @@ else if (current() == '$' && pos + 1 < src.size() && src[pos + 1] == '{')
 - **Depth Tracking**: Handles nested braces in expressions
 - **Expression Collection**: Accumulates expression source code
 
-### **Regular Text Processing (Lines 62-66)**
+###**
 ```cpp
 else
 {
@@ -280,7 +280,7 @@ else
 - **Position Advancement**: advance() handles position tracking
 - **Accumulation**: Builds text content for current segment
 
-### **Closing Backtick and Final Part (Lines 68-72)**
+###**
 ```cpp
 if (pos < src.size())
     advance(); // skip closing backtick
@@ -294,7 +294,7 @@ parts.push_back({false, seg});
 - **Final Part**: Adds last text segment to parts collection
 - **Complete Collection**: All parts now stored for processing
 
-### **Token Generation Logic (Lines 74-108)**
+###**
 ```cpp
 bool first = true;
 auto emitPlus = [&]()
@@ -323,7 +323,7 @@ for (auto &p : parts)
 - **Expression Parts**: Re-lex expressions and wrap in parentheses
 - **Concatenation**: Creates string concatenation expression
 
-### **Expression Re-lexing (Lines 89-105)**
+###**
 ```cpp
 // Re-lex the expression and wrap in parentheses
 // Use str() wrapper so numbers/bools get stringified in concat context
@@ -344,7 +344,7 @@ out.emplace_back(TokenType::RPAREN, ")", startLine, startCol);
 - **Filtering**: Removes EOF and NEWLINE tokens
 - **Wrapping**: Wraps in parentheses for proper precedence
 
-### **Empty Template Handling (Lines 110-112)**
+###**
 ```cpp
 // If the entire template was empty
 if (first)

@@ -41,78 +41,78 @@ private:
 };
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Header Guard and Includes (Lines 1-5)
-- **Line 1**: `#pragma once` - Prevents the header from being included multiple times
-- **Line 2**: `#include "Token.h"` - Includes token type definitions
-- **Line 3**: `#include <string>` - Includes string functionality for source code processing
-- **Line 4**: `#include <vector>` - Includes vector for storing tokens
-- **Line 5**: `#include <unordered_map>` - Includes hash map for keyword lookup
+###
+-  `#pragma once` - Prevents the header from being included multiple times
+-  `#include "Token.h"` - Includes token type definitions
+-  `#include <string>` - Includes string functionality for source code processing
+-  `#include <vector>` - Includes vector for storing tokens
+-  `#include <unordered_map>` - Includes hash map for keyword lookup
 
-### Class Declaration (Line 6)
-- **Line 6**: `class Lexer` - Declares the Lexer class that converts source code into tokens
+###
+-  `class Lexer` - Declares the Lexer class that converts source code into tokens
 
-### Public Interface (Lines 7-11)
+###
 
-#### Constructor (Line 7)
-- **Line 7**: `public:` - Starts the public section of the class
-- **Line 8**: `explicit Lexer(const std::string &source);` - Constructor that takes source code as string
+####
+-  `public:` - Starts the public section of the class
+-  `explicit Lexer(const std::string &source);` - Constructor that takes source code as string
   - `explicit` prevents implicit conversions
   - Takes reference to source code string
 
-#### Main Tokenization Method (Line 9)
-- **Line 9**: `std::vector<Token> tokenize();` - Main method that converts source code into a vector of tokens
+####
+-  `std::vector<Token> tokenize();` - Main method that converts source code into a vector of tokens
 
-### Private Section (Line 11)
-- **Line 10**: Empty line for readability
-- **Line 11**: `private:` - Starts the private section of the class
+###
+-  Empty line for readability
+-  `private:` - Starts the private section of the class
 
-### Private Member Variables (Lines 12-20)
+###
 
-#### Source Code Tracking (Lines 12-14)
-- **Line 12**: `std::string src;` - Stores the source code to be tokenized
-- **Line 13**: `size_t pos;` - Current position in the source string
-- **Line 14**: `int line, col;` - Current line and column numbers for error reporting
+####
+-  `std::string src;` - Stores the source code to be tokenized
+-  `size_t pos;` - Current position in the source string
+-  `int line, col;` - Current line and column numbers for error reporting
 
-#### Keyword Mapping (Line 16)
-- **Line 15**: Empty line for readability
-- **Line 16**: `static const std::unordered_map<std::string, TokenType> keywords;` - Static constant map from keyword strings to token types
+####
+-  Empty line for readability
+-  `static const std::unordered_map<std::string, TokenType> keywords;` - Static constant map from keyword strings to token types
 
-#### Advanced Features (Lines 17-20)
-- **Line 17**: `std::vector<Token> pendingTokens_; // used for f-string expansion` - Vector of tokens waiting to be processed (used for template literals)
-- **Line 18**: `// C preprocessor #define macros: name → replacement token list` - Comment explaining defines map
-- **Line 19**: `std::unordered_map<std::string, std::vector<Token>> defines_;` - Map for C-style macro definitions
-- **Line 20**: Empty line for readability
+####
+-  `std::vector<Token> pendingTokens_; // used for f-string expansion` - Vector of tokens waiting to be processed (used for template literals)
+-  `// C preprocessor #define macros: name → replacement token list` - Comment explaining defines map
+-  `std::unordered_map<std::string, std::vector<Token>> defines_;` - Map for C-style macro definitions
+-  Empty line for readability
 
-### Character Access Methods (Lines 21-24)
+###
 
-#### Current Character Access (Lines 21-24)
-- **Line 21**: `char current() const;` - Returns the current character at position
-- **Line 22**: `char peek(int offset = 1) const;` - Looks ahead at character with optional offset (default 1)
-- **Line 23**: `char advance();` - Advances position and returns the previous character
-- **Line 24**: Empty line for readability
+####
+-  `char current() const;` - Returns the current character at position
+-  `char peek(int offset = 1) const;` - Looks ahead at character with optional offset (default 1)
+-  `char advance();` - Advances position and returns the previous character
+-  Empty line for readability
 
-### Skipping Methods (Lines 25-28)
+###
 
-#### Whitespace and Comment Skipping (Lines 25-28)
-- **Line 25**: `void skipWhitespace();` - Skips whitespace characters (spaces, tabs, newlines)
-- **Line 26**: `void skipComment();      // single-line: // ...` - Skips single-line comments
-- **Line 27**: `void skipBlockComment(); // multi-line:  /* ... */` - Skips multi-line block comments
-- **Line 28**: Empty line for readability
+####
+-  `void skipWhitespace();` - Skips whitespace characters (spaces, tabs, newlines)
+-  `void skipComment();      // single-line: // ...` - Skips single-line comments
+-  `void skipBlockComment(); // multi-line:  /* ... */` - Skips multi-line block comments
+-  Empty line for readability
 
-### Token Reading Methods (Lines 29-35)
+###
 
-#### Literal Token Methods (Lines 29-31)
-- **Line 29**: `Token readNumber();` - Reads and creates a number token
-- **Line 30**: `Token readString(char quote);` - Reads and creates a string token (takes quote character)
-- **Line 31**: `void readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol);` - Reads template literals and adds tokens to output vector
+####
+-  `Token readNumber();` - Reads and creates a number token
+-  `Token readString(char quote);` - Reads and creates a string token (takes quote character)
+-  `void readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol);` - Reads template literals and adds tokens to output vector
 
-#### Identifier and Operator Methods (Lines 32-35)
-- **Line 32**: `Token readIdentifierOrKeyword();` - Reads identifier or keyword and creates appropriate token
-- **Line 33**: `Token readOperator();` - Reads operator characters and creates operator token
-- **Line 34**: Empty line for readability
-- **Line 35**: `};` - Closing brace for the Lexer class
+####
+-  `Token readIdentifierOrKeyword();` - Reads identifier or keyword and creates appropriate token
+-  `Token readOperator();` - Reads operator characters and creates operator token
+-  Empty line for readability
+-  `};` - Closing brace for the Lexer class
 
 ## Summary
 

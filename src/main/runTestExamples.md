@@ -196,7 +196,7 @@ static int runTestExamples(const std::string &examplesDir)
 
 ## Line-by-Line Analysis
 
-### **Function Signature and Validation (Lines 1-12)**
+###**
 ```cpp
 static int runTestExamples(const std::string &examplesDir)
 {
@@ -213,7 +213,7 @@ static int runTestExamples(const std::string &examplesDir)
 - **Error Reporting**: Colored, formatted error message
 - **Early Exit**: Returns failure code for invalid directory
 
-### **Test Environment Setup (Lines 14-17)**
+###**
 ```cpp
 redirectStdinToNull();
 g_testMode = true;
@@ -223,7 +223,7 @@ g_testMode = true;
 - **Global State**: Sets up environment for all subsequent tests
 - **Non-Blocking**: Ensures automated testing doesn't hang
 
-### **File Collection and Validation (Lines 19-31)**
+###**
 ```cpp
 std::vector<fs::path> files;
 collectSaFiles(dir, files);
@@ -242,7 +242,7 @@ std::sort(files.begin(), files.end());
 - **Deterministic Order**: Sorts for consistent test execution
 - **Success Return**: No files is not an error condition
 
-### **Console Header Display (Lines 33-42)**
+###**
 ```cpp
 std::cout << Colors::CYAN << Colors::BOLD
           << "\n══════════════════════════════════════════════════\n"
@@ -260,7 +260,7 @@ std::cout << Colors::CYAN << "  Files found: " << Colors::YELLOW
 - **Color Coding**: Cyan for structure, yellow for data
 - **Visual Separation**: Clear start of test execution
 
-### **Test Execution Loop (Lines 44-82)**
+###**
 ```cpp
 std::vector<TestResult> failures;
 int passed = 0;
@@ -293,7 +293,7 @@ for (const auto &filePath : files)
 - **Immediate Feedback**: Pass/fail shown immediately
 - **Failure Collection**: Stores detailed failure information
 
-### **Error Display Logic (Lines 58-79)**
+###**
 ```cpp
 if (tr.line > 0)
 {
@@ -318,7 +318,7 @@ std::cout << Colors::RED << "  Error: " << tr.error
 - **Color Coding**: Red for errors, clear visibility
 - **Detailed Information**: Line number, source, and error message
 
-### **Console Summary (Lines 84-103)**
+###**
 ```cpp
 int total = static_cast<int>(files.size());
 int failed = static_cast<int>(failures.size());
@@ -346,7 +346,7 @@ else
 - **Clear Breakdown**: Detailed counts when failures exist
 - **Visual Separation**: Boxed summary section
 
-### **Report File Generation (Lines 105-175)**
+###**
 ```cpp
 const std::string reportPath = "test_results.txt";
 std::ofstream report(reportPath);

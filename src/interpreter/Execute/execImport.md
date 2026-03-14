@@ -64,83 +64,83 @@ void Interpreter::execImport(ImportStmt &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 2346)
-- **Line 2346**: `void Interpreter::execImport(ImportStmt &s)` - Execute import statements
+### Function Signature
+-  `void Interpreter::execImport(ImportStmt &s)` - Execute import statements
   - `s`: Reference to ImportStmt AST node
   - Returns void as import statements don't produce values
 
-### Python Stubs Registry (Lines 2347-2356)
-- **Line 2347**: `{` - Opening brace
-- **Line 2348**: `// ── Stub registry for common Python standard-library symbols ──────────────` - Comment about Python stubs
-- **Line 2349**: `// Any symbol not listed here is silently injected as a no-op native stub.` - Comment about fallback behavior
-- **Line 2350**: `static const std::unordered_set<std::string> pythonStubs = {` - Python modules set
-- **Line 2351**: `"os", "sys", "math", "random", "datetime", "json", "re", "urllib",` - Common Python modules
-- **Line 2352**: `"http", "sqlite3", "threading", "multiprocessing", "subprocess",` - More Python modules
-- **Line 2353**: `"pathlib", "collections", "itertools", "functools", "operator",` - Python utility modules
-- **Line 2354**: `"typing", "dataclasses", "enum", "abc", "inspect", "importlib"` - Python advanced modules
-- **Line 2355**: `};` - Close set definition
+###
+-  `{` - Opening brace
+-  `// ── Stub registry for common Python standard-library symbols ──────────────` - Comment about Python stubs
+-  `// Any symbol not listed here is silently injected as a no-op native stub.` - Comment about fallback behavior
+-  `static const std::unordered_set<std::string> pythonStubs = {` - Python modules set
+-  `"os", "sys", "math", "random", "datetime", "json", "re", "urllib",` - Common Python modules
+-  `"http", "sqlite3", "threading", "multiprocessing", "subprocess",` - More Python modules
+-  `"pathlib", "collections", "itertools", "functools", "operator",` - Python utility modules
+-  `"typing", "dataclasses", "enum", "abc", "inspect", "importlib"` - Python advanced modules
+-  `};` - Close set definition
 
-### C++ Stubs Registry (Lines 2356-2365)
-- **Line 2356**: Empty line for readability
-- **Line 2357**: `// ── C/C++ standard library headers (as modules) ───────────────────────────` - Comment about C++ stubs
-- **Line 2358**: `static const std::unordered_set<std::string> cppStubs = {` - C++ modules set
-- **Line 2359**: `"iostream", "fstream", "sstream", "string", "vector", "array",` - C++ I/O and containers
-- **Line 2360**: `"list", "map", "set", "algorithm", "numeric", "memory",` - C++ STL modules
-- **Line 2361**: `"thread", "mutex", "condition_variable", "atomic",` - C++ concurrency modules
-- **Line 2362**: `"chrono", "filesystem", "regex", "complex", "valarray"` - C++ specialized modules
-- **Line 2363**: `};` - Close set definition
-- **Line 2364**: Empty line for readability
+###
+-  Empty line for readability
+-  `// ── C/C++ standard library headers (as modules) ───────────────────────────` - Comment about C++ stubs
+-  `static const std::unordered_set<std::string> cppStubs = {` - C++ modules set
+-  `"iostream", "fstream", "sstream", "string", "vector", "array",` - C++ I/O and containers
+-  `"list", "map", "set", "algorithm", "numeric", "memory",` - C++ STL modules
+-  `"thread", "mutex", "condition_variable", "atomic",` - C++ concurrency modules
+-  `"chrono", "filesystem", "regex", "complex", "valarray"` - C++ specialized modules
+-  `};` - Close set definition
+-  Empty line for readability
 
-### Module Name Extraction (Line 2365)
-- **Line 2365**: `std::string moduleName = s.module;` - Get module name from statement
+###
+-  `std::string moduleName = s.module;` - Get module name from statement
 
-### From Import Handling (Lines 2366-2378)
-- **Line 2366**: Empty line for readability
-- **Line 2367**: `// Handle "from module import name" syntax` - Comment about from imports
-- **Line 2368**: `if (!s.name.empty())` - Check if specific name import
-- **Line 2369**: `{` - Opening brace for from import
-- **Line 2370**: `// For now, create a simple stub object` - Comment about stub creation
-- **Line 2371**: `auto stub = std::make_shared<QuantumNative>();` - Create native stub
-- **Line 2372**: `stub->name = s.name;` - Set stub name
-- **Line 2373**: `stub->fn = [](auto args) -> QuantumValue {` - Define stub function
-- **Line 2374**: `return QuantumValue(); // No-op stub` - Return nil
-- **Line 2375**: `};` - Close stub function
-- **Line 2376**: `env->define(s.name, QuantumValue(stub));` - Define stub in environment
-- **Line 2377**: `return;` - Return early
-- **Line 2378**: `}` - Closing brace for from import
+###
+-  Empty line for readability
+-  `// Handle "from module import name" syntax` - Comment about from imports
+-  `if (!s.name.empty())` - Check if specific name import
+-  `{` - Opening brace for from import
+-  `// For now, create a simple stub object` - Comment about stub creation
+-  `auto stub = std::make_shared<QuantumNative>();` - Create native stub
+-  `stub->name = s.name;` - Set stub name
+-  `stub->fn = [](auto args) -> QuantumValue {` - Define stub function
+-  `return QuantumValue(); // No-op stub` - Return nil
+-  `};` - Close stub function
+-  `env->define(s.name, QuantumValue(stub));` - Define stub in environment
+-  `return;` - Return early
+-  `}` - Closing brace for from import
 
-### Python Module Handling (Lines 2379-2387)
-- **Line 2379**: Empty line for readability
-- **Line 2380**: `// Handle "import module" syntax` - Comment about module imports
-- **Line 2381**: `if (pythonStubs.count(moduleName))` - Check if Python module
-- **Line 2382**: `{` - Opening brace for Python module
-- **Line 2383**: `// Create stub module object` - Comment about module creation
-- **Line 2384**: `auto module = std::make_shared<Dict>();` - Create dictionary for module
-- **Line 2385**: `env->define(moduleName, QuantumValue(module));` - Define module in environment
-- **Line 2386**: `return;` - Return early
-- **Line 2387**: `}` - Closing brace for Python module
+###
+-  Empty line for readability
+-  `// Handle "import module" syntax` - Comment about module imports
+-  `if (pythonStubs.count(moduleName))` - Check if Python module
+-  `{` - Opening brace for Python module
+-  `// Create stub module object` - Comment about module creation
+-  `auto module = std::make_shared<Dict>();` - Create dictionary for module
+-  `env->define(moduleName, QuantumValue(module));` - Define module in environment
+-  `return;` - Return early
+-  `}` - Closing brace for Python module
 
-### C++ Module Handling (Lines 2388-2396)
-- **Line 2388**: `if (cppStubs.count(moduleName))` - Check if C++ module
-- **Line 2389**: `{` - Opening brace for C++ module
-- **Line 2390**: `// Create stub module object` - Comment about module creation
-- **Line 2391**: `auto module = std::make_shared<Dict>();` - Create dictionary for module
-- **Line 2392**: `env->define(moduleName, QuantumValue(module));` - Define module in environment
-- **Line 2393**: `return;` - Return early
-- **Line 2394**: `}` - Closing brace for C++ module
+###
+-  `if (cppStubs.count(moduleName))` - Check if C++ module
+-  `{` - Opening brace for C++ module
+-  `// Create stub module object` - Comment about module creation
+-  `auto module = std::make_shared<Dict>();` - Create dictionary for module
+-  `env->define(moduleName, QuantumValue(module));` - Define module in environment
+-  `return;` - Return early
+-  `}` - Closing brace for C++ module
 
-### Default Stub Creation (Lines 2395-2404)
-- **Line 2395**: Empty line for readability
-- **Line 2396**: `// Default: create no-op stub` - Comment about default behavior
-- **Line 2397**: `auto stub = std::make_shared<QuantumNative>();` - Create default stub
-- **Line 2398**: `stub->name = moduleName;` - Set stub name
-- **Line 2399**: `stub->fn = [](auto args) -> QuantumValue {` - Define stub function
-- **Line 2400**: `return QuantumValue(); // No-op stub` - Return nil
-- **Line 2401**: `};` - Close stub function
-- **Line 2402**: `env->define(moduleName, QuantumValue(stub));` - Define stub in environment
-- **Line 2403**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `// Default: create no-op stub` - Comment about default behavior
+-  `auto stub = std::make_shared<QuantumNative>();` - Create default stub
+-  `stub->name = moduleName;` - Set stub name
+-  `stub->fn = [](auto args) -> QuantumValue {` - Define stub function
+-  `return QuantumValue(); // No-op stub` - Return nil
+-  `};` - Close stub function
+-  `env->define(moduleName, QuantumValue(stub));` - Define stub in environment
+-  `}` - Closing brace for function
 
 ## Summary
 

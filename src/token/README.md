@@ -19,7 +19,7 @@ The `Token.cpp` file implements the `toString()` method for the `Token` structur
 
 ## Block-by-Block Analysis
 
-### **Include Statements (Lines 1-2)**
+###**
 ```cpp
 #include "../include/Token.h"
 #include <sstream>
@@ -34,7 +34,7 @@ The `Token.cpp` file implements the `toString()` method for the `Token` structur
 - **String Building**: `ostringstream` provides type-safe string concatenation
 - **Standard Library**: Uses proven, efficient string manipulation
 
-### **Method Implementation (Lines 4-8)**
+###**
 ```cpp
 std::string Token::toString() const {
     std::ostringstream oss;
@@ -51,7 +51,7 @@ std::string Token::toString() const {
 
 **Implementation Breakdown:**
 
-#### **String Stream Creation (Line 5)**
+####**
 ```cpp
 std::ostringstream oss;
 ```
@@ -60,7 +60,7 @@ std::ostringstream oss;
 - **Efficient Building**: Stream operators provide type-safe concatenation
 - **Memory Management**: Automatic buffer management
 
-#### **Formatted Output (Line 6)**
+####**
 ```cpp
 oss << "[" << line << ":" << col << " " << value << "]";
 ```
@@ -86,7 +86,7 @@ oss << "[" << line << ":" << col << " " << value << "]";
 "[3:7 function]"
 ```
 
-#### **String Return (Line 7)**
+####**
 ```cpp
 return oss.str();
 ```

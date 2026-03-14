@@ -19,30 +19,30 @@ QuantumValue Interpreter::evalDeref(DerefExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 4179)
-- **Line 4179**: `QuantumValue Interpreter::evalDeref(DerefExpr &e)` - Evaluate dereference expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalDeref(DerefExpr &e)` - Evaluate dereference expressions
   - `e`: Reference to DerefExpr AST node
   - Returns QuantumValue result of dereferencing
 
-### Pointer Evaluation (Lines 4180-4183)
-- **Line 4180**: `{` - Opening brace
-- **Line 4181**: `// *ptr — read the value the pointer points to` - Comment about dereferencing
-- **Line 4182**: `auto ptrVal = evaluate(*e.operand);` - Evaluate pointer expression
-- **Line 4183**: `if (!ptrVal.isPointer())` - Check if result is pointer
+###
+-  `{` - Opening brace
+-  `// *ptr — read the value the pointer points to` - Comment about dereferencing
+-  `auto ptrVal = evaluate(*e.operand);` - Evaluate pointer expression
+-  `if (!ptrVal.isPointer())` - Check if result is pointer
 
-### Type Validation (Lines 4184-4186)
-- **Line 4184**: `throw TypeError("Cannot dereference non-pointer: " + ptrVal.typeName());` - Error for non-pointer
-- **Line 4185**: Empty line for readability
-- **Line 4186**: `auto ptr = ptrVal.asPointer();` - Get pointer object
+###
+-  `throw TypeError("Cannot dereference non-pointer: " + ptrVal.typeName());` - Error for non-pointer
+-  Empty line for readability
+-  `auto ptr = ptrVal.asPointer();` - Get pointer object
 
-### Pointer Dereference (Lines 4187-4191)
-- **Line 4187**: `auto cell = ptr->deref();` - Dereference pointer to get cell
-- **Line 4188**: `if (!cell)` - Check if pointer is null
-- **Line 4189**: `throw RuntimeError("Dereferencing null pointer");` - Error for null pointer
-- **Line 4190**: `return *cell;` - Return value from cell
-- **Line 4191**: `}` - Closing brace for function
+###
+-  `auto cell = ptr->deref();` - Dereference pointer to get cell
+-  `if (!cell)` - Check if pointer is null
+-  `throw RuntimeError("Dereferencing null pointer");` - Error for null pointer
+-  `return *cell;` - Return value from cell
+-  `}` - Closing brace for function
 
 ## Summary
 

@@ -49,69 +49,69 @@ QuantumValue Interpreter::evalAssign(AssignExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3376)
-- **Line 3376**: `QuantumValue Interpreter::evalAssign(AssignExpr &e)` - Evaluate assignment expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalAssign(AssignExpr &e)` - Evaluate assignment expressions
   - `e`: Reference to AssignExpr AST node
   - Returns QuantumValue result of the assignment
 
-### Tuple Unpacking Detection (Lines 3377-3380)
-- **Line 3377**: `{` - Opening brace
-- **Line 3378**: `// Tuple unpacking: a, b, c = someIterable` - Comment about unpacking
-- **Line 3379**: `if (e.op == "unpack")` - Check if this is unpacking assignment
-- **Line 3380**: `{` - Opening brace for unpacking
+###
+-  `{` - Opening brace
+-  `// Tuple unpacking: a, b, c = someIterable` - Comment about unpacking
+-  `if (e.op == "unpack")` - Check if this is unpacking assignment
+-  `{` - Opening brace for unpacking
 
-### Iterable Evaluation (Lines 3381-3386)
-- **Line 3381**: `auto iterable = evaluate(*e.right);` - Evaluate the right-hand side
-- **Line 3382**: `std::vector<QuantumValue> items;` - Create vector for unpacked items
-- **Line 3383**: Empty line for readability
-- **Line 3384**: `if (iterable.isArray())` - Check if iterable is array
-- **Line 3385**: `{` - Opening brace for array case
-- **Line 3386**: `items = iterable.asArray()->elements;` - Copy array elements
+###
+-  `auto iterable = evaluate(*e.right);` - Evaluate the right-hand side
+-  `std::vector<QuantumValue> items;` - Create vector for unpacked items
+-  Empty line for readability
+-  `if (iterable.isArray())` - Check if iterable is array
+-  `{` - Opening brace for array case
+-  `items = iterable.asArray()->elements;` - Copy array elements
 
-### String Iteration (Lines 3387-3391)
-- **Line 3387**: `}` - Closing brace for array case
-- **Line 3388**: `else if (iterable.isString())` - Check if iterable is string
-- **Line 3389**: `{` - Opening brace for string case
-- **Line 3390**: `for (char ch : iterable.asString())` - Loop through string characters
-- **Line 3391**: `items.push_back(QuantumValue(std::string(1, ch)));` - Add each character as string
+###
+-  `}` - Closing brace for array case
+-  `else if (iterable.isString())` - Check if iterable is string
+-  `{` - Opening brace for string case
+-  `for (char ch : iterable.asString())` - Loop through string characters
+-  `items.push_back(QuantumValue(std::string(1, ch)));` - Add each character as string
 
-### Generic Iteration (Lines 3392-3400)
-- **Line 3392**: `}` - Closing brace for string case
-- **Line 3393**: `else` - Generic iterable case
-- **Line 3394**: `{` - Opening brace for generic case
-- **Line 3395**: `// Try to iterate over the object` - Comment about iteration
-- **Line 3396**: `auto it = iterable.begin();` - Get iterator begin
-- **Line 3397**: `auto end = iterable.end();` - Get iterator end
-- **Line 3398**: `for (; it != end; ++it)` - Loop through iterator
-- **Line 3399**: `items.push_back(*it);` - Add each item
-- **Line 3400**: `}` - Closing brace for generic case
+###
+-  `}` - Closing brace for string case
+-  `else` - Generic iterable case
+-  `{` - Opening brace for generic case
+-  `// Try to iterate over the object` - Comment about iteration
+-  `auto it = iterable.begin();` - Get iterator begin
+-  `auto end = iterable.end();` - Get iterator end
+-  `for (; it != end; ++it)` - Loop through iterator
+-  `items.push_back(*it);` - Add each item
+-  `}` - Closing brace for generic case
 
-### Unpacking Assignment (Lines 3401-3410)
-- **Line 3401**: Empty line for readability
-- **Line 3402**: `size_t i = 0;` - Initialize index counter
-- **Line 3403**: `for (auto &target : e.left)` - Loop through assignment targets
-- **Line 3404**: `{` - Opening brace for target loop
-- **Line 3405**: `if (i >= items.size())` - Check if too many targets
-- **Line 3406**: `throw RuntimeError("Too many targets in unpacking");` - Throw error
-- **Line 3407**: `setLValue(*target, items[i], "=");` - Assign value to target
-- **Line 3408**: `i++;` - Increment index
-- **Line 3409**: `}` - Closing brace for target loop
+###
+-  Empty line for readability
+-  `size_t i = 0;` - Initialize index counter
+-  `for (auto &target : e.left)` - Loop through assignment targets
+-  `{` - Opening brace for target loop
+-  `if (i >= items.size())` - Check if too many targets
+-  `throw RuntimeError("Too many targets in unpacking");` - Throw error
+-  `setLValue(*target, items[i], "=");` - Assign value to target
+-  `i++;` - Increment index
+-  `}` - Closing brace for target loop
 
-### Unpacking Validation (Lines 3411-3416)
-- **Line 3410**: Empty line for readability
-- **Line 3411**: `if (i < items.size())` - Check if too few values
-- **Line 3412**: `throw RuntimeError("Too few values in unpacking");` - Throw error
-- **Line 3413**: `return iterable;` - Return the original iterable
-- **Line 3414**: `}` - Closing brace for unpacking
-- **Line 3415**: Empty line for readability
+###
+-  Empty line for readability
+-  `if (i < items.size())` - Check if too few values
+-  `throw RuntimeError("Too few values in unpacking");` - Throw error
+-  `return iterable;` - Return the original iterable
+-  `}` - Closing brace for unpacking
+-  Empty line for readability
 
-### Regular Assignment (Lines 3416-3420)
-- **Line 3416**: `auto value = evaluate(*e.right);` - Evaluate right-hand side
-- **Line 3417**: `setLValue(*e.left, value, e.op);` - Perform the assignment
-- **Line 3418**: `return value;` - Return assigned value
-- **Line 3419**: `}` - Closing brace for function
+###
+-  `auto value = evaluate(*e.right);` - Evaluate right-hand side
+-  `setLValue(*e.left, value, e.op);` - Perform the assignment
+-  `return value;` - Return assigned value
+-  `}` - Closing brace for function
 
 ## Summary
 

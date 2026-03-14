@@ -31,7 +31,7 @@ static std::string getSourceLine(const std::string &source, int lineNum)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static std::string getSourceLine(const std::string &source, int lineNum)
 ```
@@ -41,7 +41,7 @@ static std::string getSourceLine(const std::string &source, int lineNum)
 - **`const std::string &source`**: Constant reference to source code for efficiency
 - **`int lineNum`**: 1-based line number to extract
 
-### **Input Validation (Lines 3-5)**
+###**
 ```cpp
 if (lineNum <= 0)
     return "";
@@ -51,7 +51,7 @@ if (lineNum <= 0)
 - **Empty String**: Indicates invalid request
 - **Defensive Programming**: Prevents undefined behavior
 
-### **Stream Setup (Lines 7-9)**
+###**
 ```cpp
 std::istringstream stream(source);
 std::string line;
@@ -62,7 +62,7 @@ int currentLine = 1;
 - **`line` Variable**: Storage for each extracted line
 - **`currentLine` Counter**: Tracks current line position (1-based)
 
-### **Line Skipping Loop (Lines 11-15)**
+###**
 ```cpp
 while (currentLine < lineNum && std::getline(stream, line))
 {
@@ -74,7 +74,7 @@ while (currentLine < lineNum && std::getline(stream, line))
 - **Line Advancement**: Increment counter for each line read
 - **Early Termination**: Stops if EOF reached before target line
 
-### **Target Line Extraction (Lines 17-21)**
+###**
 ```cpp
 if (currentLine == lineNum && std::getline(stream, line))
 {
@@ -86,7 +86,7 @@ if (currentLine == lineNum && std::getline(stream, line))
 - **Success Return**: Returns the extracted line
 - **Preserves Formatting**: Maintains original indentation and content
 
-### **Default Return (Line 23)**
+###**
 ```cpp
 return "";
 ```

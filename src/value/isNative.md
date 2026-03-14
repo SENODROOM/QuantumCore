@@ -9,23 +9,23 @@ bool QuantumValue::isNative() const
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 216)
-- **Line 216**: `bool QuantumValue::isNative() const` - Member function that checks if the value is a native function
+### Function Signature
+-  `bool QuantumValue::isNative() const` - Member function that checks if the value is a native function
   - Returns `true` if the value contains a native function, `false` otherwise
   - `const` means this function doesn't modify the QuantumValue object
 
 ### Function Body (Line 217-218)
-- **Line 217**: `{` - Opening brace for function body
-- **Line 218**: `return std::holds_alternative<std::shared_ptr<QuantumNative>>(data);` - Check if the variant holds a native function
+-  `{` - Opening brace for function body
+-  `return std::holds_alternative<std::shared_ptr<QuantumNative>>(data);` - Check if the variant holds a native function
   - `std::holds_alternative` is a standard library function that checks if a variant currently holds a specific type
   - `std::shared_ptr<QuantumNative>` is the type we're checking for
   - `data` is the variant member that stores the actual value
   - Returns `true` if the variant currently contains a `std::shared_ptr<QuantumNative>`
 
-### Function Closing (Line 219)
-- **Line 219**: `}` - Closing brace for function body
+###
+-  `}` - Closing brace for function body
 
 ## Summary
 

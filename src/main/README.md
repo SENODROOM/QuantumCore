@@ -779,7 +779,7 @@ int main(int argc, char *argv[])
 
 ## Block-by-Block Explanation
 
-### **Includes and Dependencies (Lines 1-17)**
+###**
 ```cpp
 #include "../include/Lexer.h"
 #include "../include/Parser.h"
@@ -804,7 +804,7 @@ namespace fs = std::filesystem;
 - **Platform Support**: Windows-specific header for UTF-8 console support
 - **Namespace Alias**: `fs` alias for cleaner filesystem operations
 
-### **Global Test Mode Flag (Lines 19-23)**
+###**
 ```cpp
 // ─── Globals ──────────────────────────────────────────────────────────────────
 
@@ -816,7 +816,7 @@ bool g_testMode = false;
 - **Behavior**: When true, `input()` returns empty string instead of blocking
 - **Usage**: Enables non-blocking test execution for CI/CD pipelines
 
-### **Banner Display Functions (Lines 25-77)**
+###**
 ```cpp
 static void printBanner()
 {
@@ -832,7 +832,7 @@ static void printAura()
 - **`printAura()`**: Shows comprehensive project achievements, statistics, and cybersecurity features
 - **Visual Design**: Uses Unicode box-drawing characters and ANSI color codes for professional appearance
 
-### **REPL Implementation (Lines 79-128)**
+###**
 ```cpp
 static void runREPL()
 {
@@ -848,7 +848,7 @@ static void runREPL()
 - **Error Handling**: Comprehensive exception handling with colored error messages
 - **User Experience**: Line numbering, colored prompts, graceful exit
 
-### **File Execution (Lines 130-231)**
+###**
 ```cpp
 static void runFile(const std::string &path)
 {
@@ -862,7 +862,7 @@ static void runFile(const std::string &path)
 - **Main Function Support**: Automatically detects and executes `main()` function
 - **Error Handling**: Detailed error reporting with file context and line numbers
 
-### **Syntax Checking (Lines 233-265)**
+###**
 ```cpp
 static int checkFile(const std::string &path)
 {
@@ -874,7 +874,7 @@ static int checkFile(const std::string &path)
 - **Fast Validation**: Useful for IDE integration and build systems
 - **Error Reporting**: Compiler-style error messages with line/column information
 
-### **Test Infrastructure (Lines 267-691)**
+###**
 ```cpp
 struct TestResult { /* Test result structure */ };
 static void redirectStdinToNull() { /* Non-blocking input setup */ };
@@ -892,7 +892,7 @@ static int runTestExamples(const std::string &examplesDir) { /* Test runner */ }
 - **File Discovery**: Recursive `.sa` file collection with filesystem operations
 - **Test Runner**: Comprehensive test execution with reporting and statistics
 
-### **Help System (Lines 693-713)**
+###**
 ```cpp
 static void printHelp(const char *prog)
 {
@@ -903,7 +903,7 @@ static void printHelp(const char *prog)
 - **Examples**: Practical examples for different use cases
 - **Feature Documentation**: Explains all available options and modes
 
-### **Main Function (Lines 715-769)**
+###**
 ```cpp
 int main(int argc, char *argv[])
 {

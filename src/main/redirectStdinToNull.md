@@ -19,7 +19,7 @@ static void redirectStdinToNull()
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static void redirectStdinToNull()
 ```
@@ -28,7 +28,7 @@ static void redirectStdinToNull()
 - **`redirectStdinToNull`**: Descriptive name indicating input redirection purpose
 - **No Parameters**: Self-contained utility function
 
-### **Platform-Specific Compilation (Line 2)**
+###**
 ```cpp
 #ifdef _WIN32
 ```
@@ -37,7 +37,7 @@ static void redirectStdinToNull()
 - **Cross-Platform Support**: Handles different null device paths
 - **Compile-Time Decision**: No runtime overhead for platform detection
 
-### **Windows Implementation (Lines 3-4)**
+###**
 ```cpp
 FILE *nul = nullptr;
 freopen_s(&nul, "NUL", "r", stdin);
@@ -53,7 +53,7 @@ freopen_s(&nul, "NUL", "r", stdin);
   - `"r"`: Read mode (for input redirection)
   - `stdin`: Standard input stream to redirect
 
-### **Unix/Linux Implementation (Lines 5-7)**
+###**
 ```cpp
 #else
     freopen("/dev/null", "r", stdin);

@@ -50,7 +50,7 @@ static int checkFile(const std::string &path)
 
 ## Line-by-Line Analysis
 
-### **Function Signature (Line 1)**
+###**
 ```cpp
 static int checkFile(const std::string &path)
 ```
@@ -59,7 +59,7 @@ static int checkFile(const std::string &path)
 - **`checkFile`**: Descriptive name indicating syntax validation purpose
 - **`const std::string &path`**: Constant reference to file path for efficiency
 
-### **File Opening (Lines 3-9)**
+###**
 ```cpp
 std::ifstream file(path);
 if (!file.is_open())
@@ -76,7 +76,7 @@ if (!file.is_open())
 - **Consistent Error Format**: Same error display as runFile()
 - **User Feedback**: Clear indication of file access failure
 
-### **Source Code Reading (Lines 11-15)**
+###**
 ```cpp
 std::string source((std::istreambuf_iterator<char>(file)),
                   std::istreambuf_iterator<char>());
@@ -89,7 +89,7 @@ file.close();
 - **Resource Management**: Explicit file close for deterministic cleanup
 - **Consistent Approach**: Same reading method as runFile()
 
-### **Parse-Only Validation (Lines 17-25)**
+###**
 ```cpp
 try
 {
@@ -110,7 +110,7 @@ try
 - **Success Message**: Green checkmark with file path on success
 - **Success Return**: Returns 0 (success) on successful parsing
 
-### **Error Handling (Lines 27-39)**
+###**
 ```cpp
 catch (const QuantumError &e)
 {

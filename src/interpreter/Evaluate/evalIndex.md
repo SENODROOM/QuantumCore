@@ -30,49 +30,49 @@ QuantumValue Interpreter::evalIndex(IndexExpr &e)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 3822)
-- **Line 3822**: `QuantumValue Interpreter::evalIndex(IndexExpr &e)` - Evaluate indexing expressions
+### Function Signature
+-  `QuantumValue Interpreter::evalIndex(IndexExpr &e)` - Evaluate indexing expressions
   - `e`: Reference to IndexExpr AST node
   - Returns QuantumValue result of indexing operation
 
-### Expression Evaluation (Lines 3823-3825)
-- **Line 3823**: `{` - Opening brace
-- **Line 3824**: `auto obj = evaluate(*e.object);` - Evaluate object expression
-- **Line 3825**: `auto idx = evaluate(*e.index);` - Evaluate index expression
+###
+-  `{` - Opening brace
+-  `auto obj = evaluate(*e.object);` - Evaluate object expression
+-  `auto idx = evaluate(*e.index);` - Evaluate index expression
 
-### Array Indexing (Lines 3826-3833)
-- **Line 3826**: `if (obj.isArray())` - Check if object is array
-- **Line 3827**: `{` - Opening brace for array case
-- **Line 3828**: `long long i = idx.isNumber() ? (long long)idx.asNumber() : 0;` - Convert index to integer
-- **Line 3829**: `if (i < 0 || i >= (long long)obj.asArray()->size())` - Check bounds
-- **Line 3830**: `throw IndexError("Array index out of bounds");` - Throw error for out of bounds
-- **Line 3831**: `return obj.asArray()->elements[i];` - Return array element
-- **Line 3832**: `}` - Closing brace for array case
+###
+-  `if (obj.isArray())` - Check if object is array
+-  `{` - Opening brace for array case
+-  `long long i = idx.isNumber() ? (long long)idx.asNumber() : 0;` - Convert index to integer
+-  `if (i < 0 || i >= (long long)obj.asArray()->size())` - Check bounds
+-  `throw IndexError("Array index out of bounds");` - Throw error for out of bounds
+-  `return obj.asArray()->elements[i];` - Return array element
+-  `}` - Closing brace for array case
 
-### String Indexing (Lines 3834-3842)
-- **Line 3833**: Empty line for readability
-- **Line 3834**: `if (obj.isString())` - Check if object is string
-- **Line 3835**: `{` - Opening brace for string case
-- **Line 3836**: `long long i = idx.isNumber() ? (long long)idx.asNumber() : 0;` - Convert index to integer
-- **Line 3837**: `std::string str = obj.asString();` - Get string reference
-- **Line 3838**: `if (i < 0 || i >= (long long)str.size())` - Check bounds
-- **Line 3839**: `throw IndexError("String index out of bounds");` - Throw error for out of bounds
-- **Line 3840**: `return QuantumValue(std::string(1, str[i]));` - Return character as string
-- **Line 3841**: `}` - Closing brace for string case
+###
+-  Empty line for readability
+-  `if (obj.isString())` - Check if object is string
+-  `{` - Opening brace for string case
+-  `long long i = idx.isNumber() ? (long long)idx.asNumber() : 0;` - Convert index to integer
+-  `std::string str = obj.asString();` - Get string reference
+-  `if (i < 0 || i >= (long long)str.size())` - Check bounds
+-  `throw IndexError("String index out of bounds");` - Throw error for out of bounds
+-  `return QuantumValue(std::string(1, str[i]));` - Return character as string
+-  `}` - Closing brace for string case
 
-### Dictionary Indexing (Lines 3843-3846)
-- **Line 3842**: Empty line for readability
-- **Line 3843**: `if (obj.isDict())` - Check if object is dictionary
-- **Line 3844**: `{` - Opening brace for dict case
-- **Line 3845**: `return obj.asDict()->get(idx.toString());` - Return value for key
-- **Line 3846**: `}` - Closing brace for dict case
+###
+-  Empty line for readability
+-  `if (obj.isDict())` - Check if object is dictionary
+-  `{` - Opening brace for dict case
+-  `return obj.asDict()->get(idx.toString());` - Return value for key
+-  `}` - Closing brace for dict case
 
-### Error Handling (Lines 3847-3849)
-- **Line 3847**: Empty line for readability
-- **Line 3848**: `throw TypeError("Cannot index " + obj.typeName());` - Throw error for non-indexable types
-- **Line 3849**: `}` - Closing brace for function
+###
+-  Empty line for readability
+-  `throw TypeError("Cannot index " + obj.typeName());` - Throw error for non-indexable types
+-  `}` - Closing brace for function
 
 ## Summary
 

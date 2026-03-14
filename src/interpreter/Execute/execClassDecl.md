@@ -36,52 +36,52 @@ void Interpreter::execClassDecl(ClassDecl &s)
 }
 ```
 
-## Line-by-Line Explanation
+## Code Explanation
 
-### Function Signature (Line 1795)
-- **Line 1795**: `void Interpreter::execClassDecl(ClassDecl &s)` - Execute class declarations
+### Function Signature
+-  `void Interpreter::execClassDecl(ClassDecl &s)` - Execute class declarations
   - `s`: Reference to ClassDecl AST node
   - Returns void as class declarations don't produce values
 
-### Class Object Creation (Lines 1796-1799)
-- **Line 1796**: `{` - Opening brace
-- **Line 1797**: `auto klass = std::make_shared<QuantumClass>();` - Create shared class object
-- **Line 1798**: `klass->name = s.name;` - Set class name
-- **Line 1799**: `klass->base = nullptr;` - Initialize base class to null
+###
+-  `{` - Opening brace
+-  `auto klass = std::make_shared<QuantumClass>();` - Create shared class object
+-  `klass->name = s.name;` - Set class name
+-  `klass->base = nullptr;` - Initialize base class to null
 
-### Inheritance Handling (Lines 1800-1807)
-- **Line 1800**: Empty line for readability
-- **Line 1801**: `// Handle inheritance` - Comment about inheritance
-- **Line 1802**: `if (s.baseClass)` - Check if base class specified
-- **Line 1803**: `{` - Opening brace for inheritance
-- **Line 1804**: `auto baseVal = evaluate(*s.baseClass);` - Evaluate base class expression
-- **Line 1805**: `if (baseVal.isClass())` - Check if base is a class
-- **Line 1806**: `klass->base = baseVal.asClass();` - Set base class reference
-- **Line 1807**: `else` - Base is not a class
+###
+-  Empty line for readability
+-  `// Handle inheritance` - Comment about inheritance
+-  `if (s.baseClass)` - Check if base class specified
+-  `{` - Opening brace for inheritance
+-  `auto baseVal = evaluate(*s.baseClass);` - Evaluate base class expression
+-  `if (baseVal.isClass())` - Check if base is a class
+-  `klass->base = baseVal.asClass();` - Set base class reference
+-  `else` - Base is not a class
 
-### Inheritance Error (Lines 1808-1810)
-- **Line 1808**: `throw TypeError("Base class must be a class");` - Throw error for invalid base
-- **Line 1809**: `}` - Closing brace for inheritance
-- **Line 1810**: Empty line for readability
+###
+-  `throw TypeError("Base class must be a class");` - Throw error for invalid base
+-  `}` - Closing brace for inheritance
+-  Empty line for readability
 
-### Method Setup (Lines 1811-1823)
-- **Line 1811**: `// Set up methods` - Comment about method setup
-- **Line 1812**: `for (auto &method : s.methods)` - Loop through method declarations
-- **Line 1813**: `{` - Opening brace for method loop
-- **Line 1814**: `auto fn = std::make_shared<QuantumFunction>();` - Create function object
-- **Line 1815**: `fn->name = method->name;` - Set method name
-- **Line 1816**: `fn->params = method->params;` - Copy parameter names
-- **Line 1817**: `fn->paramIsRef = method->paramIsRef;` - Copy reference parameter flags
-- **Line 1818**: `fn->defaultArgs = method->defaultArgs;` - Copy default arguments
-- **Line 1819**: `fn->body = method->body;` - Copy method body
-- **Line 1820**: `fn->closure = env;` - Set closure to current environment
-- **Line 1821**: `klass->methods[method->name] = QuantumValue(fn);` - Store method in class
+###
+-  `// Set up methods` - Comment about method setup
+-  `for (auto &method : s.methods)` - Loop through method declarations
+-  `{` - Opening brace for method loop
+-  `auto fn = std::make_shared<QuantumFunction>();` - Create function object
+-  `fn->name = method->name;` - Set method name
+-  `fn->params = method->params;` - Copy parameter names
+-  `fn->paramIsRef = method->paramIsRef;` - Copy reference parameter flags
+-  `fn->defaultArgs = method->defaultArgs;` - Copy default arguments
+-  `fn->body = method->body;` - Copy method body
+-  `fn->closure = env;` - Set closure to current environment
+-  `klass->methods[method->name] = QuantumValue(fn);` - Store method in class
 
-### Class Registration (Lines 1822-1825)
-- **Line 1822**: `}` - Closing brace for method loop
-- **Line 1823**: Empty line for readability
-- **Line 1824**: `env->define(s.name, QuantumValue(klass));` - Define class in environment
-- **Line 1825**: `}` - Closing brace for function
+###
+-  `}` - Closing brace for method loop
+-  Empty line for readability
+-  `env->define(s.name, QuantumValue(klass));` - Define class in environment
+-  `}` - Closing brace for function
 
 ## Summary
 

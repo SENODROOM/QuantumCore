@@ -1094,7 +1094,7 @@ The `Lexer.cpp` file implements a comprehensive lexical analyzer (tokenizer) for
 
 ## Block-by-Block Analysis
 
-### **Include Statements and Dependencies (Lines 1-5)**
+###**
 ```cpp
 #include "../include/Lexer.h"
 #include "../include/Error.h"
@@ -1110,7 +1110,7 @@ The `Lexer.cpp` file implements a comprehensive lexical analyzer (tokenizer) for
 - **`<cctype>`**: Character classification functions (isalpha, isdigit, etc.)
 - **`<sstream>`**: String stream operations for various parsing tasks
 
-### **Keyword Mapping Table (Lines 7-73)**
+###**
 ```cpp
 const std::unordered_map<std::string, TokenType> Lexer::keywords = {
     {"let", TokenType::LET},
@@ -1139,7 +1139,7 @@ const std::unordered_map<std::string, TokenType> Lexer::keywords = {
 10. **Type Keywords**: `int`, `float`, `string`, `bool`, etc.
 11. **Security Keywords**: `scan`, `payload`, `encrypt`, `decrypt`, `hash`
 
-### **Constructor (Lines 75-76)**
+###**
 ```cpp
 Lexer::Lexer(const std::string &source)
     : src(source), pos(0), line(1), col(1) {}
@@ -1152,9 +1152,9 @@ Lexer::Lexer(const std::string &source)
 - **Column Tracking**: Starts at column 1 (1-based indexing)
 - **Member Initializer List**: Efficient initialization of all member variables
 
-### **Core Navigation Methods (Lines 78-100)**
+###**
 
-#### **Current Character Access (Lines 78-81)**
+####**
 ```cpp
 char Lexer::current() const
 {
@@ -1165,7 +1165,7 @@ char Lexer::current() const
 - **Constant Method**: Doesn't modify lexer state
 - **Efficient Access**: Direct string indexing
 
-#### **Lookahead Function (Lines 83-87)**
+####**
 ```cpp
 char Lexer::peek(int offset) const
 {
@@ -1177,7 +1177,7 @@ char Lexer::peek(int offset) const
 - **Bounds Safe**: Returns '\0' for out-of-bounds access
 - **Multi-Character Tokens**: Essential for operators like `==`, `===`, `>>=`
 
-#### **Position Advancement (Lines 89-100)**
+####**
 ```cpp
 char Lexer::advance()
 {
@@ -1197,9 +1197,9 @@ char Lexer::advance()
 - **Character Return**: Returns the character being advanced past
 - **State Modification**: Updates lexer position state
 
-### **Whitespace and Comment Handling (Lines 102-128)**
+###**
 
-#### **Whitespace Skipping (Lines 102-106)**
+####**
 ```cpp
 void Lexer::skipWhitespace()
 {
@@ -1211,7 +1211,7 @@ void Lexer::skipWhitespace()
 - **Not Newlines**: Preserves newlines for tokenization (important for indentation)
 - **Loop Structure**: Continues until non-whitespace encountered
 
-#### **Line Comment Skipping (Lines 108-112)**
+####**
 ```cpp
 void Lexer::skipComment()
 {
@@ -1223,7 +1223,7 @@ void Lexer::skipComment()
 - **Preserves Newline**: Stops at newline, leaving it for tokenization
 - **Language Support**: Works for `//` comments
 
-#### **Block Comment Skipping (Lines 114-128)**
+####**
 ```cpp
 void Lexer::skipBlockComment()
 {
@@ -1246,7 +1246,7 @@ void Lexer::skipBlockComment()
 - **Graceful Handling**: Silently handles unterminated comments
 - **State Assumption**: Assumes opening `/*` already consumed
 
-### **Number Tokenization (Lines 130-162)**
+###**
 ```cpp
 Token Lexer::readNumber()
 {
@@ -1292,7 +1292,7 @@ Token Lexer::readNumber()
 - **Position Tracking**: Records start position for error reporting
 - **Type Detection**: Distinguishes between integer and float formats
 
-### **Template Literal Processing (Lines 164-291)**
+###**
 ```cpp
 void Lexer::readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol)
 {
@@ -1310,7 +1310,7 @@ void Lexer::readTemplateLiteral(std::vector<Token> &out, int startLine, int star
 - **Escape Sequences**: Handles backslash escapes within templates
 - **Concatenation**: Generates PLUS operators between segments
 
-### **String Literal Processing (Lines 293-340)**
+###**
 ```cpp
 Token Lexer::readString(char quote)
 {
@@ -1348,7 +1348,7 @@ Token Lexer::readString(char quote)
 - **Error Detection**: Detects unterminated strings
 - **Position Tracking**: Records string start for error reporting
 
-### **Identifier and Keyword Processing (Lines 342-492)**
+###**
 ```cpp
 Token Lexer::readIdentifierOrKeyword()
 {
@@ -1391,9 +1391,9 @@ Token Lexer::readIdentifierOrKeyword()
 - **F-Strings**: `f"..."` syntax with format specifiers
 - **Macro Expansion**: C-style preprocessor macro substitution
 
-### **Main Tokenization Function (Lines 494-1083)**
+###**
 
-#### **Initialization and Main Loop (Lines 494-506)**
+####**
 ```cpp
 std::vector<Token> Lexer::tokenize()
 {
@@ -1409,7 +1409,7 @@ std::vector<Token> Lexer::tokenize()
         int startLine = line, startCol = col;
 ```
 
-#### **Newline Handling (Lines 507-512)**
+####**
 ```cpp
 if (c == '\n')
 {
@@ -1419,7 +1419,7 @@ if (c == '\n')
 }
 ```
 
-#### **Preprocessor Directives (Lines 514-588)**
+####**
 ```cpp
 if (c == '#')
 {
@@ -1437,7 +1437,7 @@ if (c == '#')
 - **Multi-Token Macros**: Supports macros that expand to multiple tokens
 - **Nested Expansion**: Simple one-level macro expansion
 
-#### **Token Type Detection (Lines 590-627)**
+####**
 ```cpp
 if (std::isdigit(c))
 {
@@ -1462,7 +1462,7 @@ if (std::isalpha(c) || c == '_')
 }
 ```
 
-#### **Operator Parsing (Lines 629-957)**
+####**
 ```cpp
 // Operators & delimiters
 advance();
@@ -1491,7 +1491,7 @@ case '!':
 - **Optional Chaining**: `?.` and `??` operators
 - **Spread Operator**: `...` identifier
 
-#### **Python Indentation Processing (Lines 962-1083)**
+####**
 ```cpp
 // ── Python-style INDENT/DEDENT post-processing ───────────────────────────
 // Scan for COLON + NEWLINE + more-indented line → inject INDENT/DEDENT tokens.
