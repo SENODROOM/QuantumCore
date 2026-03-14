@@ -36,7 +36,23 @@ This directory contains Python examples showcasing the language's versatility, f
 - **game character stats tracker** - RPG character stats
 - **rpg character** - RPG character system
 
-### 💼 [applications/](./applications/)
+### 🎮 [simple_programs/](./simple_programs/)
+- **calculator** - Basic arithmetic calculator with menu interface
+- **guess number** - Number guessing game with random numbers
+- **to do list** - Task management system with completion tracking
+- **password generator** - Generate secure passwords with strength analysis
+- **text analyzer** - Analyze text for word count, readability, and statistics
+- **sorting algorithms** - Implementation of common sorting algorithms
+- **fibonacci sequence** - Generate and analyze Fibonacci numbers
+- **prime numbers** - Prime number generation and analysis tools
+- **binary converter** - Convert between binary, decimal, octal, and hexadecimal
+- **unit converter** - Convert between different units of measurement
+- **stopwatch** - Timer with lap times and statistics
+- **quiz game** - Interactive quiz with multiple categories
+- **hangman** - Classic word guessing game with AI opponent
+- **tic tac toe** - Two-player game with AI tournament mode
+
+### � [applications/](./applications/)
 - **budget app** - Personal budget management
 - **discount calculator** - Discount calculation utility
 - **email simulator** - Email simulation system
@@ -46,7 +62,7 @@ This directory contains Python examples showcasing the language's versatility, f
 - **salary tracker** - Salary tracking application
 - **user configuration manager** - User configuration system
 
-### 🔧 [utilities/](./utilities/)
+### � [utilities/](./utilities/)
 - **isbn validator** - ISBN validation utility
 - **planet class** - Astronomical calculations
 - **player interface** - Game player interface
@@ -71,6 +87,10 @@ These examples teach:
 - **Exception Handling** - Error management
 - **Module Usage** - Import and use of standard libraries
 - **Application Development** - Real-world program structure
+- **Game Development** - Interactive games and AI
+- **Mathematical Computing** - Number theory and algorithms
+- **Module Usage** - Import and use of standard libraries
+- **Application Development** - Real-world program structure
 
 ## 💡 Key Features
 
@@ -83,7 +103,7 @@ These examples teach:
 ## 🚀 Getting Started
 
 1. **Absolute Beginners**: Start with **examples/** for basic syntax
-2. **Beginners**: Move to **mathematical/** and **string_operations/**
+2. **Beginners**: Move to **simple_programs/** for interactive programs
 3. **Intermediate**: Study **algorithms/** and **data_structures/**
 4. **Advanced**: Explore **applications/** and **games/**
 
@@ -96,25 +116,25 @@ quantum example.sa
 
 ## 🎓 Recommended Learning Path
 
-1. **Fundamentals Phase**:
-   - Basic syntax (examples/)
-   - Variables and data types
-   - Control structures
+### **Beginner Phase**:
+- Basic syntax (examples/)
+- Interactive programs (simple_programs/)
+- Simple games and utilities
 
-2. **Intermediate Phase**:
-   - Functions and modules
-   - Data structures
-   - String operations
+### **Intermediate Phase**:
+- Functions and modules
+- Data structures and algorithms
+- Mathematical computing
 
-3. **Advanced Phase**:
-   - Algorithms and problem-solving
-   - Object-oriented programming
-   - Application development
+### **Advanced Phase**:
+- Object-oriented programming
+- Application development
+- Complex game development with AI
 
-4. **Expert Phase**:
-   - Complex applications
-   - Game development
-   - System programming
+### **Expert Phase**:
+- System programming
+- Advanced algorithms
+- Full application development
 
 ## 🔧 Python Features Demonstrated
 

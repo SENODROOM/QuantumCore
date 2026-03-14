@@ -1,0 +1,241 @@
+# Fibonacci Sequence Generator
+# Multiple ways to generate Fibonacci numbers
+
+def fibonacci_recursive(n):
+    """Generate Fibonacci number using recursion"""
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci_recursive(n-1) + fibonacci_recursive(n-2)
+
+def fibonacci_iterative(n):
+    """Generate Fibonacci number using iteration"""
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    
+    a, b = 0, 1
+    for _ in range(2, n+1):
+        a, b = b, a + b
+    return b
+
+def fibonacci_sequence(n):
+    """Generate Fibonacci sequence up to n terms"""
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    
+    sequence = [0, 1]
+    while len(sequence) < n:
+        next_num = sequence[-1] + sequence[-2]
+        sequence.append(next_num)
+    
+    return sequence
+
+def fibonacci_up_to_limit(limit):
+    """Generate Fibonacci numbers up to a limit"""
+    if limit < 0:
+        return []
+    
+    sequence = []
+    a, b = 0, 1
+    
+    while a <= limit:
+        sequence.append(a)
+        a, b = b, a + b
+    
+    return sequence
+
+def is_fibonacci_number(num):
+    """Check if a number is in the Fibonacci sequence"""
+    if num < 0:
+        return False
+    
+    # A number is Fibonacci if and only if one or both of (5*n^2 + 4) or (5*n^2 - 4) is a perfect square
+    def is_perfect_square(x):
+        s = int(x ** 0.5)
+        return s * s == x
+    
+    return is_perfect_square(5 * num * num + 4) or is_perfect_square(5 * num * num - 4)
+
+def fibonacci_golden_ratio(n):
+    """Calculate golden ratio approximation using Fibonacci numbers"""
+    if n < 2:
+        return None
+    
+    fib_n = fibonacci_iterative(n)
+    fib_n_minus_1 = fibonacci_iterative(n-1)
+    
+    return fib_n / fib_n_minus_1
+
+def fibonacci_menu():
+    print("Fibonacci Sequence Generator")
+    print("=" * 35)
+    
+    while True:
+        print("\nOptions:")
+        print("1. Find nth Fibonacci number (recursive)")
+        print("2. Find nth Fibonacci number (iterative)")
+        print("3. Generate Fibonacci sequence")
+        print("4. Generate Fibonacci numbers up to limit")
+        print("5. Check if number is Fibonacci")
+        print("6. Calculate golden ratio approximation")
+        print("7. Compare methods")
+        print("8. Exit")
+        
+        choice = input("Enter your choice (1-8): ")
+        
+        if choice == '1':
+            try:
+                n = int(input("Enter n (0-30 recommended for recursion): "))
+                if n < 0:
+                    print("Please enter a non-negative number")
+                    continue
+                
+                import time
+                start_time = time.time()
+                result = fibonacci_recursive(n)
+                end_time = time.time()
+                
+                print(f"F({n}) = {result}")
+                print(f"Time taken: {(end_time - start_time)*1000:.2f} ms")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '2':
+            try:
+                n = int(input("Enter n: "))
+                if n < 0:
+                    print("Please enter a non-negative number")
+                    continue
+                
+                import time
+                start_time = time.time()
+                result = fibonacci_iterative(n)
+                end_time = time.time()
+                
+                print(f"F({n}) = {result}")
+                print(f"Time taken: {(end_time - start_time)*1000:.4f} ms")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '3':
+            try:
+                n = int(input("Enter number of terms: "))
+                if n <= 0:
+                    print("Please enter a positive number")
+                    continue
+                
+                sequence = fibonacci_sequence(n)
+                print(f"First {n} Fibonacci numbers:")
+                print(sequence)
+                
+                # Show some statistics
+                if len(sequence) > 1:
+                    ratio = sequence[-1] / sequence[-2]
+                    print(f"Ratio of last two numbers: {ratio:.6f}")
+                    print(f"Golden ratio approximation: {1.618034:.6f}")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '4':
+            try:
+                limit = int(input("Enter upper limit: "))
+                if limit < 0:
+                    print("Please enter a non-negative number")
+                    continue
+                
+                sequence = fibonacci_up_to_limit(limit)
+                print(f"Fibonacci numbers up to {limit}:")
+                print(sequence)
+                print(f"Count: {len(sequence)} numbers")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '5':
+            try:
+                num = int(input("Enter number to check: "))
+                
+                if is_fibonacci_number(num):
+                    print(f"{num} is a Fibonacci number!")
+                    
+                    # Find its position
+                    if num == 0:
+                        print("It's F(0)")
+                    elif num == 1:
+                        print("It's F(1) or F(2)")
+                    else:
+                        # Find position
+                        i = 0
+                        while fibonacci_iterative(i) < num:
+                            i += 1
+                        if fibonacci_iterative(i) == num:
+                            print(f"It's F({i})")
+                else:
+                    print(f"{num} is not a Fibonacci number")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '6':
+            try:
+                n = int(input("Enter n (>=2): "))
+                if n < 2:
+                    print("Please enter n >= 2")
+                    continue
+                
+                ratio = fibonacci_golden_ratio(n)
+                print(f"F({n}) / F({n-1}) = {ratio:.10f}")
+                print(f"Golden ratio: {1.6180339887:.10f}")
+                print(f"Difference: {abs(ratio - 1.6180339887):.10f}")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '7':
+            try:
+                n = int(input("Enter n to compare methods: "))
+                if n < 0:
+                    print("Please enter a non-negative number")
+                    continue
+                
+                print(f"\nComparing methods for F({n}):")
+                print("-" * 40)
+                
+                import time
+                
+                # Recursive (only for small n)
+                if n <= 30:
+                    start_time = time.time()
+                    result_recursive = fibonacci_recursive(n)
+                    time_recursive = (time.time() - start_time) * 1000
+                    print(f"Recursive:   {result_recursive} ({time_recursive:.2f} ms)")
+                else:
+                    print("Recursive: Too slow for n > 30")
+                
+                # Iterative
+                start_time = time.time()
+                result_iterative = fibonacci_iterative(n)
+                time_iterative = (time.time() - start_time) * 1000
+                print(f"Iterative:   {result_iterative} ({time_iterative:.4f} ms)")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '8':
+            print("Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the Fibonacci generator
+fibonacci_menu()

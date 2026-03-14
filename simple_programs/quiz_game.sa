@@ -1,0 +1,372 @@
+# Quiz Game
+# Interactive quiz with multiple choice questions
+
+class Question:
+    def __init__(self, question_text, options, correct_answer, explanation=""):
+        self.question_text = question_text
+        self.options = options
+        self.correct_answer = correct_answer
+        self.explanation = explanation
+    
+    def check_answer(self, user_answer):
+        return user_answer.lower() == self.correct_answer.lower()
+    
+    def display(self):
+        print(f"\n{self.question_text}")
+        for i, option in enumerate(self.options, 1):
+            print(f"{i}. {option}")
+
+class Quiz:
+    def __init__(self, title):
+        self.title = title
+        self.questions = []
+        self.score = 0
+        self.total_questions = 0
+        self.answers = []
+    
+    def add_question(self, question):
+        self.questions.append(question)
+    
+    def run_quiz(self):
+        print(f"\n{self.title}")
+        print("=" * len(self.title))
+        
+        self.score = 0
+        self.total_questions = len(self.questions)
+        self.answers = []
+        
+        for i, question in enumerate(self.questions, 1):
+            question.display()
+            
+            while True:
+                try:
+                    answer = input(f"\nYour answer (1-{len(question.options)}): ")
+                    answer_num = int(answer)
+                    
+                    if 1 <= answer_num <= len(question.options):
+                        user_answer = question.options[answer_num - 1]
+                        is_correct = question.check_answer(user_answer)
+                        
+                        self.answers.append({
+                            'question': question.question_text,
+                            'user_answer': user_answer,
+                            'correct_answer': question.correct_answer,
+                            'is_correct': is_correct
+                        })
+                        
+                        if is_correct:
+                            print("✓ Correct!")
+                            self.score += 1
+                        else:
+                            print("✗ Incorrect!")
+                            print(f"The correct answer is: {question.correct_answer}")
+                        
+                        if question.explanation:
+                            print(f"Explanation: {question.explanation}")
+                        
+                        break
+                    else:
+                        print(f"Please enter a number between 1 and {len(question.options)}")
+                
+                except ValueError:
+                    print("Please enter a valid number")
+            
+            print(f"\nScore: {self.score}/{i}")
+            if i < len(self.questions):
+                input("Press Enter to continue...")
+        
+        self.show_results()
+    
+    def show_results(self):
+        percentage = (self.score / self.total_questions) * 100
+        
+        print(f"\n{'='*40}")
+        print(f"QUIZ RESULTS")
+        print(f"{'='*40}")
+        print(f"Final Score: {self.score}/{self.total_questions}")
+        print(f"Percentage: {percentage:.1f}%")
+        
+        if percentage >= 90:
+            grade = "Excellent! 🌟"
+        elif percentage >= 80:
+            grade = "Great job! 👍"
+        elif percentage >= 70:
+            grade = "Good effort! 👌"
+        elif percentage >= 60:
+            grade = "Keep practicing! 📚"
+        else:
+            grade = "Study more! 💪"
+        
+        print(f"Grade: {grade}")
+        
+        # Show detailed results
+        print(f"\n{'='*40}")
+        print("DETAILED RESULTS")
+        print(f"{'='*40}")
+        
+        for i, answer in enumerate(self.answers, 1):
+            status = "✓" if answer['is_correct'] else "✗"
+            print(f"\nQuestion {i}: {status}")
+            print(f"Your answer: {answer['user_answer']}")
+            print(f"Correct answer: {answer['correct_answer']}")
+
+def create_math_quiz():
+    """Create a math quiz"""
+    quiz = Quiz("Mathematics Quiz")
+    
+    questions = [
+        Question(
+            "What is 15 + 27?",
+            ["40", "42", "44", "46"],
+            "42",
+            "15 + 27 = 42"
+        ),
+        Question(
+            "What is 8 × 7?",
+            ["54", "56", "58", "60"],
+            "56",
+            "8 × 7 = 56"
+        ),
+        Question(
+            "What is 144 ÷ 12?",
+            ["10", "11", "12", "13"],
+            "12",
+            "144 ÷ 12 = 12"
+        ),
+        Question(
+            "What is 15²?",
+            ["225", "215", "205", "195"],
+            "225",
+            "15² = 15 × 15 = 225"
+        ),
+        Question(
+            "What is the square root of 64?",
+            ["6", "7", "8", "9"],
+            "8",
+            "√64 = 8 because 8 × 8 = 64"
+        )
+    ]
+    
+    for question in questions:
+        quiz.add_question(question)
+    
+    return quiz
+
+def create_science_quiz():
+    """Create a science quiz"""
+    quiz = Quiz("Science Quiz")
+    
+    questions = [
+        Question(
+            "What is the chemical symbol for gold?",
+            ["Go", "Gd", "Au", "Ag"],
+            "Au",
+            "Au comes from the Latin word 'aurum' meaning gold"
+        ),
+        Question(
+            "What planet is known as the Red Planet?",
+            ["Venus", "Mars", "Jupiter", "Saturn"],
+            "Mars",
+            "Mars appears red due to iron oxide on its surface"
+        ),
+        Question(
+            "What is the speed of light?",
+            ["299,792 km/s", "199,792 km/s", "399,792 km/s", "499,792 km/s"],
+            "299,792 km/s",
+            "The speed of light in vacuum is approximately 299,792 kilometers per second"
+        ),
+        Question(
+            "What is the largest organ in the human body?",
+            ["Heart", "Liver", "Brain", "Skin"],
+            "Skin",
+            "The skin is the body's largest organ, covering about 20 square feet"
+        ),
+        Question(
+            "What gas do plants absorb from the atmosphere?",
+            ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+            "Carbon Dioxide",
+            "Plants use carbon dioxide for photosynthesis and release oxygen"
+        )
+    ]
+    
+    for question in questions:
+        quiz.add_question(question)
+    
+    return quiz
+
+def create_geography_quiz():
+    """Create a geography quiz"""
+    quiz = Quiz("Geography Quiz")
+    
+    questions = [
+        Question(
+            "What is the capital of France?",
+            ["London", "Berlin", "Paris", "Madrid"],
+            "Paris",
+            "Paris has been the capital of France since 987 AD"
+        ),
+        Question(
+            "Which is the largest ocean?",
+            ["Atlantic", "Indian", "Arctic", "Pacific"],
+            "Pacific",
+            "The Pacific Ocean covers about 63 million square miles"
+        ),
+        Question(
+            "What is the longest river in the world?",
+            ["Amazon", "Nile", "Mississippi", "Yangtze"],
+            "Nile",
+            "The Nile River is about 4,132 miles long"
+        ),
+        Question(
+            "Which country has the largest population?",
+            ["India", "China", "USA", "Indonesia"],
+            "China",
+            "China has over 1.4 billion people"
+        ),
+        Question(
+            "What is the smallest continent?",
+            ["Australia", "Europe", "Antarctica", "South America"],
+            "Australia",
+            "Australia is the smallest continent at about 3 million square miles"
+        )
+    ]
+    
+    for question in questions:
+        quiz.add_question(question)
+    
+    return quiz
+
+def create_programming_quiz():
+    """Create a programming quiz"""
+    quiz = Quiz("Programming Quiz")
+    
+    questions = [
+        Question(
+            "What does 'HTML' stand for?",
+            ["Hyper Text Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language"],
+            "Hyper Text Markup Language",
+            "HTML is the standard markup language for creating web pages"
+        ),
+        Question(
+            "Which of these is not a programming language?",
+            ["Python", "Java", "HTML", "C++"],
+            "HTML",
+            "HTML is a markup language, not a programming language"
+        ),
+        Question(
+            "What does 'CSS' stand for?",
+            ["Computer Style Sheets", "Creative Style Sheets", "Cascading Style Sheets", "Colorful Style Sheets"],
+            "Cascading Style Sheets",
+            "CSS is used to style and layout web pages"
+        ),
+        Question(
+            "Which symbol is used for comments in Python?",
+            ["//", "#", "/* */", "--"],
+            "#",
+            "In Python, # is used to create single-line comments"
+        ),
+        Question(
+            "What is a 'variable'?",
+            ["A container for storing data", "A type of loop", "A mathematical operation", "A programming language"],
+            "A container for storing data",
+            "Variables are used to store information that can be referenced and manipulated"
+        )
+    ]
+    
+    for question in questions:
+        quiz.add_question(question)
+    
+    return quiz
+
+def custom_quiz():
+    """Create a custom quiz with user input"""
+    print("Create Your Own Quiz")
+    print("=" * 25)
+    
+    quiz_title = input("Enter quiz title: ")
+    quiz = Quiz(quiz_title)
+    
+    while True:
+        print(f"\nQuestion {len(quiz.questions) + 1}")
+        question_text = input("Enter question: ")
+        
+        print("Enter 4 answer options:")
+        options = []
+        for i in range(4):
+            option = input(f"Option {i+1}: ")
+            options.append(option)
+        
+        while True:
+            try:
+                correct_num = int(input("Enter number of correct answer (1-4): "))
+                if 1 <= correct_num <= 4:
+                    correct_answer = options[correct_num - 1]
+                    break
+                else:
+                    print("Please enter a number between 1 and 4")
+            except ValueError:
+                print("Please enter a valid number")
+        
+        explanation = input("Enter explanation (optional): ")
+        
+        question = Question(question_text, options, correct_answer, explanation)
+        quiz.add_question(question)
+        
+        another = input("Add another question? (y/n): ").lower()
+        if another != 'y':
+            break
+    
+    return quiz
+
+def quiz_game():
+    """Main quiz game menu"""
+    print("Welcome to Quiz Game!")
+    print("=" * 25)
+    
+    while True:
+        print("\nSelect a Quiz Category:")
+        print("1. Mathematics")
+        print("2. Science")
+        print("3. Geography")
+        print("4. Programming")
+        print("5. Create Custom Quiz")
+        print("6. Exit")
+        
+        choice = input("Enter your choice (1-6): ")
+        
+        if choice == '1':
+            quiz = create_math_quiz()
+            quiz.run_quiz()
+        
+        elif choice == '2':
+            quiz = create_science_quiz()
+            quiz.run_quiz()
+        
+        elif choice == '3':
+            quiz = create_geography_quiz()
+            quiz.run_quiz()
+        
+        elif choice == '4':
+            quiz = create_programming_quiz()
+            quiz.run_quiz()
+        
+        elif choice == '5':
+            quiz = custom_quiz()
+            if quiz.questions:
+                quiz.run_quiz()
+        
+        elif choice == '6':
+            print("Thanks for playing!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+        
+        if choice != '6':
+            play_again = input("\nPlay another quiz? (y/n): ").lower()
+            if play_again != 'y':
+                print("Thanks for playing!")
+                break
+
+# Run the quiz game
+quiz_game()

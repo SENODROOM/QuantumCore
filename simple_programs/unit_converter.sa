@@ -1,0 +1,350 @@
+# Unit Converter
+# Convert between different units of measurement
+
+def celsius_to_fahrenheit(celsius):
+    """Convert Celsius to Fahrenheit"""
+    return (celsius * 9/5) + 32
+
+def fahrenheit_to_celsius(fahrenheit):
+    """Convert Fahrenheit to Celsius"""
+    return (fahrenheit - 32) * 5/9
+
+def celsius_to_kelvin(celsius):
+    """Convert Celsius to Kelvin"""
+    return celsius + 273.15
+
+def kelvin_to_celsius(kelvin):
+    """Convert Kelvin to Celsius"""
+    return kelvin - 273.15
+
+def meters_to_feet(meters):
+    """Convert meters to feet"""
+    return meters * 3.28084
+
+def feet_to_meters(feet):
+    """Convert feet to meters"""
+    return feet / 3.28084
+
+def kilometers_to_miles(kilometers):
+    """Convert kilometers to miles"""
+    return kilometers * 0.621371
+
+def miles_to_kilometers(miles):
+    """Convert miles to kilometers"""
+    return miles / 0.621371
+
+def kilograms_to_pounds(kilograms):
+    """Convert kilograms to pounds"""
+    return kilograms * 2.20462
+
+def pounds_to_kilograms(pounds):
+    """Convert pounds to kilograms"""
+    return pounds / 2.20462
+
+def liters_to_gallons(liters):
+    """Convert liters to gallons (US)"""
+    return liters * 0.264172
+
+def gallons_to_liters(gallons):
+    """Convert gallons (US) to liters"""
+    return gallons / 0.264172
+
+def bytes_to_megabytes(bytes_val):
+    """Convert bytes to megabytes"""
+    return bytes_val / (1024 * 1024)
+
+def megabytes_to_gigabytes(megabytes):
+    """Convert megabytes to gigabytes"""
+    return megabytes / 1024
+
+def gigabytes_to_terabytes(gigabytes):
+    """Convert gigabytes to terabytes"""
+    return gigabytes / 1024
+
+def temperature_converter():
+    """Temperature conversion menu"""
+    print("Temperature Converter")
+    print("=" * 25)
+    
+    while True:
+        print("\nTemperature Conversions:")
+        print("1. Celsius to Fahrenheit")
+        print("2. Fahrenheit to Celsius")
+        print("3. Celsius to Kelvin")
+        print("4. Kelvin to Celsius")
+        print("5. All conversions")
+        print("6. Back to main menu")
+        
+        choice = input("Enter choice (1-6): ")
+        
+        if choice == '6':
+            break
+        
+        try:
+            if choice == '1':
+                celsius = float(input("Enter temperature in Celsius: "))
+                fahrenheit = celsius_to_fahrenheit(celsius)
+                print(f"{celsius}°C = {fahrenheit:.2f}°F")
+            
+            elif choice == '2':
+                fahrenheit = float(input("Enter temperature in Fahrenheit: "))
+                celsius = fahrenheit_to_celsius(fahrenheit)
+                print(f"{fahrenheit}°F = {celsius:.2f}°C")
+            
+            elif choice == '3':
+                celsius = float(input("Enter temperature in Celsius: "))
+                kelvin = celsius_to_kelvin(celsius)
+                print(f"{celsius}°C = {kelvin:.2f}K")
+            
+            elif choice == '4':
+                kelvin = float(input("Enter temperature in Kelvin: "))
+                celsius = kelvin_to_celsius(kelvin)
+                print(f"{kelvin}K = {celsius:.2f}°C")
+            
+            elif choice == '5':
+                temp = float(input("Enter temperature: "))
+                unit = input("Enter unit (C/F/K): ").upper()
+                
+                if unit == 'C':
+                    celsius = temp
+                    fahrenheit = celsius_to_fahrenheit(celsius)
+                    kelvin = celsius_to_kelvin(celsius)
+                    print(f"{celsius}°C = {fahrenheit:.2f}°F = {kelvin:.2f}K")
+                elif unit == 'F':
+                    fahrenheit = temp
+                    celsius = fahrenheit_to_celsius(fahrenheit)
+                    kelvin = celsius_to_kelvin(celsius)
+                    print(f"{fahrenheit}°F = {celsius:.2f}°C = {kelvin:.2f}K")
+                elif unit == 'K':
+                    kelvin = temp
+                    celsius = kelvin_to_celsius(kelvin)
+                    fahrenheit = celsius_to_fahrenheit(celsius)
+                    print(f"{kelvin}K = {celsius:.2f}°C = {fahrenheit:.2f}°F")
+                else:
+                    print("Invalid unit")
+            
+            else:
+                print("Invalid choice")
+        
+        except ValueError:
+            print("Please enter a valid number")
+
+def length_converter():
+    """Length conversion menu"""
+    print("Length Converter")
+    print("=" * 20)
+    
+    while True:
+        print("\nLength Conversions:")
+        print("1. Meters to Feet")
+        print("2. Feet to Meters")
+        print("3. Kilometers to Miles")
+        print("4. Miles to Kilometers")
+        print("5. All conversions")
+        print("6. Back to main menu")
+        
+        choice = input("Enter choice (1-6): ")
+        
+        if choice == '6':
+            break
+        
+        try:
+            if choice == '1':
+                meters = float(input("Enter length in meters: "))
+                feet = meters_to_feet(meters)
+                print(f"{meters}m = {feet:.2f}ft")
+            
+            elif choice == '2':
+                feet = float(input("Enter length in feet: "))
+                meters = feet_to_meters(feet)
+                print(f"{feet}ft = {meters:.2f}m")
+            
+            elif choice == '3':
+                km = float(input("Enter distance in kilometers: "))
+                miles = kilometers_to_miles(km)
+                print(f"{km}km = {miles:.2f} miles")
+            
+            elif choice == '4':
+                miles = float(input("Enter distance in miles: "))
+                km = miles_to_kilometers(miles)
+                print(f"{miles} miles = {km:.2f}km")
+            
+            elif choice == '5':
+                length = float(input("Enter length: "))
+                unit = input("Enter unit (m/ft/km/miles): ").lower()
+                
+                if unit == 'm':
+                    meters = length
+                    feet = meters_to_feet(meters)
+                    print(f"{meters}m = {feet:.2f}ft")
+                elif unit == 'ft':
+                    feet = length
+                    meters = feet_to_meters(feet)
+                    print(f"{feet}ft = {meters:.2f}m")
+                elif unit == 'km':
+                    km = length
+                    miles = kilometers_to_miles(km)
+                    print(f"{km}km = {miles:.2f} miles")
+                elif unit == 'miles':
+                    miles = length
+                    km = miles_to_kilometers(miles)
+                    print(f"{miles} miles = {km:.2f}km")
+                else:
+                    print("Invalid unit")
+            
+            else:
+                print("Invalid choice")
+        
+        except ValueError:
+            print("Please enter a valid number")
+
+def weight_converter():
+    """Weight conversion menu"""
+    print("Weight Converter")
+    print("=" * 18)
+    
+    while True:
+        print("\nWeight Conversions:")
+        print("1. Kilograms to Pounds")
+        print("2. Pounds to Kilograms")
+        print("3. Back to main menu")
+        
+        choice = input("Enter choice (1-3): ")
+        
+        if choice == '3':
+            break
+        
+        try:
+            if choice == '1':
+                kg = float(input("Enter weight in kilograms: "))
+                pounds = kilograms_to_pounds(kg)
+                print(f"{kg}kg = {pounds:.2f}lbs")
+            
+            elif choice == '2':
+                pounds = float(input("Enter weight in pounds: "))
+                kg = pounds_to_kilograms(pounds)
+                print(f"{pounds}lbs = {kg:.2f}kg")
+            
+            else:
+                print("Invalid choice")
+        
+        except ValueError:
+            print("Please enter a valid number")
+
+def volume_converter():
+    """Volume conversion menu"""
+    print("Volume Converter")
+    print("=" * 18)
+    
+    while True:
+        print("\nVolume Conversions:")
+        print("1. Liters to Gallons")
+        print("2. Gallons to Liters")
+        print("3. Back to main menu")
+        
+        choice = input("Enter choice (1-3): ")
+        
+        if choice == '3':
+            break
+        
+        try:
+            if choice == '1':
+                liters = float(input("Enter volume in liters: "))
+                gallons = liters_to_gallons(liters)
+                print(f"{liters}L = {gallons:.2f} gallons")
+            
+            elif choice == '2':
+                gallons = float(input("Enter volume in gallons: "))
+                liters = gallons_to_liters(gallons)
+                print(f"{gallons} gallons = {liters:.2f}L")
+            
+            else:
+                print("Invalid choice")
+        
+        except ValueError:
+            print("Please enter a valid number")
+
+def data_storage_converter():
+    """Data storage conversion menu"""
+    print("Data Storage Converter")
+    print("=" * 25)
+    
+    while True:
+        print("\nData Storage Conversions:")
+        print("1. Bytes to Megabytes")
+        print("2. Megabytes to Gigabytes")
+        print("3. Gigabytes to Terabytes")
+        print("4. Back to main menu")
+        
+        choice = input("Enter choice (1-4): ")
+        
+        if choice == '4':
+            break
+        
+        try:
+            if choice == '1':
+                bytes_val = float(input("Enter size in bytes: "))
+                mb = bytes_to_megabytes(bytes_val)
+                print(f"{bytes_val} bytes = {mb:.2f} MB")
+            
+            elif choice == '2':
+                mb = float(input("Enter size in megabytes: "))
+                gb = megabytes_to_gigabytes(mb)
+                print(f"{mb} MB = {gb:.2f} GB")
+            
+            elif choice == '3':
+                gb = float(input("Enter size in gigabytes: "))
+                tb = gigabytes_to_terabytes(gb)
+                print(f"{gb} GB = {tb:.2f} TB")
+            
+            else:
+                print("Invalid choice")
+        
+        except ValueError:
+            print("Please enter a valid number")
+
+def main_unit_converter():
+    """Main unit converter menu"""
+    print("Universal Unit Converter")
+    print("=" * 30)
+    
+    while True:
+        print("\nSelect conversion type:")
+        print("1. Temperature")
+        print("2. Length")
+        print("3. Weight")
+        print("4. Volume")
+        print("5. Data Storage")
+        print("6. Quick conversions")
+        print("7. Exit")
+        
+        choice = input("Enter your choice (1-7): ")
+        
+        if choice == '1':
+            temperature_converter()
+        elif choice == '2':
+            length_converter()
+        elif choice == '3':
+            weight_converter()
+        elif choice == '4':
+            volume_converter()
+        elif choice == '5':
+            data_storage_converter()
+        elif choice == '6':
+            print("\nQuick Conversions:")
+            print("-" * 20)
+            print("0°C = 32°F = 273.15K")
+            print("100°C = 212°F = 373.15K")
+            print("1m = 3.28ft")
+            print("1km = 0.62 miles")
+            print("1kg = 2.20 lbs")
+            print("1L = 0.26 gallons")
+            print("1GB = 1024MB")
+        elif choice == '7':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the unit converter
+main_unit_converter()
