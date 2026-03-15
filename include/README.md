@@ -1,125 +1,68 @@
-# Quantum Language Compiler - Abstract Syntax Tree (AST)
+# Error Handling Module for Quantum Language Compiler
 
-## Overview
+This module is integral to the Quantum Language compiler's error handling system, designed to manage various types of errors encountered during compilation. It leverages C++'s standard exception hierarchy to provide a structured approach to error reporting, making it easier to identify and handle different kinds of issues within the compiler.
 
-The `include/AST.h` file defines the structure of the Abstract Syntax Tree (AST) used by the Quantum Language compiler. This file serves as the backbone for representing the syntax of the programming language in a structured manner, which facilitates semantic analysis, optimization, and code generation phases of the compilation process.
+## Design Decisions
 
-## Key Design Decisions
+### Inheritance from `std::runtime_error`
+The decision to inherit from `std::runtime_error` was made to ensure compatibility with existing C++ exception handling mechanisms. This choice allows the use of `try-catch` blocks and other standard exception handling techniques, simplifying error propagation and management throughout the compiler.
 
-### Use of `std::variant` for Expressions
+### Custom Error Classes
+Each specific type of error (e.g., `RuntimeError`, `TypeError`) is represented by a custom class derived from `QuantumError`. This approach provides clear distinctions between different error categories and makes it straightforward to catch and respond to specific types of errors.
 
-**Why:** To provide a flexible and extensible way to represent different types of expressions without using multiple inheritance or complex visitor patterns. This allows for easy addition of new expression types in the future without breaking existing code.
+### Line Number Information
+Including line number information in the error classes (`line`) was deemed crucial for debugging purposes. By associating each error with its location in the source code, developers can quickly locate and fix the issue, enhancing the overall development experience.
 
-### Smart Pointers (`std::unique_ptr`) for AST Nodes
+## Documentation
 
-**Why:** To manage memory automatically and avoid manual memory management errors such as leaks or dangling pointers. Using smart pointers ensures that each node in the AST is properly deallocated when it is no longer needed, simplifying the overall memory management strategy of the compiler.
+### Class: `QuantumError`
+**Purpose:** Base class for all quantum-specific errors.
+**Behavior:** Inherits from `std::runtime_error` and adds line number and error kind information.
+**Trade-offs:** While providing flexibility, this class may lead to increased memory usage due to additional data members.
 
-### Separate Classes for Expressions and Statements
+### Class: `RuntimeError`
+**Purpose:** Represents runtime errors that occur during the execution of the compiled code.
+**Behavior:** Inherits from `QuantumError` with a fixed kind of "RuntimeError".
+**Trade-offs:** Limited flexibility compared to `QuantumError`, but ensures consistent error categorization.
 
-**Why:** To clearly distinguish between syntactic constructs that evaluate to values (expressions) and those that perform actions (statements). This separation helps in organizing the codebase better and makes it easier to implement specific optimizations and transformations on either category.
+### Class: `TypeError`
+**Purpose:** Indicates type-related errors, such as mismatched data types in operations.
+**Behavior:** Inherits from `QuantumError` with a fixed kind of "TypeError".
+**Trade-offs:** Similar to `RuntimeError`, limited flexibility but ensures accurate error classification.
 
-## Class Documentation
+### Class: `NameError`
+**Purpose:** Used when an undefined variable or function is referenced.
+**Behavior:** Inherits from `QuantumError` with a fixed kind of "NameError".
+**Trade-offs:** Minimal flexibility, but essential for catching name-related issues early in the compilation process.
 
-### `NumberLiteral`
+### Class: `IndexError`
+**Purpose:** Signifies errors related to accessing elements outside the bounds of arrays or lists.
+**Behavior:** Inherits from `QuantumError` with a fixed kind of "IndexError".
+**Trade-offs:** Provides specific error handling for index-related issues, which are common in many programming languages.
 
-**Purpose:** Represents a numeric literal in the source code.
+### Namespace: `Colors`
+**Purpose:** Contains ANSI escape codes for console text coloring.
+**Behavior:** Offers predefined constants for colorizing output in terminal-based environments.
+**Trade-offs:** Adds complexity to the codebase for managing console output formatting, but enhances readability and user experience in error messages.
 
-**Behavior:** Contains a `double` value that holds the numeric literal's value.
+## Usage Example
 
-### `StringLiteral`
+```cpp
+#include "Error.h"
 
-**Purpose:** Represents a string literal in the source code.
+int main() {
+    try {
+        // Simulate a runtime error
+        throw RuntimeError("Division by zero", 10);
+    } catch (const QuantumError &err) {
+        std::cerr << Colors::RED << "Error on line " << err.line << ": " << Colors::RESET << err.what() << std::endl;
+    }
+    return 0;
+}
+```
 
-**Behavior:** Contains a `std::string` value that holds the string literal's content.
+In this example, the `RuntimeError` is thrown with a message and line number. The catch block catches the exception, and the error message is printed in red using the `Colors` namespace.
 
-### `BoolLiteral`
+## Conclusion
 
-**Purpose:** Represents a boolean literal in the source code.
-
-**Behavior:** Contains a `bool` value that indicates whether the literal is `true` or `false`.
-
-### `NilLiteral`
-
-**Purpose:** Represents a `nil` literal in the source code, often used to denote the absence of a value.
-
-**Behavior:** No data members, as it represents an empty state.
-
-### `Identifier`
-
-**Purpose:** Represents an identifier (variable, function, etc.) in the source code.
-
-**Behavior:** Contains a `std::string` that holds the identifier's name.
-
-### `BinaryExpr`
-
-**Purpose:** Represents a binary expression (e.g., `a + b`).
-
-**Behavior:** Contains an operation (`op`), a left-hand side (`left`), and a right-hand side (`right`). The operation is represented as a `std::string`, and both sides are pointers to `ASTNode`.
-
-### `UnaryExpr`
-
-**Purpose:** Represents a unary expression (e.g., `-a`).
-
-**Behavior:** Contains an operation (`op`) and an operand (`operand`). The operation is represented as a `std::string`, and the operand is a pointer to `ASTNode`.
-
-### `AssignExpr`
-
-**Purpose:** Represents an assignment expression (e.g., `x = y`).
-
-**Behavior:** Contains an operation (`op`), a target (`target`), and a value (`value`). The operation can be one of several assignment operators, and both the target and value are pointers to `ASTNode`.
-
-### `CallExpr`
-
-**Purpose:** Represents a function call expression (e.g., `func(arg)`).
-
-**Behavior:** Contains a callee (`callee`) and a vector of arguments (`args`). Both the callee and arguments are pointers to `ASTNode`.
-
-### `IndexExpr`
-
-**Purpose:** Represents an indexing expression (e.g., `array[index]`).
-
-**Behavior:** Contains an object (`object`) and an index (`index`). Both are pointers to `ASTNode`.
-
-### `SliceExpr`
-
-**Purpose:** Represents a slicing expression similar to Python's `obj[start:stop:step]`.
-
-**Behavior:** Contains an object (`object`), optional start, stop, and step indices (`start`, `stop`, `step`). All indices are pointers to `ASTNode`. If an index is omitted, it defaults to `nullptr` (interpreted as `0`, `end`, or `1` respectively).
-
-### `MemberExpr`
-
-**Purpose:** Represents a member access expression (e.g., `obj.member`).
-
-**Behavior:** Contains an object (`object`) and a member name (`member`). Both are pointers to `ASTNode`.
-
-### `ArrayLiteral`
-
-**Purpose:** Represents an array literal (e.g., `[1, 2, 3]`).
-
-**Behavior:** Contains a vector of elements (`elements`). Each element is a pointer to `ASTNode`.
-
-### `DictLiteral`
-
-**Purpose:** Represents a dictionary literal (e.g., `{key: value}`).
-
-**Behavior:** Contains a vector of key-value pairs (`pairs`). Each pair consists of two pointers to `ASTNode` representing the key and value respectively.
-
-### `LambdaExpr`
-
-**Purpose:** Represents a lambda function expression (e.g., `lambda x: x + 1`).
-
-**Behavior:** Contains parameters (`params`), parameter types (`paramTypes`), default arguments (`defaultArgs`), return type (`returnType`), and a body (`body`). Parameters and their types are stored as vectors of strings, default arguments as pointers to `ASTNode`, and the return type as a string.
-
-### `TernaryExpr`
-
-**Purpose:** Represents a ternary conditional expression (e.g., `condition ? then : else`).
-
-**Behavior:** Contains a condition (`condition`), a true branch (`thenExpr`), and a false branch (`elseExpr`). All branches are pointers to `ASTNode`.
-
-### `SuperExpr`
-
-**Purpose:** Represents a `super()` call or a method call on the superclass.
-
-**Behavior:** Contains an optional method name (`method`). If `method` is empty, it represents a call to the superclass constructor. Otherwise, it represents a method call on the superclass.
-
-## Tradeoffs and Limitations
+This error handling module plays a vital role in the Quantum Language compiler by providing a robust framework for identifying and responding to various types of errors. Its design choices ensure compatibility with existing C++ practices while offering specific functionality tailored to quantum programming needs. By documenting each class and function thoroughly, developers can better understand how to utilize these tools effectively and maintain a high-quality error-handling system within the compiler.
