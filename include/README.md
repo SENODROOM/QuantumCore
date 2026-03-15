@@ -1,95 +1,124 @@
-# QuantumLanguage Compiler - AST.h
+# QuantumLanguage Compiler - Error.h
 
 ## Overview
 
-The `include/AST.h` header file is an integral component of the QuantumLanguage compiler, responsible for defining and managing the Abstract Syntax Tree (AST). The AST represents the syntactic structure of the source code as a tree-like graph, where each node corresponds to a construct in the language. This file plays a crucial role in the compiler pipeline by providing the foundational structures necessary for parsing, semantic analysis, and code generation phases.
+The `include/Error.h` header file is an integral component of the QuantumLanguage compiler, designed to manage and categorize errors encountered during the compilation process. It provides a structured approach to error handling, ensuring that each error is clearly identified and associated with its location in the source code. The file includes several custom exception classes derived from `std::runtime_error`, each tailored to specific error scenarios such as runtime errors, type mismatches, name conflicts, and index out-of-bounds errors. Additionally, it defines a namespace `Colors` containing ANSI escape codes for console text formatting, which can be used to highlight error messages in the output.
 
 ## Key Design Decisions
 
-### Use of `std::variant`
-- **Why**: Leveraging `std::variant` allows for the encapsulation of multiple possible value types within a single unified type. This choice simplifies the handling of different data types in expressions and literals.
-  
-### Smart Pointers (`std::unique_ptr`)
-- **Why**: Using smart pointers ensures automatic memory management and prevents memory leaks. It also enhances safety by ensuring exclusive ownership of resources, which is particularly important when dealing with dynamically allocated AST nodes.
+### Custom Exception Classes
 
-## Class Documentation
+The design decision to create custom exception classes was driven by the need for precise error identification and localization. Each exception class (`QuantumError`, `RuntimeError`, `TypeError`, `NameError`, `IndexError`) serves a distinct purpose:
 
-### ASTNode
-- **Purpose**: Base class for all AST nodes. It serves as a polymorphic container for different expression and statement types.
-- **Behavior**: Provides virtual functions that derived classes must implement to define their specific behaviors.
+- **QuantumError**: A base class for all quantum-related errors, providing common attributes like `line` and `kind`.
+- **RuntimeError**: Used for errors that occur during program execution, such as division by zero or accessing a null pointer.
+- **TypeError**: Indicates issues related to incorrect data types being used in operations, ensuring type safety.
+- **NameError**: Thrown when a variable or function name is not found, helping developers identify missing identifiers.
+- **IndexError**: Used for errors involving array or list indices, such as accessing an element at an invalid position.
 
-### NumberLiteral
-- **Purpose**: Represents numeric literals in the source code.
-- **Behavior**: Holds a `double` value representing the literal number.
+This hierarchical structure allows for easy differentiation between different error types and facilitates more informative error reporting.
 
-### StringLiteral
-- **Purpose**: Represents string literals in the source code.
-- **Behavior**: Holds a `std::string` value representing the literal string.
+### ANSI Escape Codes for Console Formatting
 
-### BoolLiteral
-- **Purpose**: Represents boolean literals in the source code.
-- **Behavior**: Holds a `bool` value indicating whether the literal is `true` or `false`.
+Using ANSI escape codes to format error messages in the console was a conscious choice to enhance readability and provide visual cues. These codes allow the compiler to color-code error messages, making them stand out against normal text. For example, runtime errors could be displayed in red, while type errors might appear in yellow. This feature is particularly useful during development and debugging phases, where quick identification of error types is crucial.
 
-### NilLiteral
-- **Purpose**: Represents the `nil` literal in the source code, often used to denote the absence of a value.
-- **Behavior**: No additional members since it represents an empty state.
+However, this approach has limitations:
 
-### Identifier
-- **Purpose**: Represents variable identifiers in the source code.
-- **Behavior**: Holds a `std::string` value representing the identifier's name.
+- **Platform Dependency**: ANSI escape codes are primarily supported on Unix-like systems. Windows users may not see colored output unless they use a compatible terminal emulator.
+- **Readability Trade-off**: While colorful output can help distinguish between different error types, overuse or misuse of these codes might reduce overall readability.
 
-### BinaryExpr
-- **Purpose**: Represents binary expressions such as addition, subtraction, etc.
-- **Behavior**: Contains an operation (`op`) and two operands (`left` and `right`). Each operand is an `ASTNodePtr`.
+## Documentation
 
-### UnaryExpr
-- **Purpose**: Represents unary expressions such as negation, increment, etc.
-- **Behavior**: Contains an operation (`op`) and one operand (`operand`). The operand is an `ASTNodePtr`.
+### QuantumError Class
 
-### AssignExpr
-- **Purpose**: Represents assignment expressions, including compound assignments.
-- **Behavior**: Contains an operation (`op`, e.g., `=`), a target (`target`), and a value (`value`). Both the target and value are `ASTNodePtr`.
+**Purpose**: Base class for all quantum-related errors, providing a common interface for error handling.
 
-### CallExpr
-- **Purpose**: Represents function calls.
-- **Behavior**: Contains a callee (`callee`, an `ASTNodePtr`) and a vector of arguments (`args`).
+**Behavior**: Accepts a `kind` (error category), a `message` (description of the error), and optionally a `line` number where the error occurred. Inherits from `std::runtime_error`.
 
-### IndexExpr
-- **Purpose**: Represents indexing operations on arrays or other indexed objects.
-- **Behavior**: Contains an object (`object`, an `ASTNodePtr`) and an index (`index`, an `ASTNodePtr`).
+**Usage Example**:
+```cpp
+try {
+    // Some operation that throws an error
+} catch (const QuantumError &e) {
+    std::cerr << "Error on line " << e.line << ": " << e.what() << std::endl;
+}
+```
 
-### SliceExpr
-- **Purpose**: Represents slicing operations similar to Python's `[start:stop:step]`.
-- **Behavior**: Contains an object (`object`, an `ASTNodePtr`), optional start, stop, and step indices (`start`, `stop`, `step`, each being an `ASTNodePtr`).
+### RuntimeError Class
 
-### MemberExpr
-- **Purpose**: Represents member access, either through dot notation or arrow notation.
-- **Behavior**: Contains an object (`object`, an `ASTNodePtr`) and a member name (`member`, a `std::string`).
+**Purpose**: Represents errors that occur during program execution.
 
-### ArrayLiteral
-- **Purpose**: Represents array literals.
-- **Behavior**: Contains a vector of elements (`elements`), each being an `ASTNodePtr`.
+**Behavior**: Inherits from `QuantumError` with a fixed `kind` of `"RuntimeError"`. Accepts a message and optionally a line number.
 
-### DictLiteral
-- **Purpose**: Represents dictionary literals.
-- **Behavior**: Contains a vector of key-value pairs (`pairs`), where both keys and values are `ASTNodePtr`.
+**Usage Example**:
+```cpp
+if (value == 0) {
+    throw RuntimeError("Division by zero");
+}
+```
 
-### LambdaExpr
-- **Purpose**: Represents lambda expressions.
-- **Behavior**: Contains parameters (`params`), parameter types (`paramTypes`), default arguments (`defaultArgs`), return type (`returnType`, a `std::string`), and a body (`body`, an `ASTNodePtr`).
+### TypeError Class
 
-### TernaryExpr
-- **Purpose**: Represents ternary conditional expressions.
-- **Behavior**: Contains a condition (`condition`, an `ASTNodePtr`), a true branch (`thenExpr`, an `ASTNodePtr`), and an else branch (`elseExpr`, an `ASTNodePtr`).
+**Purpose**: Indicates issues related to incorrect data types being used in operations.
 
-### SuperExpr
-- **Purpose**: Represents super constructor or method calls.
-- **Behavior**: Contains an optional method name (`method`, a `std::string`). If empty, it denotes a super constructor call.
+**Behavior**: Inherits from `QuantumError` with a fixed `kind` of `"TypeError"`. Accepts a message and optionally a line number.
 
-## Tradeoffs and Limitations
+**Usage Example**:
+```cpp
+if (!isInteger(value)) {
+    throw TypeError("Expected integer but got " + valueType);
+}
+```
 
-- **Flexibility vs. Complexity**: While using `std::variant` simplifies the representation of different value types, it might introduce complexity in terms of type checking and handling during semantic analysis.
-- **Memory Management**: Although smart pointers ensure automatic memory management, they might add overhead compared to raw pointers, especially in performance-critical sections of the compiler.
-- **Extensibility**: Adding new expression or statement types requires modifications to the existing hierarchy, which could lead to increased coupling between components.
+### NameError Class
 
-This README provides a comprehensive overview of the `AST.h` file, detailing its role, design choices, and the behavior of each major class/function.
+**Purpose**: Thrown when a variable or function name is not found.
+
+**Behavior**: Inherits from `QuantumError` with a fixed `kind` of `"NameError"`. Accepts a message and optionally a line number.
+
+**Usage Example**:
+```cpp
+if (!variableExists(name)) {
+    throw NameError("Variable '" + name + "' not defined");
+}
+```
+
+### IndexError Class
+
+**Purpose**: Used for errors involving array or list indices.
+
+**Behavior**: Inherits from `QuantumError` with a fixed `kind` of `"IndexError"`. Accepts a message and optionally a line number.
+
+**Usage Example**:
+```cpp
+if (index >= arraySize) {
+    throw IndexError("Index out of bounds: " + std::to_string(index));
+}
+```
+
+### Colors Namespace
+
+**Purpose**: Provides ANSI escape codes for console text formatting, enhancing the visibility of error messages.
+
+**Contents**: 
+- `RED`: Red text color.
+- `YELLOW`: Yellow text color.
+- `WHITE`: White text color.
+- `CYAN`: Cyan text color.
+- `GREEN`: Green text color.
+- `BLUE`: Blue text color.
+- `BOLD`: Bold text style.
+- `RESET`: Reset text style to default.
+- `MAGENTA`: Magenta text color.
+
+**Usage Example**:
+```cpp
+std::cerr << Colors::RED << "Runtime Error" << Colors::RESET << std::endl;
+```
+
+## Limitations
+
+- **Platform Dependency**: The console coloring feature is limited to Unix-like systems due to the dependency on ANSI escape codes.
+- **Overuse of Color**: Excessive use of colored output might reduce the overall readability of the error messages.
+
+These limitations should be considered when integrating this header file into larger projects or deploying the compiler on different platforms.
