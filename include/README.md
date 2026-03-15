@@ -1,68 +1,79 @@
-# Error Handling Module for Quantum Language Compiler
+# QuantumLanguage Compiler - Interpreter.h
 
-This module is integral to the Quantum Language compiler's error handling system, designed to manage various types of errors encountered during compilation. It leverages C++'s standard exception hierarchy to provide a structured approach to error reporting, making it easier to identify and handle different kinds of issues within the compiler.
+## Overview
 
-## Design Decisions
+The `Interpreter.h` file is an integral part of the QuantumLanguage compiler's runtime system. It defines the `Interpreter` class, which is responsible for executing abstract syntax tree (AST) nodes and evaluating expressions within the QuantumLanguage environment. This class forms the core of the interpreter component, enabling the execution of quantum programs.
 
-### Inheritance from `std::runtime_error`
-The decision to inherit from `std::runtime_error` was made to ensure compatibility with existing C++ exception handling mechanisms. This choice allows the use of `try-catch` blocks and other standard exception handling techniques, simplifying error propagation and management throughout the compiler.
+## Key Design Decisions
 
-### Custom Error Classes
-Each specific type of error (e.g., `RuntimeError`, `TypeError`) is represented by a custom class derived from `QuantumError`. This approach provides clear distinctions between different error categories and makes it straightforward to catch and respond to specific types of errors.
+### ASTNode and Value Classes
 
-### Line Number Information
-Including line number information in the error classes (`line`) was deemed crucial for debugging purposes. By associating each error with its location in the source code, developers can quickly locate and fix the issue, enhancing the overall development experience.
+**Why:** The use of `ASTNode` and `Value` classes allows for a flexible and extensible representation of both program structure and data values. By leveraging these classes, the interpreter can handle various types of statements and expressions seamlessly.
 
-## Documentation
+### Environment Management
 
-### Class: `QuantumError`
-**Purpose:** Base class for all quantum-specific errors.
-**Behavior:** Inherits from `std::runtime_error` and adds line number and error kind information.
-**Trade-offs:** While providing flexibility, this class may lead to increased memory usage due to additional data members.
+**Why:** An environment management system is essential for maintaining state across different scopes in the program. Using `std::shared_ptr<Environment>` ensures efficient memory management and sharing of environments between nested scopes.
 
-### Class: `RuntimeError`
-**Purpose:** Represents runtime errors that occur during the execution of the compiled code.
-**Behavior:** Inherits from `QuantumError` with a fixed kind of "RuntimeError".
-**Trade-offs:** Limited flexibility compared to `QuantumError`, but ensures consistent error categorization.
+### Step Counting to Prevent Infinite Loops
 
-### Class: `TypeError`
-**Purpose:** Indicates type-related errors, such as mismatched data types in operations.
-**Behavior:** Inherits from `QuantumError` with a fixed kind of "TypeError".
-**Trade-offs:** Similar to `RuntimeError`, limited flexibility but ensures accurate error classification.
+**Why:** Implementing a step counter (`stepCount_`) helps prevent infinite loops, especially in cases where user input might be empty or not properly handled. Setting a maximum number of steps (`MAX_STEPS`) provides a safety net, ensuring that the interpreter will terminate if it runs for too long.
 
-### Class: `NameError`
-**Purpose:** Used when an undefined variable or function is referenced.
-**Behavior:** Inherits from `QuantumError` with a fixed kind of "NameError".
-**Trade-offs:** Minimal flexibility, but essential for catching name-related issues early in the compilation process.
+## Class Documentation
 
-### Class: `IndexError`
-**Purpose:** Signifies errors related to accessing elements outside the bounds of arrays or lists.
-**Behavior:** Inherits from `QuantumError` with a fixed kind of "IndexError".
-**Trade-offs:** Provides specific error handling for index-related issues, which are common in many programming languages.
+### Interpreter Class
 
-### Namespace: `Colors`
-**Purpose:** Contains ANSI escape codes for console text coloring.
-**Behavior:** Offers predefined constants for colorizing output in terminal-based environments.
-**Trade-offs:** Adds complexity to the codebase for managing console output formatting, but enhances readability and user experience in error messages.
+**Purpose:** The `Interpreter` class is the central component responsible for interpreting and executing QuantumLanguage programs. It manages the environment and handles the evaluation of AST nodes.
 
-## Usage Example
+**Behaviour:**
+- **Constructor (`Interpreter()`):** Initializes the interpreter with a global environment.
+- **execute (`void execute(ASTNode &node)`):** Executes a single AST node.
+- **evaluate (`QuantumValue evaluate(ASTNode &node)`):** Evaluates an AST node and returns its value.
+- **execBlock (`void execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr)`):** Executes a block of statements within a specified scope.
+- **globals:** A shared pointer to the global environment, accessible throughout the interpreter.
 
-```cpp
-#include "Error.h"
+### Private Member Functions
 
-int main() {
-    try {
-        // Simulate a runtime error
-        throw RuntimeError("Division by zero", 10);
-    } catch (const QuantumError &err) {
-        std::cerr << Colors::RED << "Error on line " << err.line << ": " << Colors::RESET << err.what() << std::endl;
-    }
-    return 0;
-}
-```
+#### Statement Executors
 
-In this example, the `RuntimeError` is thrown with a message and line number. The catch block catches the exception, and the error message is printed in red using the `Colors` namespace.
+- **execVarDecl (`void execVarDecl(VarDecl &s)`):** Handles variable declarations.
+- **execFunctionDecl (`void execFunctionDecl(FunctionDecl &s)`):** Handles function declarations.
+- **execClassDecl (`void execClassDecl(ClassDecl &s)`):** Handles class declarations.
+- **execIf (`void execIf(IfStmt &s)`):** Handles conditional statements.
+- **execWhile (`void execWhile(WhileStmt &s)`):** Handles while loops.
+- **execFor (`void execFor(ForStmt &s)`):** Handles for loops.
+- **execReturn (`void execReturn(ReturnStmt &s)`):** Handles return statements.
+- **execPrint (`void execPrint(PrintStmt &s)`):** Handles print statements.
+- **execInput (`void execInput(InputStmt &s)`):** Handles input statements.
+- **execImport (`void execImport(ImportStmt &s)`):** Handles import statements.
+- **execExprStmt (`void execExprStmt(ExprStmt &s)`):** Handles expression statements.
 
-## Conclusion
+#### Expression Evaluators
 
-This error handling module plays a vital role in the Quantum Language compiler by providing a robust framework for identifying and responding to various types of errors. Its design choices ensure compatibility with existing C++ practices while offering specific functionality tailored to quantum programming needs. By documenting each class and function thoroughly, developers can better understand how to utilize these tools effectively and maintain a high-quality error-handling system within the compiler.
+- **evalBinary (`QuantumValue evalBinary(BinaryExpr &e)`):** Evaluates binary expressions.
+- **evalUnary (`QuantumValue evalUnary(UnaryExpr &e)`):** Evaluates unary expressions.
+- **evalAssign (`QuantumValue evalAssign(AssignExpr &e)`):** Evaluates assignment expressions.
+- **evalCall (`QuantumValue evalCall(CallExpr &e)`):** Evaluates function calls.
+- **evalIndex (`QuantumValue evalIndex(IndexExpr &e)`):** Evaluates index expressions.
+- **evalMember (`QuantumValue evalMember(MemberExpr &e)`):** Evaluates member access expressions.
+- **evalArray (`QuantumValue evalArray(ArrayLiteral &e)`):** Evaluates array literals.
+- **evalDict (`QuantumValue evalDict(DictLiteral &e)`):** Evaluates dictionary literals.
+- **evalLambda (`QuantumValue evalLambda(LambdaExpr &e)`):** Evaluates lambda expressions.
+- **evalListComp (`QuantumValue evalListComp(ListComp &e)`):** Evaluates list comprehensions.
+- **evalIdentifier (`QuantumValue evalIdentifier(Identifier &e)`):** Evaluates identifier expressions.
+
+#### C++ Pointer Evaluators
+
+- **evalAddressOf (`QuantumValue evalAddressOf(AddressOfExpr &e)`):** Evaluates address-of expressions (`&var`).
+- **evalDeref (`QuantumValue evalDeref(DerefExpr &e)`):** Evaluates dereference expressions (`*ptr`).
+- **evalArrow (`QuantumValue evalArrow(ArrowExpr &e)`):** Evaluates arrow expressions (`ptr->member`).
+- **evalNewExpr (`QuantumValue evalNewExpr(NewExpr &e)`):** Evaluates new expressions (`new T(args)`).
+
+#### Function Call Handlers
+
+- **callFunction (`QuantumValue callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)`):** Calls a user-defined function.
+- **callNative (`QuantumValue callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args)`):** Calls a native function.
+- **callInstanceMethod (`QuantumValue callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)`):** Calls a method on an instance object.
+
+#### Built-In Method Dispatch
+
+- **callMethod (`QuantumValue callMethod(QuantumValue &obj, const std::string &method, std::vector<QuantumValue> args
