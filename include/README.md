@@ -1,62 +1,118 @@
-# QuantumLanguage Compiler - Value.h
+# QuantumLanguage Compiler - AST.h
 
 ## Overview
 
-The `include/Value.h` header file is a fundamental part of the QuantumLanguage compiler, serving as the backbone for representing various data types and values within the language. This file defines a comprehensive set of structures and types that encapsulate different kinds of values, including basic types like integers, doubles, strings, arrays, dictionaries, functions, native functions, instances, classes, and pointers. By providing a robust framework for handling these values, the compiler ensures accurate evaluation and manipulation of expressions throughout the compilation process.
+The `include/AST.h` header file is an essential component of the QuantumLanguage compiler, responsible for defining the Abstract Syntax Tree (AST) structure. The AST serves as a hierarchical representation of the syntactic structure of a program written in QuantumLanguage. This file includes various structures and types that represent different components of the language syntax, such as expressions, statements, and literals. By providing a structured and flexible way to represent the program's syntax, `AST.h` facilitates semantic analysis, code generation, and other stages of the compilation process.
 
 ## Key Design Decisions
 
-### Use of `std::variant`
-The primary reason for choosing `std::variant` over traditional unions is its type safety and ease of use. `std::variant` allows for multiple possible types within a single variable, ensuring that each value has a well-defined type at compile time. This approach eliminates the risk of undefined behavior due to incorrect type access and simplifies the implementation of type-specific operations.
+### Use of `std::variant` for Expressions
 
-### Smart Pointers (`std::shared_ptr`)
-Smart pointers, specifically `std::shared_ptr`, are used extensively to manage memory and ensure proper resource deallocation. By employing smart pointers, the compiler avoids manual memory management issues such as dangling pointers and memory leaks. Additionally, `std::shared_ptr` facilitates easy sharing of resources between different parts of the compiler, enhancing modularity and reusability.
+One of the primary design decisions in `AST.h` is the use of `std::variant` to represent different types of expressions. This choice allows for a single unified type (`Expression`) to hold various expression variants without requiring multiple inheritance or additional type-checking mechanisms. By using `std::variant`, we can efficiently manage and dispatch operations on expressions based on their actual type.
 
-### Non-Owning Pointers (`std::weak_ptr`)
-In scenarios where a value needs to refer to another value without taking ownership, `std::weak_ptr` is utilized. This helps prevent circular references and memory leaks while still allowing for efficient sharing of resources. The use of `std::weak_ptr` ensures that the referenced object remains valid as long as there is an owning `std::shared_ptr`.
+**Why:** Using `std::variant` simplifies the implementation of the visitor pattern, which is crucial for traversing and processing the AST during various phases of compilation. It also reduces the overhead associated with multiple inheritance and provides a more straightforward and intuitive way to handle different expression types.
 
-## Class Documentation
+### Separate Structures for Statements and Literals
 
-### QuantumNil
-**Purpose**: Represents the null value in QuantumLanguage.
-**Behavior**: A simple struct indicating the absence of a value.
+Another significant decision is the separation of structures for statements and literals. This distinction ensures that each category has its own dedicated set of fields and behaviors, making the codebase easier to understand and maintain. For example, statements like variable declarations and function definitions have specific attributes related to their scope, initialization, and return types, while literals (like numbers and strings) contain only their values.
 
-### QuantumFunction
-**Purpose**: Encapsulates information about a function defined in QuantumLanguage.
-**Behavior**: Contains details such as the function's name, parameters, default arguments, body, and closure environment.
+**Why:** Separating statements and literals into distinct structures helps in clearly distinguishing between the syntactic roles they play in the program. It also makes it easier to implement specialized handling for each category, ensuring that the AST accurately reflects the program's structure and semantics.
 
-#### Tradeoffs/Limitations:
-- Does not support variadic arguments directly.
-- Limited flexibility in parameter passing modes beyond pass-by-value and pass-by-reference.
+## Documentation of Major Classes/Functions
 
-### QuantumClass
-**Purpose**: Represents a class definition in QuantumLanguage.
-**Behavior**: Not fully implemented in the provided snippet but intended to store class metadata and methods.
+### `NumberLiteral`
 
-### QuantumInstance
-**Purpose**: Represents an instance of a class in QuantumLanguage.
-**Behavior**: Stores attributes and methods associated with a particular class instance.
+Represents a numeric literal in the program. Contains a `double` value.
 
-### QuantumNativeFunc
-**Purpose**: A function type alias for native functions in QuantumLanguage.
-**Behavior**: Defines a callable entity that takes a vector of `QuantumValue`s and returns a `QuantumValue`.
+- **Purpose:** To store numeric constants encountered in the source code.
+- **Behavior:** Provides easy access to the numeric value and supports arithmetic operations during semantic analysis.
 
-### QuantumNative
-**Purpose**: Encapsulates information about a native function in QuantumLanguage.
-**Behavior**: Holds the function's name and its callable entity.
+### `StringLiteral`
 
-### QuantumValue
-**Purpose**: A versatile structure capable of holding any value type supported by QuantumLanguage.
-**Behavior**: Utilizes `std::variant` to store different types of values, including custom types like functions, instances, and classes. Provides constructors for initializing various value types and a method for accessing the stored value.
+Represents a string literal in the program. Contains a `std::string` value.
 
-#### Tradeoffs/Limitations:
-- Performance overhead associated with `std::variant`.
-- Complexity in implementing type-specific operations.
+- **Purpose:** To store string constants encountered in the source code.
+- **Behavior:** Allows for string manipulation and concatenation during semantic analysis.
 
-## Function Documentation
+### `Identifier`
 
-No specific functions are documented in the provided snippet. However, it includes constructors for the `QuantumValue` struct, which facilitate creating instances of `QuantumValue` with different underlying types.
+Represents an identifier (variable, function, etc.) in the program. Contains a `std::string` name.
 
-## Conclusion
+- **Purpose:** To identify variables, functions, and other named entities in the source code.
+- **Behavior:** Used to resolve references to these entities during symbol table construction and semantic analysis.
 
-The `include/Value.h` header file plays a critical role in the QuantumLanguage compiler by providing a unified framework for representing various value types. Through strategic design choices such as the use of `std::variant` and smart pointers, the compiler ensures both type safety and efficient memory management. While some limitations exist, particularly regarding performance and complexity, the overall architecture provides a solid foundation for further development and expansion of the QuantumLanguage compiler.
+### `BinaryExpr`
+
+Represents a binary expression (e.g., addition, multiplication) in the program. Contains an operation string and two operands.
+
+- **Purpose:** To model binary operations in the AST.
+- **Behavior:** Supports evaluation of the expression during code generation and runtime interpretation.
+
+### `UnaryExpr`
+
+Represents a unary expression (e.g., negation, increment) in the program. Contains an operation string and one operand.
+
+- **Purpose:** To model unary operations in the AST.
+- **Behavior:** Enables the evaluation of the expression during code generation and runtime interpretation.
+
+### `AssignExpr`
+
+Represents an assignment expression in the program. Contains an operation string, a target variable, and a value.
+
+- **Purpose:** To model variable assignments in the AST.
+- **Behavior:** Handles both simple and compound assignments, updating the target variable's value accordingly.
+
+### `CallExpr`
+
+Represents a function call expression in the program. Contains a callee and a list of arguments.
+
+- **Purpose:** To model function calls in the AST.
+- **Behavior:** Supports passing arguments by value or reference and invokes the appropriate function during code generation.
+
+### `IndexExpr`
+
+Represents an indexing expression (e.g., array access, dictionary lookup) in the program. Contains an object and an index.
+
+- **Purpose:** To model indexing operations in the AST.
+- **Behavior:** Enables access to elements within arrays or dictionaries during code execution.
+
+### `SliceExpr`
+
+Represents a slicing expression in the program. Contains an object and optional start, stop, and step indices.
+
+- **Purpose:** To model slicing operations in the AST.
+- **Behavior:** Supports extracting subarrays or substrings from the object during code execution.
+
+### `MemberExpr`
+
+Represents a member access expression (e.g., struct field access) in the program. Contains an object and a member name.
+
+- **Purpose:** To model member access operations in the AST.
+- **Behavior:** Enables accessing fields or methods of objects during code execution.
+
+### `ArrayLiteral`
+
+Represents an array literal in the program. Contains a vector of element expressions.
+
+- **Purpose:** To model array literals in the AST.
+- **Behavior:** Facilitates the creation and initialization of arrays during code generation.
+
+### `DictLiteral`
+
+Represents a dictionary literal in the program. Contains a vector of key-value pairs.
+
+- **Purpose:** To model dictionary literals in the AST.
+- **Behavior:** Enables the creation and initialization of dictionaries during code generation.
+
+### `LambdaExpr`
+
+Represents a lambda expression in the program. Contains parameters, parameter types, default arguments, a return type, and a body.
+
+- **Purpose:** To model anonymous functions in the AST.
+- **Behavior:** Supports capturing local variables and generating executable code for the lambda function.
+
+### `TernaryExpr`
+
+Represents a ternary conditional expression in the program. Contains a condition, a 'then' expression, and an 'else' expression.
+
+- **Purpose:** To model conditional logic in the AST
