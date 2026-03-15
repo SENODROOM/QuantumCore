@@ -1,106 +1,43 @@
-# execReturn() Function Explanation
+# execReturn Function Explanation
 
-## Complete Code
+The `execReturn` function is a crucial component of the Quantum Language interpreter, responsible for executing return statements within quantum programs. This function ensures that the interpreter can properly handle the termination of functions and the passing of values back to the caller.
 
-```cpp
-void Interpreter::execReturn(ReturnStmt &s)
-{
-    QuantumValue val;
-    if (s.value)
-        val = evaluate(*s.value);
-    throw ReturnSignal(std::move(val));
-}
-```
+## What It Does
 
-## Code Explanation
+When a return statement is encountered in the quantum program, the `execReturn` function evaluates the expression associated with the return statement (if any) and then throws a `ReturnSignal` exception containing the evaluated value. This allows the calling context to catch the exception and use the returned value appropriately.
 
-### Function Signature
--  `void Interpreter::execReturn(ReturnStmt &s)` - Execute return statements
-  - `s`: Reference to ReturnStmt AST node
-  - Returns void as return statements don't produce values directly
+## Why It Works This Way
 
-###
--  `{` - Opening brace
--  `QuantumValue val;` - Create default return value (nil)
--  `if (s.value)` - Check if return value provided
--  `val = evaluate(*s.value);` - Evaluate return expression
--  `throw ReturnSignal(std::move(val));` - Throw return signal with value
+1. **Evaluation**: The function first checks if there is an expression (`s.value`) associated with the return statement. If there is, it evaluates this expression using the `evaluate` method. This ensures that the correct value is computed before returning.
+   
+2. **Exception Throwing**: By throwing a `ReturnSignal`, the function effectively terminates the current execution context and passes control back to the caller. The `ReturnSignal` contains the evaluated value, making it available to the caller after catching the exception.
 
-## Summary
+3. **Interception by Caller**: The calling context catches the `ReturnSignal` exception, which allows it to retrieve the returned value and continue its execution accordingly. This design leverages exceptions as a mechanism for control flow, which is a common approach in interpreted languages.
 
-The `execReturn()` function handles return statements in the Quantum Language:
+## Parameters/Return Value
 
-### Key Features
-- **Optional Return Values**: Functions can return with or without values
-- **Expression Evaluation**: Return expressions are evaluated before returning
-- **Exception-Based Control**: Uses exceptions for non-local control flow
-- **Value Transfer**: Efficient value transfer using move semantics
+- **Parameters**:
+  - `ReturnStmt &s`: A reference to the `ReturnStmt` object representing the return statement being executed. This object contains information about the expression to be evaluated (if any).
 
-### Return Process
-1. **Value Initialization**: Create default nil return value
-2. **Expression Check**: Check if return value expression exists
-3. **Expression Evaluation**: Evaluate return expression if provided
-4. **Signal Throwing**: Throw ReturnSignal with evaluated value
+- **Return Value**:
+  - None. The function does not explicitly return a value; instead, it throws a `ReturnSignal` exception containing the result of evaluating the return expression.
 
-### Return Statement Types
-- **Void Return**: `return;` - returns nil
-- **Value Return**: `return expression;` - returns evaluated value
-- **Early Return**: Can appear anywhere in function body
-- **Nested Returns**: Works with nested function calls
+## Edge Cases
 
-### Return Value Handling
-- **Default Value**: Nil returned when no expression provided
-- **Expression Evaluation**: Any valid expression can be returned
-- **Type Flexibility**: Any QuantumValue type can be returned
-- **Move Semantics**: Efficient value transfer to caller
+1. **No Return Expression**: If the return statement does not have an associated expression (`s.value == nullptr`), the function simply throws a `ReturnSignal` without evaluating anything. This handles the case where a function returns without producing a value.
 
-### Control Flow Mechanism
-- **Exception Throwing**: Uses ReturnSignal exception for control flow
-- **Non-Local Exit**: Exits multiple function levels efficiently
-- **Value Transfer**: Return value carried in exception
-- **Stack Unwinding**: Proper cleanup during stack unwinding
+2. **Empty Expression**: If the return expression evaluates to an empty or invalid value, the `evaluate` method may throw an appropriate exception. The `execReturn` function should handle these exceptions gracefully, possibly by propagating them up the call stack or logging an error message.
 
-### ReturnSignal Exception
-- **Custom Exception**: Special exception type for returns
-- **Value Storage**: Carries return value to caller
-- **Catch Handling**: Caught by function call machinery
-- **Efficient Transfer**: Fast non-local control flow
+3. **Nested Functions**: When dealing with nested functions, the `execReturn` function ensures that each function's return value is correctly propagated to the outermost caller. This is achieved through the use of exceptions to break out of the nested execution contexts.
 
-### Design Benefits
-- **Performance**: Exception-based control flow is efficient
-- **Flexibility**: Supports any return value type
-- **Correctness**: Proper stack unwinding and cleanup
-- **Simplicity**: Clean, straightforward implementation
+4. **Error Handling**: The function relies on proper error handling mechanisms provided by the `evaluate` method. If an error occurs during evaluation, the `execReturn` function should catch and handle these errors appropriately, ensuring that the interpreter remains robust and reliable.
 
-### Use Cases
-- **Function Results**: Return computation results
-- **Early Exit**: Exit functions early based on conditions
-- **Error Handling**: Return error indicators
-- **Control Flow**: Implement complex control patterns
+## Interactions With Other Components
 
-### Error Handling
-- **Expression Errors**: Errors in return expressions propagate up
-- **Stack Cleanup**: Proper cleanup during exception propagation
-- **Memory Safety**: Smart pointers manage memory during unwind
-- **Type Safety**: All return types handled safely
+- **Evaluator**: The `execReturn` function interacts closely with the `evaluate` method, which is responsible for computing the value of expressions. The `evaluate` method provides the necessary functionality to compute the value of the return expression.
 
-### Integration with Other Statements
-- **Function Calls**: Return signals caught by call machinery
-- **Try-Catch**: Return signals can be caught by exception handlers
-- **Nested Functions**: Proper handling of nested returns
-- **Loops**: Return can exit from loops within functions
+- **Exception Handling**: The function uses exceptions to manage control flow and propagate return values. Proper exception handling is essential for maintaining the integrity and reliability of the interpreter.
 
-### Performance Characteristics
-- **Exception Overhead**: Minimal overhead for control flow
-- **Value Transfer**: Efficient move semantics
-- **Stack Unwinding**: Fast stack unwinding process
-- **Memory Management**: No memory leaks during return
+- **Call Stack**: The `execReturn` function operates within the context of the call stack, managing the execution of nested functions. When a function returns, the interpreter unwinds the call stack, allowing the next function in the sequence to resume execution.
 
-### Return Value Examples
-- **Numbers**: `return 42;`
-- **Strings**: `return "hello";`
-- **Arrays**: `return [1, 2, 3];`
-- **Objects**: `return object;`
-- **Functions**: `return function() { };`
-
-This function provides the foundation for function returns in the Quantum Language, enabling flexible value return with efficient control flow through exception-based non-local exits while maintaining proper memory management and type safety throughout the return process.
+In summary, the `execReturn` function plays a vital role in the Quantum Language interpreter by evaluating return expressions and using exceptions to propagate these values back to the caller. Its design ensures that the interpreter can handle various edge cases and maintain robustness and reliability throughout the execution of quantum programs.
