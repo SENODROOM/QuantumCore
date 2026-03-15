@@ -1,89 +1,93 @@
-# QuantumLanguage Compiler - Interpreter.h
+# QuantumLanguage Compiler - Lexer.h
 
 ## Overview
 
-The `include/Interpreter.h` header file is an essential part of the QuantumLanguage compiler, focusing on the execution phase of the compilation process. This file defines the `Interpreter` class, which is responsible for interpreting and executing Abstract Syntax Tree (AST) nodes generated during the parsing stage. The `Interpreter` class manages the evaluation of expressions, execution of statements, and handling of function calls, providing the core functionality needed for running quantum programs.
+The `include/Lexer.h` header file is an essential part of the QuantumLanguage compiler, focusing on the lexical analysis phase. This phase involves breaking down the input source code into meaningful tokens that can be processed further by the parser. The `Lexer` class plays a pivotal role in this process by converting raw characters into structured tokens, including identifiers, keywords, operators, numbers, strings, and comments.
+
+This file is critical because it forms the basis for understanding the syntax and structure of the QuantumLanguage code. By accurately identifying and categorizing these elements, the lexer enables subsequent phases of the compiler to build a proper abstract syntax tree (AST).
 
 ## Key Design Decisions
 
-### Use of Smart Pointers
+### Use of `std::unordered_map` for Keywords
 
-**Why:** To ensure memory safety and prevent memory leaks, smart pointers (`std::shared_ptr`) are used extensively throughout the `Interpreter` class. This decision simplifies memory management by automatically deallocating memory when it is no longer needed, reducing the risk of bugs related to manual memory management.
+**WHY:** Using `std::unordered_map` allows for efficient keyword lookup during the tokenization process. Since keywords are relatively few in number compared to other tokens like identifiers and numbers, this data structure provides faster access times than alternatives like linear search or binary search, making the lexer more performant.
 
-### Separate ASTNode Types for Execution and Evaluation
+### Pending Tokens for F-String Expansion
 
-**Why:** Differentiating between `ASTNode` types for execution and evaluation allows for more efficient processing. For example, some nodes can be evaluated directly without further interpretation, while others require full execution. This separation ensures that the interpreter focuses on executing statements and calling functions, rather than evaluating every expression repeatedly.
+**WHY:** F-strings (formatted string literals) in QuantumLanguage require special handling during tokenization to ensure correct interpretation of embedded expressions. The `pendingTokens_` vector is used to temporarily store tokens generated during f-string expansion, allowing the lexer to manage complex string structures without disrupting the overall flow of tokenization.
 
-### Environment Management
+### Support for Preprocessor Macros
 
-**Why:** An environment (`std::shared_ptr<Environment>`) is crucial for managing variable scopes and storing variables during the execution phase. By maintaining separate global and local environments, the interpreter can accurately resolve variable references and manage state across different parts of the program.
+**WHY:** Including support for preprocessor macros (`#define`) enhances the flexibility and power of the QuantumLanguage compiler. Macros allow developers to define reusable code snippets and constants, which simplifies maintenance and reduces redundancy in the source code. However, this feature also introduces complexity in the lexer, requiring additional logic to expand macro definitions before further processing.
 
-## Classes and Functions Documentation
+## Class and Function Documentation
 
-### Class: Interpreter
+### Lexer Class
 
-**Purpose:** Manages the interpretation and execution of AST nodes, including statement execution and expression evaluation.
+**Purpose:** The `Lexer` class is designed to take a source code string and convert it into a sequence of tokens, which represent the syntactic units of the language.
 
-**Behavior:**
-- **Constructor:** Initializes the interpreter with a global environment.
-- **execute(ASTNode &node):** Executes the given AST node.
-- **evaluate(ASTNode &node):** Evaluates the given AST node and returns its result.
-- **execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr):** Executes a block of statements, optionally using a custom scope.
-- **registerNatives():** Registers built-in native functions and methods.
-- **Private Member Functions:** Various helper functions for executing specific types of statements and evaluating expressions.
+#### Public Methods
 
-### Function: QuantumValue callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)
+- **explicit Lexer(const std::string &source):**
+  - **Purpose:** Initializes the lexer with the provided source code.
+  - **Behaviour:** Sets up the internal state of the lexer, including the source string, position, line, and column counters.
 
-**Purpose:** Calls a user-defined function with the provided arguments.
+- **std::vector<Token> tokenize():**
+  - **Purpose:** Converts the entire source code into a vector of tokens.
+  - **Behaviour:** Iterates through the source code, calling private methods to identify and create tokens until the end of the source is reached.
 
-**Behavior:** Invokes the specified function with the arguments and returns the result.
+#### Private Methods
 
-### Function: QuantumValue callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args)
+- **char current() const:**
+  - **Purpose:** Returns the character at the current position in the source code.
+  - **Behaviour:** Provides direct access to the current character without advancing the position.
 
-**Purpose:** Calls a native function with the provided arguments.
+- **char peek(int offset = 1) const:**
+  - **Purpose:** Returns the character at the specified offset from the current position.
+  - **Behaviour:** Allows lookahead without modifying the lexer's state, facilitating pattern matching.
 
-**Behavior:** Invokes the specified native function with the arguments and returns the result.
+- **char advance():**
+  - **Purpose:** Advances the lexer's position to the next character and returns it.
+  - **Behaviour:** Updates the line and column counters accordingly to track the lexer's progress.
 
-### Function: QuantumValue callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)
+- **void skipWhitespace():**
+  - **Purpose:** Skips over any whitespace characters in the source code.
+  - **Behaviour:** Ensures that only relevant characters are considered during tokenization.
 
-**Purpose:** Calls a method on an instance object with the provided arguments.
+- **void skipComment():**
+  - **Purpose:** Skips over single-line comments (starting with `//`).
+  - **Behaviour:** Removes comment text from the token stream, ensuring that it does not interfere with parsing.
 
-**Behavior:** Invokes the specified method on the given instance object with the arguments and returns the result.
+- **void skipBlockComment():**
+  - **Purpose:** Skips over multi-line comments (enclosed between `/*` and `*/`).
+  - **Behaviour:** Handles nested comments and ensures that the entire block is skipped correctly.
 
-### Function: QuantumValue callMethod(QuantumValue &obj, const std::string &method, std::vector<QuantumValue> args)
+- **Token readNumber():**
+  - **Purpose:** Reads a numeric literal from the source code.
+  - **Behaviour:** Identifies integer and floating-point numbers and converts them into appropriate token types.
 
-**Purpose:** Dispatches a method call based on the type of the object.
+- **Token readString(char quote):**
+  - **Purpose:** Reads a string literal from the source code.
+  - **Behaviour:** Handles both single-quoted and double-quoted strings, recognizing escape sequences and concatenation.
 
-**Behavior:** Determines the appropriate method dispatcher based on the object type and invokes the method with the provided arguments.
+- **void readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol):**
+  - **Purpose:** Reads and processes template literals (f-strings) from the source code.
+  - **Behaviour:** Expands embedded expressions within the string and appends the resulting tokens to the output vector.
 
-### Function: QuantumValue callArrayMethod(std::shared_ptr<Array> arr, const std::string &method, std::vector<QuantumValue> args)
+- **Token readIdentifierOrKeyword():**
+  - **Purpose:** Reads an identifier or keyword from the source code.
+  - **Behaviour:** Distinguishes between valid identifiers and reserved keywords, returning the corresponding token type.
 
-**Purpose:** Handles method calls on array objects.
-
-**Behavior:** Invokes the specified method on the given array object with the arguments and returns the result.
-
-### Function: QuantumValue callStringMethod(const std::string &str, const std::string &method, std::vector<QuantumValue> args)
-
-**Purpose:** Handles method calls on string objects.
-
-**Behavior:** Invokes the specified method on the given string object with the arguments and returns the result.
-
-### Function: QuantumValue callDictMethod(std::shared_ptr<Dict> dict, const std::string &method, std::vector<QuantumValue> args)
-
-**Purpose:** Handles method calls on dictionary objects.
-
-**Behavior:** Invokes the specified method on the given dictionary object with the arguments and returns the result.
-
-### Function: void setLValue(ASTNode &target, QuantumValue val, const std::string &op)
-
-**Purpose:** Sets the value of an l-value (variable or member) based on the operation performed.
-
-**Behavior:** Updates the target l-value with the provided value according to the specified operation.
+- **Token readOperator():**
+  - **Purpose:** Reads an operator from the source code.
+  - **Behaviour:** Recognizes various arithmetic, logical, and assignment operators and returns their respective token types.
 
 ## Tradeoffs and Limitations
 
-- **Performance:** While smart pointers provide memory safety, they may introduce slight performance overhead compared to raw pointers.
-- **Complexity:** The separation of execution and evaluation into distinct classes/functions adds complexity to the codebase but improves modularity and maintainability.
-- **Infinite Loops Protection:** The `stepCount_` mechanism prevents infinite loops by limiting the number of steps the interpreter can take. However, this may not catch all potential infinite loop scenarios.
+- **Complexity Introduced by Macros:** Supporting macros adds significant complexity to the lexer, requiring careful handling to avoid premature expansion of tokens within macro definitions.
+  
+- **Limited Error Handling:** The lexer focuses primarily on tokenization and does not provide extensive error handling mechanisms. Errors related to invalid syntax or malformed tokens are typically detected later in the compilation process.
 
-This file plays a critical role in the QuantumLanguage compiler by enabling the execution of quantum programs. Through careful design decisions and comprehensive implementation, the `Interpreter` class provides a robust foundation for handling various aspects of quantum programming.
+- **Performance Considerations:** While `std::unordered_map` offers fast keyword lookups, the overhead associated with maintaining and expanding macro definitions can impact performance, especially for large codebases.
+
+Overall, the `Lexer.h` file is a fundamental component of the QuantumLanguage compiler, providing the necessary infrastructure for accurate lexical analysis. Its design choices balance functionality with performance and maintainability, while acknowledging the inherent complexities introduced
