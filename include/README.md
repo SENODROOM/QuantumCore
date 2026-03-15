@@ -1,113 +1,95 @@
-# QuantumLanguage Compiler - Error.h
+# QuantumLanguage Compiler - Interpreter.h
 
 ## Overview
 
-The `include/Error.h` header file is an essential part of the QuantumLanguage compiler, designed to manage and categorize errors encountered during compilation and runtime. This file provides a structured approach to error handling, ensuring that errors are not only thrown but also associated with specific details such as error type, message, and line number. The primary role of this file is to facilitate the reporting of meaningful error messages to the user, thereby improving the debugging experience.
+The `include/Interpreter.h` header file is an essential part of the QuantumLanguage compiler, focusing on the interpretation and execution of abstract syntax tree (AST) nodes. This file defines the `Interpreter` class, which is responsible for evaluating expressions and executing statements based on the AST structure. It also includes utility functions to handle different types of values and operations encountered during the compilation process.
 
 ## Key Design Decisions
 
-### Inheritance from Standard Exceptions
+### Use of Smart Pointers
 
-The decision to inherit custom error classes (`QuantumError`, `RuntimeError`, `TypeError`, etc.) from `std::runtime_error` was made to leverage the robust exception handling mechanisms provided by C++. This inheritance ensures that all custom exceptions can be caught using a catch block for `std::exception`, making it easier to handle different types of errors uniformly across the compiler.
+**Why:** The use of smart pointers (`std::shared_ptr`) ensures automatic memory management and helps prevent memory leaks by automatically deallocating memory when it's no longer needed. This is particularly important in a compiler where many objects are dynamically allocated and managed throughout the compilation lifecycle.
 
-### Adding Line Number Information
+### Environment Management
 
-Including the line number information in the error class was a critical design choice to enhance the accuracy of error reporting. By associating each error with a specific line number, developers can quickly locate the source of the issue in their code, significantly speeding up the debugging process.
+**Why:** An environment (`std::shared_ptr<Environment>`) is used to manage variable scopes and symbol tables. This allows the interpreter to keep track of variables at different levels of the program, ensuring correct access and modification of variables within their respective scopes.
 
-### Custom Color Codes for Error Messages
+### Step Count Limitation
 
-The introduction of color codes through the `Colors` namespace was another deliberate design decision aimed at making error messages more visually distinct and easier to identify. Different colors can be used to highlight different types of errors, such as syntax errors in red, runtime errors in yellow, and so on. This visual distinction helps users quickly understand the nature of the error without having to read the entire message.
+**Why:** To guard against potential infinite loops, especially in cases like empty input streams, a maximum step count (`MAX_STEPS`) is enforced. This limit prevents the interpreter from running indefinitely and ensures robustness in handling edge cases.
 
-## Documentation of Major Classes/Functions
+## Class and Function Documentation
 
-### QuantumError Class
+### Interpreter Class
 
-**Purpose**: Base class for all quantum-specific errors. It extends `std::runtime_error` to provide additional context about the error.
+**Purpose:** The main interpreter class that handles the evaluation of AST nodes and the execution of quantum language programs.
 
-**Behavior**: 
-- Inherits from `std::runtime_error` to utilize standard exception handling.
-- Adds two attributes: `line` (the line number where the error occurred) and `kind` (a string describing the type of error).
+**Behavior:**
+- **Constructor (`Interpreter()`):** Initializes the interpreter with default settings.
+- **execute (`void execute(ASTNode &node`):** Executes the given AST node.
+- **evaluate (`QuantumValue evaluate(ASTNode &node`):** Evaluates the given AST node and returns its result.
+- **execBlock (`void execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr`):** Executes a block statement with an optional custom scope.
+- **registerNatives (`void registerNatives()`):** Registers built-in native functions.
+- **Statement Executors:** Functions like `execVarDecl`, `execFunctionDecl`, etc., handle specific types of statements.
+- **Expression Evaluators:** Functions like `evalBinary`, `evalUnary`, etc., evaluate specific types of expressions.
+- **C++ Pointer Evaluators:** Functions like `evalAddressOf`, `evalDeref`, etc., handle pointer-related operations in C++.
+- **callFunction (`QuantumValue callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args`):** Calls a user-defined function with arguments.
+- **callNative (`QuantumValue callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args`):** Calls a native function with arguments.
+- **callInstanceMethod (`QuantumValue callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args`):** Calls a method on an instance object.
+- **Built-in Method Dispatch:** Functions like `callMethod`, `callArrayMethod`, etc., dispatch calls to appropriate methods based on the type of object.
+- **setLValue (`void setLValue(ASTNode &target, QuantumValue val, const std::string &op`):** Sets the value of a left-hand side expression.
 
-**Usage**: 
-```cpp
-throw QuantumError("SyntaxError", "Unexpected token '}'", 10);
-```
+### Major Functions
 
-### RuntimeError Class
+#### `void execute(ASTNode &node)`
 
-**Purpose**: Represents errors that occur during runtime execution of the program.
+**Purpose:** Executes the provided AST node.
 
-**Behavior**: 
-- Inherits from `QuantumError` and sets the `kind` attribute to `"RuntimeError"`.
+**Behavior:** Depending on the type of node, either evaluates the expression or executes the statement.
 
-**Usage**: 
-```cpp
-throw RuntimeError("Division by zero attempted");
-```
+#### `QuantumValue evaluate(ASTNode &node)`
 
-### TypeError Class
+**Purpose:** Evaluates the provided AST node and returns its result.
 
-**Purpose**: Indicates errors related to incorrect type usage in the program.
+**Behavior:** Recursively evaluates the node and returns the corresponding `QuantumValue`.
 
-**Behavior**: 
-- Inherits from `QuantumError` and sets the `kind` attribute to `"TypeError"`.
+#### `void execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr)`
 
-**Usage**: 
-```cpp
-throw TypeError("Cannot add integer and string");
-```
+**Purpose:** Executes a block statement with an optional custom scope.
 
-### NameError Class
+**Behavior:** Iterates through the statements in the block and executes them, using the provided scope if available.
 
-**Purpose**: Used when a variable or function name is not found.
+#### `QuantumValue callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)`
 
-**Behavior**: 
-- Inherits from `QuantumError` and sets the `kind` attribute to `"NameError"`.
+**Purpose:** Calls a user-defined function with arguments.
 
-**Usage**: 
-```cpp
-throw NameError("Variable 'x' is not defined");
-```
+**Behavior:** Invokes the function with the specified arguments and returns the result.
 
-### IndexError Class
+#### `QuantumValue callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args)`
 
-**Purpose**: Thrown when an index is out of bounds for an array or dictionary.
+**Purpose:** Calls a native function with arguments.
 
-**Behavior**: 
-- Inherits from `QuantumError` and sets the `kind` attribute to `"IndexError"`.
+**Behavior:** Invokes the native function with the specified arguments and returns the result.
 
-**Usage**: 
-```cpp
-throw IndexError("Attempted to access index 5 of an array with length 3");
-```
+#### `QuantumValue callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)`
 
-### Colors Namespace
+**Purpose:** Calls a method on an instance object.
 
-**Purpose**: Provides a set of predefined ANSI escape sequences for text coloring.
+**Behavior:** Invokes the method on the specified instance with the provided arguments and returns the result.
 
-**Behavior**: 
-- Contains constants representing different colors and formatting options (e.g., bold).
-- Each constant returns a string that can be prepended to text to change its appearance.
+#### `QuantumValue callMethod(QuantumValue &obj, const std::string &method, std::vector<QuantumValue> args)`
 
-**Usage**: 
-```cpp
-std::cout << Colors::RED << "This is a red error message" << Colors::RESET << std::endl;
-```
+**Purpose:** Dispatches calls to appropriate methods based on the type of object.
 
-## Tradeoffs/Limitations
+**Behavior:** Determines the type of the object and calls the corresponding method with the provided arguments.
 
-### Overhead of Exception Handling
+#### `void setLValue(ASTNode &target, QuantumValue val, const std::string &op)`
 
-While exception handling is powerful, it comes with performance overhead. Using exceptions for control flow can lead to slower execution times compared to traditional if-else constructs. However, given the importance of accurate error reporting, this tradeoff was deemed necessary.
+**Purpose:** Sets the value of a left-hand side expression.
 
-### Limited Use of Colors in Non-Terminal Environments
+**Behavior:** Handles assignment operations and updates the target variable with the new value.
 
-ANSI escape sequences for text coloring work well in terminal environments but may not render correctly in other contexts, such as certain IDEs or web-based terminals. This limitation means that while error messages are visually appealing in terminals, they might appear less informative in other environments.
+## Tradeoffs and Limitations
 
-### Static Nature of Color Codes
-
-The use of static color codes within the `Colors` namespace implies that all error messages will follow the same styling rules. While this simplifies implementation, it may restrict the flexibility of error message presentation in complex scenarios.
-
-## Conclusion
-
-The `include/Error.h` header file plays a vital role in the QuantumLanguage compiler by providing a structured and informative way to handle errors. Through inheritance from standard exceptions, line number association, and custom color coding, this file enhances the debugging experience. Despite some limitations, such as potential performance impacts and restricted color support, the benefits of improved error reporting make it an indispensable part of the compiler's architecture.
+- **Memory Management:** While smart pointers provide automatic memory management, they may introduce overhead compared to manual memory management.
+- **Infinite Loop Prevention:** The step count limitation prevents infinite loops but may be too restrictive
