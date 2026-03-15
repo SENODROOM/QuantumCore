@@ -1,0 +1,86 @@
+/* index.css — QuantumDocsSyncer · Terminal Noir */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --bg:       #030508;
+  --bg1:      #080d12;
+  --bg2:      #0d1520;
+  --bg3:      #111c2e;
+  --border:   #1a2d42;
+  --border2:  #254060;
+
+  --green:    #00ff88;
+  --green2:   #00cc6a;
+  --green3:   #007744;
+  --cyan:     #00d4ff;
+  --cyan2:    #0099cc;
+  --amber:    #ffb300;
+  --red:      #ff4444;
+  --purple:   #9d6fff;
+
+  --text:     #c8f0d8;
+  --text2:    #7ab890;
+  --muted:    #3d6655;
+  --dim:      #1f4035;
+
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Orbitron', monospace;
+
+  --glow-green:  0 0 8px rgba(0,255,136,0.4), 0 0 24px rgba(0,255,136,0.15);
+  --glow-cyan:   0 0 8px rgba(0,212,255,0.4), 0 0 24px rgba(0,212,255,0.15);
+  --glow-border: 0 0 0 1px rgba(0,255,136,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Scanline overlay */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 136, 0.012) 2px,
+      rgba(0, 255, 136, 0.012) 4px
+    );
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg1); }
+::-webkit-scrollbar-thumb { background: var(--green3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--green2); }
+
+/* Selection */
+::selection { background: rgba(0,255,136,0.25); color: var(--green); }
+
+/* Links */
+a { color: var(--cyan); text-decoration: none; }
+a:hover { color: var(--green); text-shadow: var(--glow-green); }
+
+/* Utility */
+.mono { font-family: var(--font-mono); }
+.display { font-family: var(--font-display); }
+
+/* Animations */
+@keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes scanIn   { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+@keyframes pulseGlow{ 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes slideUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+@keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+@keyframes glitch {
+  0%   { clip-path: inset(0 0 98% 0); transform: translate(-2px, 0); }
+  10%  { clip-path: inset(40% 0 50% 0); transform: translate(2px, 0); }
+  20%  { clip-path: inset(80% 0 5% 0); transform: translate(-1px, 0); }
+  30%  { clip-path: inset(20% 0 70% 0); transform: translate(1px, 0); }
+  40%  { clip-path: inset(60% 0 30% 0); transform: translate(0, 0); }
+  100% { clip-path: inset(0 0 0 0);    transform: translate(0, 0); }
+}
