@@ -1,119 +1,103 @@
-# QuantumLanguage Compiler - AST.h
+# QuantumLanguage Compiler - Error.h
 
 ## Overview
 
-The `include/AST.h` header file is an essential part of the QuantumLanguage compiler, focusing on the Abstract Syntax Tree (AST). This file defines the structure and behavior of nodes within the AST, which represent different elements of the QuantumLanguage syntax. The AST serves as the intermediate representation between the source code and the executable code, allowing for efficient parsing, semantic analysis, and code generation. By leveraging C++'s type system and features like `std::variant`, this file ensures that all possible node types can be encapsulated within a single unified structure, making it easier to manage and manipulate the tree during compilation.
+The `include/Error.h` header file is an essential part of the QuantumLanguage compiler, focusing on error handling mechanisms. This file defines several custom exception classes derived from `std::runtime_error` to manage different types of errors encountered during compilation and execution. Each error class includes additional information such as the error kind and line number, which aids in debugging and provides more context about where the error occurred.
 
-## Key Design Decisions
+This header file plays a critical role in ensuring robust error management throughout the compiler pipeline. By centralizing error handling logic, it simplifies the process of propagating errors up the call stack and makes it easier to maintain consistent error reporting across the entire compiler.
 
-### Use of `std::variant`
+## Design Decisions
 
-**WHY:** The use of `std::variant` allows for a flexible and type-safe way to represent different node types within the AST. Instead of using inheritance, which can lead to complex and hard-to-maintain hierarchies, `std::variant` provides a more straightforward approach by enabling a single variable to hold one of several alternative types. This decision simplifies the implementation and reduces runtime overhead associated with virtual functions.
+### Why Custom Exception Classes?
 
-### Separate Expression and Statement Types
+Custom exception classes are used instead of relying solely on standard exceptions like `std::runtime_error` because they provide a more structured way to represent specific error conditions. Each custom class (`QuantumError`, `RuntimeError`, `TypeError`, `NameError`, `IndexError`) clearly identifies the type of error, making it easier to catch and respond to errors appropriately.
 
-**WHY:** Separating expression and statement types into distinct classes helps in maintaining clarity and separation of concerns within the AST. Expressions evaluate to a value, while statements perform actions without necessarily producing a result. By keeping these two categories distinct, the compiler can easily identify and process them separately, leading to more organized and maintainable code.
+### Why Additional Information?
 
-## Documentation of Major Classes/Functions
+Including additional information such as the error kind (`kind`) and line number (`line`) in each exception class enhances the debugging experience. The error kind helps quickly identify the nature of the error, while the line number allows developers to pinpoint the exact location in the source code where the error occurred.
 
-### ASTNode
+## Documentation
 
-**Purpose:** Base class for all AST nodes. Provides common functionality and interfaces for interacting with the nodes.
+### QuantumError Class
 
-**Behavior:** All AST nodes inherit from `ASTNode`. They should implement methods for visiting the node during the traversal of the AST.
+**Purpose:** Base class for all custom quantum language errors.
 
-### NumberLiteral
+**Behavior:** Inherits from `std::runtime_error` and adds two additional members: `kind` (a string representing the type of error) and `line` (an integer indicating the line number where the error occurred).
 
-**Purpose:** Represents a numeric literal in the source code.
+**Usage:**
+```cpp
+throw QuantumError("SyntaxError", "Unexpected token at end of line");
+```
 
-**Behavior:** Holds a `double` value representing the number.
+### RuntimeError Class
 
-### StringLiteral
+**Purpose:** Represents runtime errors that occur during program execution.
 
-**Purpose:** Represents a string literal in the source code.
+**Behavior:** Inherits from `QuantumError` and sets the error kind to `"RuntimeError"`.
 
-**Behavior:** Holds a `std::string` value representing the string.
+**Usage:**
+```cpp
+if (condition) {
+    throw RuntimeError("Division by zero");
+}
+```
 
-### BoolLiteral
+### TypeError Class
 
-**Purpose:** Represents a boolean literal in the source code.
+**Purpose:** Indicates errors related to incorrect data types being used in operations.
 
-**Behavior:** Holds a `bool` value indicating whether the literal is `true` or `false`.
+**Behavior:** Inherits from `QuantumError` and sets the error kind to `"TypeError"`.
 
-### NilLiteral
+**Usage:**
+```cpp
+if (!isInteger(value)) {
+    throw TypeError("Expected an integer but got a float");
+}
+```
 
-**Purpose:** Represents the `nil` literal in the source code.
+### NameError Class
 
-**Behavior:** Does not store any value, serving as a placeholder for null or undefined values.
+**Purpose:** Used when a variable or identifier is not found.
 
-### Identifier
+**Behavior:** Inherits from `QuantumError` and sets the error kind to `"NameError"`.
 
-**Purpose:** Represents an identifier (variable name, function name, etc.) in the source code.
+**Usage:**
+```cpp
+if (!variableExists(name)) {
+    throw NameError("Variable '" + name + "' is not defined");
+}
+```
 
-**Behavior:** Holds a `std::string` value representing the name of the identifier.
+### IndexError Class
 
-### BinaryExpr
+**Purpose:** Signifies errors related to accessing elements outside the bounds of arrays or lists.
 
-**Purpose:** Represents a binary expression (e.g., `a + b`) in the source code.
+**Behavior:** Inherits from `QuantumError` and sets the error kind to `"IndexError"`.
 
-**Behavior:** Holds an operation (`op`), a left operand (`left`), and a right operand (`right`). The operation is represented as a `std::string`.
+**Usage:**
+```cpp
+if (index >= arraySize) {
+    throw IndexError("Index out of range");
+}
+```
 
-### UnaryExpr
+### Colors Namespace
 
-**Purpose:** Represents a unary expression (e.g., `-a`) in the source code.
+**Purpose:** Provides ANSI escape codes for console text coloring.
 
-**Behavior:** Holds an operation (`op`) and an operand (`operand`). The operation is represented as a `std::string`.
+**Behavior:** Contains constants for various colors and formatting options (e.g., bold, reset). These constants can be used to colorize error messages in the console output, making them stand out and easier to read.
 
-### AssignExpr
+**Usage:**
+```cpp
+std::cerr << Colors::RED << "Error: " << Colors::RESET << message << std::endl;
+```
 
-**Purpose:** Represents an assignment expression (e.g., `x = y`) in the source code.
+## Tradeoffs and Limitations
 
-**Behavior:** Holds an operation (`op`), a target (`target`), and a value (`value`). The operation indicates the type of assignment (e.g., `=`).
+- **Overhead:** Using custom exception classes introduces some overhead compared to using standard exceptions. However, this overhead is minimal and is outweighed by the benefits of clearer error handling.
+  
+- **Complexity:** Adding additional information to exception classes increases the complexity of error handling code. Developers must ensure that this information is correctly propagated and handled throughout the compiler.
 
-### CallExpr
+- **Console Output:** The use of ANSI escape codes for console coloring may not work on all platforms or terminals. While this feature enhances readability, it should be used judiciously to avoid compatibility issues.
 
-**Purpose:** Represents a function call in the source code.
-
-**Behavior:** Holds a callee (`callee`) and a list of arguments (`args`). The callee is an `ASTNodePtr`, and the arguments are stored in a `std::vector<ASTNodePtr>`.
-
-### IndexExpr
-
-**Purpose:** Represents an indexed expression (e.g., `arr[0]`) in the source code.
-
-**Behavior:** Holds an object (`object`) and an index (`index`). Both the object and the index are `ASTNodePtr`s.
-
-### SliceExpr
-
-**Purpose:** Represents a slicing expression (e.g., `obj[start:stop:step]`) in the source code.
-
-**Behavior:** Holds an object (`object`), a start index (`start`), a stop index (`stop`), and a step index (`step`). Each of these components is an `ASTNodePtr`. If any part is omitted, it defaults to `nullptr` or a specific value (e.g., `0` for start).
-
-### MemberExpr
-
-**Purpose:** Represents a member access expression (e.g., `obj.member`) in the source code.
-
-**Behavior:** Holds an object (`object`) and a member name (`member`). Both the object and the member name are `ASTNodePtr`s and `std::string`, respectively.
-
-### ArrayLiteral
-
-**Purpose:** Represents an array literal in the source code.
-
-**Behavior:** Holds a vector of elements (`elements`). Each element is an `ASTNodePtr`.
-
-### DictLiteral
-
-**Purpose:** Represents a dictionary literal in the source code.
-
-**Behavior:** Holds a vector of key-value pairs (`pairs`). Each pair consists of an `ASTNodePtr` for the key and another `ASTNodePtr` for the value.
-
-### LambdaExpr
-
-**Purpose:** Represents a lambda expression in the source code.
-
-**Behavior:** Holds parameters (`params`), parameter types (`paramTypes`), default arguments (`defaultArgs`), return type (`returnType`), and a body (`body`). Parameters and parameter types are vectors of strings, default arguments are vectors of `ASTNodePtr`s, and the return type is a string.
-
-### TernaryExpr
-
-**Purpose:** Represents a ternary conditional expression (e.g., `condition ? then : else`) in the source code.
-
-**Behavior:** Holds a condition (`condition`), a
+Overall, the `include/Error.h` header file provides a flexible and informative error handling mechanism, which is crucial for maintaining the reliability and usability of the QuantumLanguage compiler.
