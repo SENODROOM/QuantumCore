@@ -1,21 +1,15 @@
-/* global __BACKEND_URL__ __IS_PROD__ */
+/* global __BACKEND_URL__ */
 
 const BASE = (typeof __BACKEND_URL__ !== "undefined" && __BACKEND_URL__)
   ? `${__BACKEND_URL__}/api`
   : "/api";
 
-// Safe fetch wrapper — never throws on empty/bad JSON
 async function safeFetch(url, options) {
-  const r = await fetch(url, options);
+  const r    = await fetch(url, options);
   const text = await r.text();
-  if (!text || text.trim() === "") {
-    throw new Error(`Empty response from ${url} (status ${r.status})`);
-  }
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error(`Invalid JSON from ${url}: ${text.slice(0, 100)}`);
-  }
+  if (!text || text.trim() === "") throw new Error(`Empty response from ${url} (status ${r.status})`);
+  try { return JSON.parse(text); }
+  catch { throw new Error(`Invalid JSON from ${url}: ${text.slice(0, 100)}`); }
 }
 
 export const fetchStats = (type) =>
@@ -38,14 +32,30 @@ export const triggerAll = () =>
     body: JSON.stringify({ all: true }),
   });
 
+// SSE for both local and Render (Render supports persistent connections)
+// Falls back to polling if SSE fails
 export function createSSE(onMessage) {
-  const isProd = typeof __IS_PROD__ !== "undefined" && __IS_PROD__;
+  let stopped = false;
 
-  if (isProd) {
-    // Polling mode for Vercel — SSE doesn't work on serverless
+  function trySSE() {
+    if (stopped) return;
+    try {
+      const es = new EventSource(`${BASE}/stream`);
+      es.onmessage = e => { try { onMessage(JSON.parse(e.data)); } catch {} };
+      es.onerror   = () => {
+        es.close();
+        // SSE failed — fall back to polling
+        console.log("SSE failed, switching to polling");
+        startPolling();
+      };
+      return es;
+    } catch {
+      startPolling();
+    }
+  }
+
+  function startPolling() {
     let lastTs = new Date(Date.now() - 5000).toISOString();
-    let stopped = false;
-
     const poll = async () => {
       if (stopped) return;
       try {
@@ -59,14 +69,14 @@ export function createSSE(onMessage) {
       }
       setTimeout(poll, 3000);
     };
-
     poll();
-    return { close: () => { stopped = true; } };
   }
 
-  // SSE for local dev
-  const es = new EventSource(`${BASE}/stream`);
-  es.onmessage = e => { try { onMessage(JSON.parse(e.data)); } catch {} };
-  es.onerror   = () => { es.close(); setTimeout(() => createSSE(onMessage), 5000); };
-  return es;
+  const es = trySSE();
+  return {
+    close: () => {
+      stopped = true;
+      if (es && es.close) es.close();
+    }
+  };
 }
