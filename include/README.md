@@ -1,120 +1,123 @@
-# QuantumLanguage Compiler - Lexer.h
+# QuantumLanguage Compiler - Parser.h
 
 ## Overview
 
-The `include/Lexer.h` header file is an essential component of the QuantumLanguage compiler's lexical analysis phase. It defines the `Lexer` class responsible for converting the input source code into a sequence of tokens, which are then processed by the parser. The lexer handles the conversion of characters into meaningful units such as identifiers, numbers, strings, operators, and keywords, facilitating the subsequent stages of compilation.
+The `include/Parser.h` header file is a critical component of the QuantumLanguage compiler's architecture. It encapsulates the logic responsible for converting a sequence of tokens into an Abstract Syntax Tree (AST). The parser handles the syntactic analysis of the input code, ensuring it adheres to the language's grammar rules and constructs meaningful AST nodes from the parsed elements.
+
+This file serves as the bridge between the lexical analysis phase (tokenization) and the semantic analysis phase (building the AST). By accurately interpreting the syntax of the source code, the parser facilitates subsequent phases such as type checking, optimization, and code generation.
 
 ## Key Design Decisions
 
-- **Separation of Concerns**: The lexer is designed to handle the low-level parsing of characters into tokens without worrying about higher-level semantic analysis. This separation ensures that changes in the syntax do not affect other parts of the compiler.
-  
-- **Efficient Tokenization**: To optimize performance, the lexer uses efficient data structures like vectors and unordered maps. For example, it utilizes an unordered map to quickly identify keywords, reducing the time complexity of token recognition.
+### Error Handling
 
-- **Support for F-Strings**: The lexer includes support for f-string expansion using a pending tokens buffer. This feature allows for dynamic string generation based on variable values, enhancing the flexibility and usability of the language.
+**Design Decision:** The parser uses custom exceptions (`ParseError`) to handle errors during parsing. These exceptions store both the error message and the location in the source code (line and column).
 
-## Class Documentation
+**Why:** Custom exceptions provide more context about the error, making debugging easier. They also allow for more precise control over error handling, enabling the compiler to report errors in a user-friendly manner.
 
-### Lexer
+### Pratt Parsing Algorithm
 
-**Purpose**: The `Lexer` class is responsible for reading the source code and converting it into a stream of tokens.
+**Design Decision:** The expression parsing is implemented using the Pratt parsing algorithm, which supports operator precedence and associativity without requiring parentheses for all expressions.
 
-**Behavior**:
-- **Constructor (`explicit Lexer(const std::string &source)`)**: Initializes the lexer with the source code.
-- **Method (`std::vector<Token> tokenize()`)**: Reads through the source code and returns a vector of tokens representing the parsed content.
+**Why:** Pratt parsing is highly flexible and efficient, allowing for complex expressions to be parsed correctly while keeping the implementation straightforward. This approach simplifies the parser and reduces the likelihood of bugs related to operator precedence.
 
-**Tradeoffs**:
-- **Complexity**: Supporting f-string expansion adds complexity to the lexer, requiring additional state management and logic.
+### Recursive Descent Parsing
 
-### Keywords Map
+**Design Decision:** The parser employs a recursive descent parsing technique, where each non-terminal rule in the grammar corresponds to a function in the parser class.
 
-**Purpose**: A static unordered map that stores keyword strings and their corresponding token types.
+**Why:** Recursive descent parsing is intuitive and easy to implement, especially for simple grammars. It allows for clear separation of concerns, making the code modular and easier to understand and maintain.
 
-**Behavior**:
-- Maps specific keyword strings to their respective `TokenType`, aiding in quick identification during tokenization.
+### Support for C-Type Variables
 
-## Function Documentation
+**Design Decision:** The parser includes specific support for declaring variables with C-type hints (e.g., `int x`, `int* p`).
 
-### current()
+**Why:** This feature enables the parser to recognize and handle variables declared according to C-like syntax, providing compatibility and flexibility for developers familiar with C-based languages.
 
-**Purpose**: Returns the character at the current position in the source code.
+## Classes and Functions Documentation
 
-**Behavior**:
-- Provides access to the character pointed to by `pos`.
+### ParseError Class
 
-### peek(int offset = 1)
+**Purpose:** Represents a parsing error, storing the error message along with the line and column numbers where the error occurred.
 
-**Purpose**: Returns the character at the specified offset relative to the current position.
+**Behavior:** Inherits from `std::runtime_error` and adds additional fields for line and column information.
 
-**Behavior**:
-- Allows lookahead without advancing the position pointer, useful for parsing complex constructs.
+### Parser Class
 
-### advance()
+**Purpose:** Manages the parsing process, converting a sequence of tokens into an AST.
 
-**Purpose**: Advances the position pointer to the next character in the source code.
+#### Constructor
 
-**Behavior**:
-- Increments `pos` and returns the character that was previously at `pos`.
+```cpp
+explicit Parser(std::vector<Token> tokens);
+```
 
-### skipWhitespace()
+**Behavior:** Initializes the parser with a vector of tokens.
 
-**Purpose**: Skips over any whitespace characters in the source code.
+#### parse Function
 
-**Behavior**:
-- Iterates through the source code until a non-whitespace character is encountered, updating `line` and `col` accordingly.
+```cpp
+ASTNodePtr parse();
+```
 
-### skipComment()
+**Purpose:** Parses the entire input stream and returns the root node of the AST.
 
-**Purpose**: Skips over a single-line comment starting with `//`.
+**Behavior:** Iterates through the tokens, invoking appropriate parsing functions based on the current token type.
 
-**Behavior**:
-- Continues reading characters until the end of the line is reached, updating `line` but not `col`.
+### Token Helpers
 
-### skipBlockComment()
+- **current**: Retrieves the current token being processed.
+- **peek**: Looks ahead at a specified number of tokens without consuming them.
+- **consume**: Consumes the current token and advances the position.
+- **expect**: Ensures the next token matches the expected type, throwing an error if not.
+- **check**: Checks if the next token matches a specified type.
+- **match**: Attempts to consume the next token if it matches the specified type.
+- **atEnd**: Determines if the end of the token stream has been reached.
+- **skipNewlines**: Skips any newline characters encountered during parsing.
 
-**Purpose**: Skips over a multi-line comment enclosed between `/*` and `*/`.
+### Statement Parsing Methods
 
-**Behavior**:
-- Continues reading characters until both `*/` are found, updating `line` and `col`.
+- **parseStatement**: Parses a single statement.
+- **parseBlock**: Parses a block of statements enclosed in curly braces.
+- **parseBodyOrStatement**: Parses either a block or a single statement, depending on whether curly braces are present.
+- **parseVarDecl**: Parses a variable declaration, optionally marking it as constant.
+- **parseFunctionDecl**: Parses a function declaration.
+- **parseClassDecl**: Parses a class declaration.
+- **parseIfStmt**: Parses an if statement.
+- **parseWhileStmt**: Parses a while loop.
+- **parseForStmt**: Parses a for loop.
+- **parseReturnStmt**: Parses a return statement.
+- **parsePrintStmt**: Parses a print statement.
+- **parseInputStmt**: Parses an input statement.
+- **parseCoutStmt**: Parses a `cout << ...` statement.
+- **parseCinStmt**: Parses a `cin >> ...` statement.
+- **parseImportStmt**: Parses an import statement, optionally specifying a module name.
+- **parseExprStmt**: Parses an expression followed by a semicolon.
 
-### readNumber()
+### Expression Parsing Methods
 
-**Purpose**: Parses a numeric literal from the source code.
+- **parseExpr**: Parses a top-level expression.
+- **parseAssignment**: Parses an assignment expression.
+- **parseOr**: Parses logical OR expressions.
+- **parseAnd**: Parses logical AND expressions.
+- **parseBitwise**: Parses bitwise operations.
+- **parseEquality**: Parses equality comparisons.
+- **parseComparison**: Parses relational comparisons.
+- **parseShift**: Parses shift operations.
+- **parseAddSub**: Parses addition and subtraction operations.
+- **parseMulDiv**: Parses multiplication and division operations.
+- **parsePower**: Parses exponentiation operations.
+- **parseUnary**: Parses unary operators.
+- **parsePostfix**: Parses postfix expressions.
+- **parsePrimary**: Parses primary expressions (literals, identifiers, etc.).
 
-**Behavior**:
-- Recognizes integer and floating-point literals, returning a `Token` of type `NUMBER`.
+### Additional Helper Functions
 
-### readString(char quote)
+- **parseArrayLiteral**: Parses an array literal.
+- **parseDictLiteral**: Parses a dictionary literal.
+- **parseLambda**: Parses a lambda function.
+- **parseArrowFunction**: Parses an arrow function with specified parameters.
+- **parseArgList**: Parses a list of arguments.
+- **parseParamList**: Parses a list of function parameters, supporting references and default values.
 
-**Purpose**: Parses a string literal from the source code.
+## Tradeoffs and Limitations
 
-**Behavior**:
-- Handles both single and double-quoted strings, returning a `Token` of type `STRING`.
-
-### readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol)
-
-**Purpose**: Parses a template literal (f-string) from the source code.
-
-**Behavior**:
-- Expands the f-string by evaluating embedded expressions and concatenating them with string literals, storing the result in `out`.
-
-### readIdentifierOrKeyword()
-
-**Purpose**: Parses an identifier or keyword from the source code.
-
-**Behavior**:
-- Determines if the parsed text is an identifier or a keyword, returning a `Token` of type `IDENTIFIER` or `KEYWORD`.
-
-### readOperator()
-
-**Purpose**: Parses an operator from the source code.
-
-**Behavior**:
-- Identifies and returns a `Token` representing one of the supported operators.
-
-## Limitations
-
-- **F-String Expansion**: While powerful, the implementation of f-string expansion can lead to increased memory usage and slower parsing times due to the need to evaluate and store intermediate results.
-  
-- **Error Handling**: Basic error handling mechanisms are implemented, but more sophisticated error reporting could be added for better debugging capabilities.
-
-This README provides a comprehensive overview of the `Lexer.h` file, detailing its functionality, design decisions, and potential limitations.
+- **Flexibility vs. Simplicity
