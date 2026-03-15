@@ -1,79 +1,62 @@
-# QuantumLanguage Compiler - TypeChecker.h
+# QuantumLanguage Compiler - Value.h
 
 ## Overview
 
-The `include/TypeChecker.h` header file is an essential part of the QuantumLanguage compiler, focusing on the type checking mechanism. This file defines the `StaticTypeError`, `TypeEnv`, and `TypeChecker` classes, which work together to ensure that the syntax tree adheres to the specified type rules during compilation. The primary role of this file is to validate the types of variables, function parameters, and return values throughout the program, preventing runtime errors related to type mismatches.
+The `include/Value.h` header file is a fundamental part of the QuantumLanguage compiler, serving as the backbone for representing various data types and values within the language. This file defines a comprehensive set of structures and types that encapsulate different kinds of values, including basic types like integers, doubles, strings, arrays, dictionaries, functions, native functions, instances, classes, and pointers. By providing a robust framework for handling these values, the compiler ensures accurate evaluation and manipulation of expressions throughout the compilation process.
 
 ## Key Design Decisions
 
-### Use of Exceptions for Error Handling
+### Use of `std::variant`
+The primary reason for choosing `std::variant` over traditional unions is its type safety and ease of use. `std::variant` allows for multiple possible types within a single variable, ensuring that each value has a well-defined type at compile time. This approach eliminates the risk of undefined behavior due to incorrect type access and simplifies the implementation of type-specific operations.
 
-**Why:** The decision to use exceptions (`std::runtime_error`) for error handling was made to provide clear and structured feedback about static type errors. This approach allows the compiler to propagate error information up the call stack, making it easier to pinpoint the exact location where the error occurred (line number). It also aligns with common practices in C++ for handling exceptional conditions.
+### Smart Pointers (`std::shared_ptr`)
+Smart pointers, specifically `std::shared_ptr`, are used extensively to manage memory and ensure proper resource deallocation. By employing smart pointers, the compiler avoids manual memory management issues such as dangling pointers and memory leaks. Additionally, `std::shared_ptr` facilitates easy sharing of resources between different parts of the compiler, enhancing modularity and reusability.
 
-### Hierarchical Type Environment
-
-**Why:** A hierarchical type environment (`TypeEnv`) was designed to support nested scopes in the quantum language. Each scope has its own type environment, and when a variable is not found in the current scope, the compiler looks up the parent scope. This design ensures that local variables shadow outer variables, maintaining consistency with how scoping works in other programming languages.
-
-### Shared Pointer for Type Environment
-
-**Why:** Using `std::shared_ptr` for the parent environment allows for efficient memory management and sharing of type environments between different parts of the compiler without copying them. This is particularly useful for large programs with many nested scopes.
+### Non-Owning Pointers (`std::weak_ptr`)
+In scenarios where a value needs to refer to another value without taking ownership, `std::weak_ptr` is utilized. This helps prevent circular references and memory leaks while still allowing for efficient sharing of resources. The use of `std::weak_ptr` ensures that the referenced object remains valid as long as there is an owning `std::shared_ptr`.
 
 ## Class Documentation
 
-### StaticTypeError
+### QuantumNil
+**Purpose**: Represents the null value in QuantumLanguage.
+**Behavior**: A simple struct indicating the absence of a value.
 
-**Purpose:** Represents a static type error encountered during compilation.
+### QuantumFunction
+**Purpose**: Encapsulates information about a function defined in QuantumLanguage.
+**Behavior**: Contains details such as the function's name, parameters, default arguments, body, and closure environment.
 
-**Behavior:** Inherits from `std::runtime_error` and adds a line number attribute to indicate where the error occurred.
+#### Tradeoffs/Limitations:
+- Does not support variadic arguments directly.
+- Limited flexibility in parameter passing modes beyond pass-by-value and pass-by-reference.
 
-**Tradeoffs:** While exceptions are powerful, they can lead to performance overhead and complex error handling logic. However, for a compiler, static type errors are critical issues that need immediate attention, making exceptions a suitable choice.
+### QuantumClass
+**Purpose**: Represents a class definition in QuantumLanguage.
+**Behavior**: Not fully implemented in the provided snippet but intended to store class metadata and methods.
 
-### TypeEnv
+### QuantumInstance
+**Purpose**: Represents an instance of a class in QuantumLanguage.
+**Behavior**: Stores attributes and methods associated with a particular class instance.
 
-**Purpose:** Manages the type environment for a given scope, including variable definitions and resolution.
+### QuantumNativeFunc
+**Purpose**: A function type alias for native functions in QuantumLanguage.
+**Behavior**: Defines a callable entity that takes a vector of `QuantumValue`s and returns a `QuantumValue`.
 
-**Behavior:** 
-- Contains a map of variable names to their types.
-- Supports hierarchical scoping through a shared pointer to the parent environment.
-- Provides methods to define new variables and resolve existing ones.
+### QuantumNative
+**Purpose**: Encapsulates information about a native function in QuantumLanguage.
+**Behavior**: Holds the function's name and its callable entity.
 
-**Tradeoffs:** This design simplifies the implementation of scoping but may increase complexity when dealing with large programs. Additionally, using shared pointers can introduce reference counting overhead, which might be significant in a high-performance compiler.
+### QuantumValue
+**Purpose**: A versatile structure capable of holding any value type supported by QuantumLanguage.
+**Behavior**: Utilizes `std::variant` to store different types of values, including custom types like functions, instances, and classes. Provides constructors for initializing various value types and a method for accessing the stored value.
 
-### TypeChecker
+#### Tradeoffs/Limitations:
+- Performance overhead associated with `std::variant`.
+- Complexity in implementing type-specific operations.
 
-**Purpose:** Performs type checking on the abstract syntax tree (AST) of the quantum language program.
+## Function Documentation
 
-**Behavior:** 
-- Initializes with a global type environment.
-- Offers methods to check entire ASTs or individual nodes.
-- Utilizes the type environment to validate types during traversal of the AST.
+No specific functions are documented in the provided snippet. However, it includes constructors for the `QuantumValue` struct, which facilitate creating instances of `QuantumValue` with different underlying types.
 
-**Tradeoffs:** Centralizing the type checking logic in a single class makes the compiler easier to understand and maintain. However, it might limit parallelism in type checking operations, especially for very large programs.
+## Conclusion
 
-## Usage Example
-
-Below is a simplified example demonstrating how these components might be used together:
-
-```cpp
-#include "TypeChecker.h"
-
-int main() {
-    // Create a vector of AST nodes representing the program
-    std::vector<ASTNodePtr> nodes = ...;
-
-    // Initialize the type checker
-    TypeChecker tc;
-
-    try {
-        // Check the entire AST
-        tc.check(nodes);
-    } catch (const StaticTypeError& e) {
-        // Handle static type errors
-        std::cerr << "Static type error at line " << e.line << ": " << e.what() << std::endl;
-    }
-
-    return 0;
-}
-```
-
-This example shows the initialization of the `TypeChecker` and the attempt to check an AST, with proper error handling for static type errors.
+The `include/Value.h` header file plays a critical role in the QuantumLanguage compiler by providing a unified framework for representing various value types. Through strategic design choices such as the use of `std::variant` and smart pointers, the compiler ensures both type safety and efficient memory management. While some limitations exist, particularly regarding performance and complexity, the overall architecture provides a solid foundation for further development and expansion of the QuantumLanguage compiler.
