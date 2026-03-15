@@ -1,121 +1,34 @@
-# execWhile() Function Explanation
+# `execWhile` Function Explanation
 
-## Complete Code
+The `execWhile` function is part of the Quantum Language interpreter and is responsible for executing a `WhileStmt` statement. This function iterates over the body of the `WhileStmt` as long as the condition remains true.
 
-```cpp
-void Interpreter::execWhile(WhileStmt &s)
-{
-    while (evaluate(*s.condition).isTruthy())
-    {
-        execute(*s.body);
-        stepCount_++;
-        if (stepCount_ > MAX_STEPS)
-            throw RuntimeError("Infinite loop detected");
-    }
-}
-```
+## What It Does
 
-## Code Explanation
+The primary purpose of the `execWhile` function is to repeatedly execute the statements within the body of a `WhileStmt` until the condition evaluates to false. If the condition never becomes false, an infinite loop will be detected, and a runtime error will be thrown.
 
-### Function Signature
--  `void Interpreter::execWhile(WhileStmt &s)` - Execute while statements
-  - `s`: Reference to WhileStmt AST node
-  - Returns void as while statements don't produce values
+## Why It Works This Way
 
-###
--  `{` - Opening brace
--  `while (evaluate(*s.condition).isTruthy())` - Main while loop condition
-  - `evaluate(*s.condition)`: Evaluate condition expression each iteration
-  - `.isTruthy()`: Check if result is truthy
--  `{` - Opening brace for loop body
--  `execute(*s.body);` - Execute loop body statements
--  `stepCount_++;` - Increment step counter for infinite loop detection
--  `if (stepCount_ > MAX_STEPS)` - Check for infinite loop
--  `throw RuntimeError("Infinite loop detected");` - Throw error for infinite loop
--  `}` - Closing brace for loop body
--  `}` - Closing brace for function
+This implementation ensures that the `WhileStmt` can handle complex conditions and bodies without getting stuck in an infinite loop. By evaluating the condition before each iteration and checking if it is truthy, the function can determine whether to continue or terminate the loop. Additionally, the use of exception handling (`BreakSignal` and `ContinueSignal`) allows the body of the loop to control its own flow, providing flexibility for breaking out of the loop prematurely or continuing to the next iteration.
 
-## Summary
+## Parameters/Return Value
 
-The `execWhile()` function handles while loop execution in the Quantum Language:
+- **Parameters**:
+  - `s`: A reference to the `WhileStmt` object that contains the condition and body to be executed.
 
-### Key Features
-- **Condition Evaluation**: Evaluates condition each iteration
-- **Loop Body Execution**: Executes body statements repeatedly
-- **Infinite Loop Protection**: Prevents endless loops with step counting
-- **Truthiness Checking**: Uses QuantumValue truthiness rules
+- **Return Value**:
+  - The function does not explicitly return any value but throws exceptions when necessary.
 
-### Loop Execution Process
-1. **Condition Check**: Evaluate condition expression
-2. **Truthiness Test**: Check if condition is truthy
-3. **Body Execution**: Execute loop body if condition is truthy
-4. **Step Counting**: Track execution steps
-5. **Loop Detection**: Check for infinite loops
-6. **Repeat**: Continue until condition is falsy
+## Edge Cases
 
-### Condition Evaluation
-- **Per Iteration**: Condition evaluated each loop iteration
-- **Truthiness**: Uses QuantumValue truthiness semantics
-- **Side Effects**: Condition evaluation can have side effects
-- **Type Safety**: All condition types handled safely
+1. **Empty Condition**: If the condition is always false (e.g., `false`), the loop will not execute at all.
+2. **No Body**: If the body of the `WhileStmt` is empty, the loop will still evaluate the condition on each iteration.
+3. **Infinite Loop**: If the condition is always true (e.g., `true`), the loop will run indefinitely until a maximum step count is reached, after which a runtime error is thrown.
+4. **Exception Handling**: The presence of `BreakSignal` and `ContinueSignal` allows for controlled exit from the loop, making it robust against unexpected errors within the loop body.
 
-### Infinite Loop Protection
-- **Step Counting**: Tracks total steps across all loops
-- **MAX_STEPS Limit**: Prevents infinite loops from hanging
-- **RuntimeError**: Thrown when step limit exceeded
-- **Global Counter**: Shared across all loop executions
+## Interactions With Other Components
 
-### Loop Body Features
-- **Block Execution**: Body can contain any statements
-- **Scope Management**: Body gets its own scope
-- **Control Flow**: Can contain break, continue, return
-- **Nested Loops**: While loops can be nested
+- **Evaluator**: The `evaluate` method is used to evaluate the condition of the `WhileStmt`. This interaction ensures that the condition is correctly interpreted based on the current state of the program.
+- **Executor**: The `execute` method is called to execute the statements within the body of the `WhileStmt`. This interaction is crucial for performing the actual computations and operations defined within the loop.
+- **Step Counter**: The `stepCount_` variable increments with each iteration of the loop. This interaction helps in detecting infinite loops by comparing the number of steps taken against a predefined maximum limit (`MAX_STEPS`). If the limit is exceeded, a `RuntimeError` is thrown.
 
-### Truthiness Rules
-- **Truthy Values**: Non-zero numbers, non-empty strings, non-empty arrays, true
-- **Falsy Values**: nil, false, zero, empty strings, empty arrays
-- **Type Safety**: All QuantumValue types have defined truthiness
-
-### While Loop Types
-- **Simple Loop**: `while (condition) { body }`
-- **Empty Loop**: `while (condition) { }`
-- **Complex Conditions**: Any expression that evaluates to a value
-- **Nested Loops**: While loops can contain other loops
-
-### Design Benefits
-- **Safety**: Infinite loop protection prevents hanging
-- **Correctness**: Proper truthiness semantics
-- **Flexibility**: Supports complex loop conditions
-- **Performance**: Efficient condition evaluation
-
-### Use Cases
-- **Iteration**: Processing collections and data structures
-- **Input Validation**: Loop until valid input received
-- **Game Loops**: Main game execution loops
-- **Processing**: Repeated data processing operations
-
-### Error Handling
-- **Condition Errors**: Errors in condition evaluation propagate up
-- **Body Errors**: Errors in body execution propagate up
-- **Infinite Loop**: RuntimeError thrown when step limit exceeded
-- **Type Errors**: Truthiness handles all types safely
-
-### Performance Characteristics
-- **Condition Overhead**: Condition evaluated each iteration
-- **Step Counting**: Minimal overhead for safety
-- **Memory Efficient**: No additional memory allocation
-- **Early Exit**: Loop exits immediately when condition is falsy
-
-### Integration with Other Statements
-- **Break Statement**: Exits loop early
-- **Continue Statement**: Skips to next iteration
-- **Return Statement**: Exits function from within loop
-- **Nested Control**: Can contain other control statements
-
-### Loop Control Flow
-- **Normal Exit**: Condition becomes falsy
-- **Break Exit**: Break statement encountered
-- **Return Exit**: Return statement encountered
-- **Error Exit**: Exception thrown during execution
-
-This function provides the foundation for iterative programming in the Quantum Language, enabling flexible while loop execution while maintaining safety through infinite loop protection and proper truthiness semantics.
+By managing these interactions effectively, the `execWhile` function provides a reliable mechanism for executing `WhileStmt` statements in the Quantum Language interpreter.
