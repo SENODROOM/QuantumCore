@@ -1,59 +1,66 @@
-# QuantumLanguage Compiler - Token.h
+# QuantumLanguage Compiler - TypeChecker.h
 
 ## Overview
 
-The `include/Token.h` header file is an essential component of the QuantumLanguage compiler, responsible for defining the structure and behavior of tokens used throughout the compilation process. Tokens represent individual elements in the source code, such as literals, identifiers, keywords, operators, delimiters, and special symbols. This file serves as the foundation for parsing and understanding the syntax of the QuantumLanguage source code.
+The `include/TypeChecker.h` header file is an essential component of the QuantumLanguage compiler, focusing on type checking during the semantic analysis phase. It provides the infrastructure to validate the types of expressions, statements, and declarations within the source code, ensuring that operations are performed between compatible types and preventing runtime errors due to type mismatches.
+
+This file plays a crucial role in maintaining the integrity and correctness of the compiled code by enforcing strict type rules throughout the compilation process.
 
 ## Key Design Decisions
 
-### Tokenization Strategy
+### 1. **StaticTypeError Class**
+   - **Purpose**: To represent static type errors encountered during the type checking process.
+   - **Why**: A custom exception class allows for more specific error handling related to type issues, making it easier to diagnose problems at compile time rather than at runtime.
 
-**Why:** The choice to use a simple enumeration (`TokenType`) for token types allows for clear and efficient categorization of lexical elements. Each token type is explicitly defined, making it easy to understand and implement the lexer.
+### 2. **TypeEnv Structure**
+   - **Purpose**: To manage the environment of variable types, allowing for nested scopes where variables can be defined and resolved.
+   - **Why**: Nested environments enable the tracking of local and global variable types, facilitating the resolution of variable references based on their scope. The use of shared pointers ensures efficient memory management and avoids deep copying of environment objects.
 
-### String Storage
+### 3. **TypeChecker Class**
+   - **Purpose**: To orchestrate the type checking process across the entire program.
+   - **Why**: Centralizing the type checking logic within a single class makes it easier to maintain and extend. It also simplifies the integration of type checking into the broader compiler architecture.
 
-**Why:** Storing token values as `std::string` provides flexibility and ensures that all token types can be represented accurately. Using move semantics in the constructor helps optimize memory management by transferring ownership of the string rather than copying it.
+## Documentation
 
-### Line and Column Tracking
+### StaticTypeError Class
 
-**Why:** Keeping track of the line and column numbers where each token appears aids in error reporting and debugging. It allows the compiler to provide precise location information when encountering syntax errors or other issues.
+**Inheritance**: Inherits from `std::runtime_error`.
 
-## Classes and Functions
+**Constructor**:
+- `StaticTypeError(const std::string &msg, int l)`: Constructs a new `StaticTypeError` object with the given message and line number.
 
-### TokenType Enum Class
+**Members**:
+- `int line`: Stores the line number where the error occurred.
 
-**Purpose:** Defines an enumeration of possible token types, covering literals, identifiers, keywords, operators, delimiters, and special symbols.
+### TypeEnv Structure
 
-**Behavior:** Each token type is associated with a unique identifier and a descriptive name, facilitating easy identification and handling during parsing.
+**Purpose**: Manages the environment of variable types, supporting nested scopes.
 
-### Token Struct
+**Members**:
+- `std::map<std::string, std::string> vars`: Maps variable names to their types.
+- `std::shared_ptr<TypeEnv> parent`: Points to the parent environment, enabling nested scopes.
 
-**Purpose:** Represents a single token in the source code, containing its type, value, line number, and column position.
+**Methods**:
+- `void define(const std::string& name, const std::string& type)`: Defines a new variable in the current environment.
+- `std::string resolve(const std::string& name)`: Resolves the type of a variable by searching through the current and parent environments.
 
-**Constructor:**
-```cpp
-Token(TokenType t, std::string v, int ln, int c);
-```
-- **Parameters:**
-  - `t`: The type of the token.
-  - `v`: The value of the token.
-  - `ln`: The line number where the token appears.
-  - `c`: The column position where the token appears.
-- **Behavior:** Initializes a new `Token` object with the specified type, value, line number, and column position.
+### TypeChecker Class
 
-**Function:**
-```cpp
-std::string toString() const;
-```
-- **Return Value:** A string representation of the token, useful for debugging and logging purposes.
-- **Behavior:** Returns a formatted string that includes the token's type, value, line number, and column position.
+**Purpose**: Orchestrates the type checking process across the entire program.
+
+**Members**:
+- `std::shared_ptr<TypeEnv> globalEnv`: Represents the global type environment.
+
+**Methods**:
+- `TypeChecker()`: Initializes a new `TypeChecker` object with an empty global environment.
+- `void check(const std::vector<ASTNodePtr>& nodes)`: Checks the types of all nodes in a vector of abstract syntax tree (AST) nodes.
+- `void check(const ASTNodePtr& node)`: Checks the type of a single AST node.
+- `std::string checkNode(const ASTNodePtr& node, std::shared_ptr<TypeEnv> env)`: Recursively checks the type of an AST node within a given environment and returns the inferred type.
 
 ## Tradeoffs and Limitations
 
-- **Flexibility vs. Simplicity:** While using `std::string` for token values offers flexibility, it may introduce performance overhead compared to fixed-size data types. However, the simplicity of the implementation outweighs these potential drawbacks.
-- **Error Reporting:** Accurate line and column tracking enhances error reporting but requires additional complexity in the lexer and parser.
-- **Special Cases:** Handling special cases like template strings and decorators may require additional logic and state management within the lexer.
+- **Complexity**: Implementing a comprehensive type checker adds significant complexity to the compiler, requiring careful handling of various data types and operations.
+- **Performance**: Frequent type lookups and validation can impact performance, especially in large programs with many nested scopes.
+- **Error Handling**: While `StaticTypeError` provides specific information about type errors, it may not cover all possible scenarios, leading to potential gaps in error reporting.
 
-## Conclusion
-
-The `include/Token.h` header file plays a crucial role in the QuantumLanguage compiler by defining the structure and behavior of tokens. Its design choices ensure clarity, efficiency, and accurate error reporting, forming the basis for effective parsing and semantic analysis of the source code.
+By addressing these tradeoffs, the QuantumLanguage compiler aims to strike a balance between thoroughness, efficiency, and usability.
