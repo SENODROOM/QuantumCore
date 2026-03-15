@@ -1,117 +1,47 @@
-# evalIdentifier() Function Explanation
+# `evalIdentifier()` Function Explanation
 
-## Complete Code
+The `evalIdentifier` function is responsible for evaluating an identifier within the quantum language interpreter. An identifier typically represents a variable, function, or method name that needs to be resolved to its corresponding value or reference.
 
-```cpp
-QuantumValue Interpreter::evalIdentifier(Identifier &e)
-{
-    // Try regular env lookup first
-    try
-    {
-        return env->get(e.name);
-    }
-    catch (const NameError &)
-    {
-        // Check if it's a native function (e.g., print, len, etc.)
-        auto native = env->getNative(e.name);
-        if (native)
-            return QuantumValue(native);
-        throw NameError("Undefined variable: '" + e.name + "'");
-    }
-}
-```
+## What It Does
 
-## Code Explanation
+The primary role of `evalIdentifier` is to resolve the given identifier (`e.name`) to its associated value or reference. If the identifier is not found in the current environment (`env`), it attempts to find it within the context of an instance (`self`). This allows for accessing fields and methods of objects in a manner similar to how they would be accessed in languages like Python.
 
-### Function Signature
--  `QuantumValue Interpreter::evalIdentifier(Identifier &e)` - Evaluate identifier expressions
-  - `e`: Reference to Identifier AST node
-  - Returns QuantumValue result of identifier lookup
+## Why It Works This Way
 
-###
--  `{` - Opening brace
--  `// Try regular env lookup first` - Comment about lookup strategy
--  `try` - Start try block for environment lookup
--  `{` - Opening brace for try block
--  `return env->get(e.name);` - Try to get variable from environment
--  `}` - Closing brace for try block
+1. **Environment Lookup**: The function first tries to look up the identifier directly in the current environment using `env->get(e.name)`. This is the most straightforward approach and should cover most cases where identifiers are defined at the top level of the program or module.
 
-###
--  `catch (const NameError &)` - Catch name errors from environment
--  `{` - Opening brace for catch block
--  `// Check if it's a native function (e.g., print, len, etc.)` - Comment about native function check
--  `auto native = env->getNative(e.name);` - Try to get native function
--  `if (native)` - Check if native function found
--  `return QuantumValue(native);` - Return native function value
--  `}` - Closing brace for catch block
+2. **Fallback to Instance Context**: If the identifier is not found in the environment, the function falls back to checking if there is an instance named `"self"` in the current scope. This is useful in scenarios where identifiers represent properties or methods of an object.
 
-###
--  `throw NameError("Undefined variable: '" + e.name + "'");` - Throw error for undefined identifier
--  `}` - Closing brace for catch block
--  `}` - Closing brace for function
+3. **Handling Instances**: If `"self"` exists and is an instance, the function checks if the identifier corresponds to a field in the instance. If it does, the field's value is returned. If not, the function then searches for the identifier among the methods of the instance's class.
 
-## Summary
+4. **Method Binding**: If a matching method is found, it is wrapped in a `QuantumValue` object. This wrapping allows the method to be treated similarly to functions, enabling further processing such as calling the method with arguments.
 
-The `evalIdentifier()` function handles identifier lookup and resolution in the Quantum Language:
+5. **Exception Handling**: The function uses exception handling to manage errors gracefully. If the identifier is not found in either the environment or the instance context, it re-throws the original `NameError`.
 
-### Key Features
-- **Environment Lookup**: First tries regular variable lookup
-- **Native Function Support**: Falls back to native function lookup
-- **Error Handling**: Clear error messages for undefined identifiers
-- **Scope Resolution**: Proper lexical scoping through environment chain
+## Parameters/Return Value
 
-### Lookup Process
-1. **Regular Lookup**: Try to find variable in current environment
-2. **Native Function Check**: If not found, check for native function
-3. **Error Generation**: Throw descriptive error if identifier not found
-4. **Value Return**: Return the found identifier's value
+- **Parameters**:
+  - `Identifier &e`: A reference to the identifier that needs to be evaluated.
 
-### Identifier Types Supported
-- **Variables**: User-defined variables in current scope
-- **Parameters**: Function parameters in local scope
-- **Native Functions**: Built-in language functions
-- **Constants**: Constant values defined in scope
+- **Return Value**:
+  - `QuantumValue`: The resolved value or reference associated with the identifier. If the identifier is not found, it throws a `NameError`.
 
-### Environment Chain
-- **Current Scope**: Checks current environment first
-- **Parent Scopes**: Automatically searches parent environments
-- **Global Scope**: Eventually reaches global environment
-- **Native Functions**: Special lookup for built-in functions
+## Edge Cases
 
-### Error Handling
-- **NameError**: Thrown for undefined identifiers
-- **Descriptive Messages**: Includes identifier name in error
-- **Native Function Fallback**: Checks built-in functions before error
-- **Exception Propagation**: Errors propagate up to error handlers
+1. **Non-existent Identifier**: If the identifier is not defined anywhere in the environment or as a field/method of `"self"`, the function will throw a `NameError`.
+   
+2. **Ambiguous Identifiers**: In complex programs, there might be situations where an identifier could potentially refer to both a global variable and a field/method of an instance. The function currently prioritizes the instance context over the global environment, which may need to be adjusted based on specific requirements.
 
-### Design Benefits
-- **Lexical Scoping**: Proper variable resolution through environment chain
-- **Native Integration**: Seamless access to built-in functions
-- **Clear Errors**: Helpful error messages for debugging
-- **Performance**: Efficient lookup through environment hierarchy
+3. **Dynamic Typing**: Since `"self"` can represent any type of object, the function must handle different types of instances and their respective fields and methods dynamically.
 
-### Use Cases
-- **Variable Access**: All variable references in expressions
-- **Function Calls**: Native function calls (print, len, etc.)
-- **Parameter Access**: Function parameter references
-- **Constant Access**: Constant value references
+## Interactions With Other Components
 
-### Integration with Other Components
-- **Environment System**: Uses environment for variable storage
-- **Native Functions**: Integrates with native function registry
-- **Error System**: Uses NameError for undefined identifiers
-- **Expression Evaluation**: Called by main expression evaluator
+- **Environment Management**: The function interacts with the `env` object, which manages the current execution environment. It uses `env->get(e.name)` to retrieve values from the environment.
+  
+- **Instance Representation**: The function assumes that `"self"` represents an instance of some class. It accesses the instance's fields and methods through the `inst->fields` and `inst->klass->methods` data structures.
 
-### Performance Characteristics
-- **Environment Lookup**: O(n) where n is scope depth
-- **Native Function Check**: O(1) hash table lookup
-- **Memory Efficient**: No unnecessary allocations
-- **Fast Path**: Fast lookup for common cases
+- **Class Hierarchy**: When searching for methods, the function traverses the class hierarchy using `k->base.get()`, allowing it to find methods defined in parent classes.
 
-### Scope Resolution Examples
-- **Local Variables**: `x = 5; print(x);` - finds local variable
-- **Global Variables**: `print("hello");` - finds native function
-- **Parameters**: `function(param) { return param; }` - finds parameter
-- **Undefined**: `print(undefined_var);` - throws NameError
+- **Wrapping Methods**: To facilitate further processing of methods, the function wraps them in a `QuantumValue` object. This interaction with the `QuantumValue` class is crucial for maintaining consistency in how values are handled throughout the interpreter.
 
-This function provides the foundation for variable and function access in the Quantum Language, enabling proper lexical scoping while maintaining seamless integration with built-in native functions and providing clear error messages for undefined identifiers.
+Overall, `evalIdentifier` plays a vital role in resolving identifiers within the quantum language interpreter, ensuring that variables, fields, and methods are correctly accessed and referenced during execution.
