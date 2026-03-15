@@ -1,60 +1,61 @@
-# QuantumLanguage Compiler - Lexer.h
+# QuantumLanguage Compiler - Parser.h
 
 ## Overview
 
-The `include/Lexer.h` header file is an essential component of the QuantumLanguage compiler, responsible for converting raw text into a sequence of tokens. These tokens serve as the building blocks for further parsing and semantic analysis. The Lexer class plays a pivotal role in the initial stages of the compilation process, ensuring that the input source code is accurately parsed into meaningful units.
+The `include/Parser.h` header file is a crucial component of the QuantumLanguage compiler, responsible for converting a sequence of tokens into an Abstract Syntax Tree (AST). This file plays a pivotal role in the compiler's pipeline by interpreting the syntactic structure of the source code and constructing a hierarchical representation of it.
 
 ## Key Design Decisions
 
-### Use of `std::unordered_map` for Keywords
+### Error Handling
 
-**WHY**: Using an unordered map allows for constant time complexity (`O(1)`) lookups when checking if a word is a keyword. This is crucial for quickly identifying reserved words during the lexing phase, enhancing performance and reducing overhead.
+A custom exception class, `ParseError`, is designed to handle errors during parsing. It extends `std::runtime_error` and includes additional information about the error location (`line` and `col`). This decision was made to provide more context-specific error messages, aiding in debugging and improving user experience.
 
-### Separate Handling of Template Literals
+### Pratt Parsing Algorithm
 
-**WHY**: Template literals, which allow for string interpolation using expressions enclosed within `${}`, require special handling to ensure correct tokenization and evaluation. Separating their processing into a dedicated function (`readTemplateLiteral`) ensures clarity and modularity, making it easier to manage and extend the lexer's functionality in the future.
+The parser employs the Pratt parsing algorithm for expression evaluation. This method allows for flexible handling of operator precedence and associativity without requiring complex recursive descent parsers. The choice of Pratt parsing simplifies the implementation of the parser while maintaining control over operator priorities.
 
-### Use of Pending Tokens for F-Strings
+## Classes and Functions Documentation
 
-**WHY**: F-strings (formatted string literals) in QuantumLanguage support dynamic content insertion within strings. To handle this, the lexer uses a temporary storage mechanism (`pendingTokens_`) to accumulate tokens before they are finalized. This approach simplifies the integration of f-string expansion logic without cluttering the main lexing process.
+### ParseError Class
 
-## Class and Function Documentation
+**Purpose:**  
+To represent parsing errors with detailed location information.
 
-### Lexer Class
+**Behavior:**  
+- Inherits from `std::runtime_error`.
+- Stores the line and column number where the error occurred.
+- Provides a constructor to initialize these attributes along with the error message.
 
-**Purpose**: The `Lexer` class is designed to take a source code string and convert it into a vector of `Token` objects. Each token represents a syntactic element of the source code, such as identifiers, numbers, operators, and keywords.
+### Parser Class
 
-**Behavior**:
-- **Constructor (`explicit Lexer(const std::string &source)`)**: Initializes the lexer with the provided source code string.
-- **Function (`std::vector<Token> tokenize()`)**: Processes the entire source code and returns a vector of tokens.
+**Purpose:**  
+To manage the parsing process, converting a vector of tokens into an AST.
 
-### Private Member Variables
+**Behavior:**  
+- Constructor initializes with a vector of tokens.
+- `parse()` function initiates the parsing process, returning the root node of the AST.
+- Private helper functions manage token consumption, checking, and error reporting.
+- Major parsing methods correspond to different constructs in the language, such as variable declarations, function definitions, conditional statements, loops, and expressions.
 
-- **src**: Stores the source code string being processed.
-- **pos**: Tracks the current position in the source code.
-- **line** and **col**: Maintain the current line and column numbers for error reporting and debugging purposes.
-- **keywords**: A static unordered map containing all recognized keywords and their corresponding token types.
-- **pendingTokens_**: Used temporarily to store tokens while expanding f-strings.
-- **defines_**: Stores macro definitions, mapping macro names to lists of replacement tokens.
+### Expression Parsing Methods
 
-### Private Functions
+These methods implement the Pratt parsing algorithm to evaluate expressions based on their precedence and associativity:
 
-- **current() const**: Returns the character at the current position in the source code.
-- **peek(int offset = 1) const**: Returns the character at the specified offset ahead of the current position without advancing the position.
-- **advance()**: Advances the current position in the source code by one character and returns the character that was previously at the current position.
-- **skipWhitespace()**: Skips over any whitespace characters in the source code.
-- **skipComment()**: Skips over single-line comments starting with `//`.
-- **skipBlockComment()**: Skips over multi-line comments enclosed between `/*` and `*/`.
-- **readNumber()**: Reads a numeric literal from the source code and returns the corresponding `Token`.
-- **readString(char quote)**: Reads a string literal from the source code, handling both single (`'`) and double (`"`) quotes, and returns the corresponding `Token`.
-- **readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol)**: Handles the expansion of template literals, accumulating tokens in the provided output vector.
-- **readIdentifierOrKeyword()**: Reads an identifier or keyword from the source code and returns the corresponding `Token`.
-- **readOperator()**: Reads an operator or punctuation mark from the source code and returns the corresponding `Token`.
+- `parseExpr()`: Main entry point for expression parsing.
+- `parseAssignment()`, `parseOr()`, `parseAnd()`, etc.: Handle specific operators and operations.
+
+### Statement Parsing Methods
+
+These methods parse different types of statements in the language:
+
+- `parseStatement()`: Parses individual statements.
+- `parseBlock()`: Parses compound statements enclosed in braces.
+- `parseIfStmt()`, `parseWhileStmt()`, `parseForStmt()`, etc.: Handle control flow statements.
 
 ## Tradeoffs and Limitations
 
-- **Performance**: While the use of an unordered map for keywords provides fast lookup times, it may introduce additional memory overhead compared to other data structures.
-- **Complexity**: Handling template literals requires additional complexity in the lexer, potentially complicating the overall architecture of the compiler.
-- **Error Reporting**: The lexer maintains line and column information, which aids in accurate error reporting but adds some computational cost.
+- **Flexibility vs. Complexity:** While Pratt parsing offers flexibility, it can be more complex to implement than traditional recursive descent parsers. However, this complexity is managed through clear separation of concerns and modular design.
+- **Error Reporting:** Detailed error reporting requires additional overhead but enhances the usability of the compiler by providing precise feedback.
+- **Operator Precedence:** The Pratt parsing algorithm inherently handles operator precedence, which simplifies the parser's logic but may complicate the addition of new operators.
 
-This README.md provides a detailed overview of the `Lexer.h` file, explaining its purpose, key design decisions, and the behavior of its major components. It also highlights potential tradeoffs and limitations associated with the implementation.
+This README provides a comprehensive overview of the `Parser.h` file, detailing its functionality, design choices, and potential limitations.
