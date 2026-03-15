@@ -2,70 +2,79 @@
 
 ## Overview
 
-`Parser.cpp` is a crucial component of the Quantum Language compiler, responsible for converting a sequence of tokens into an Abstract Syntax Tree (AST). This transformation ensures that the program conforms to the syntax rules of the Quantum Language, facilitating further semantic analysis and code generation stages.
+`Parser.cpp` is a critical component of the Quantum Language compiler, responsible for converting a sequence of tokens into an Abstract Syntax Tree (AST). This transformation ensures that the program conforms to the syntax rules of the Quantum Language, facilitating further semantic analysis and code generation stages.
 
 ## Role in the Compiler Pipeline
 
-The parser plays a pivotal role in the compilation process by taking the output of the lexer (tokenized input) and constructing a structured representation of the code. This AST serves as the foundation for subsequent stages such as semantic analysis and code generation.
+The parser plays a pivotal role in the compilation process by taking the output from the lexer (tokenized input) and constructing a structured representation of the program's syntax. This AST serves as the foundation for subsequent phases of the compiler, including semantic analysis and code generation.
 
 ## Key Design Decisions
 
-### Tokenization vs Lexical Analysis
+### Token Consumption and Management
 
-**WHY:** Tokenization is the initial stage in breaking down the source code into individual lexical elements (tokens), whereas lexical analysis involves understanding the structure and meaning of these tokens. By separating these concerns, `Parser.cpp` can focus on the syntactic correctness of the code without delving into its semantics.
+- **Token Reference vs Ownership**: The parser uses references to tokens rather than owning them. This decision was made to avoid unnecessary copying of token objects, which can be costly in terms of performance.
+  
+- **Position Tracking**: A `pos` variable tracks the current position in the token list. This allows the parser to efficiently move forward and backward through the tokens as needed during parsing.
 
-### Handling Decorators and Storage Class Specifiers
+### Error Handling
 
-**WHY:** To maintain compatibility with existing programming paradigms, it was decided to allow Python-like decorators (e.g., `@property`, `@dataclass`) and C/C++ storage class specifiers (e.g., `static`, `extern`). These features enable developers to use familiar patterns while writing quantum programs, enhancing readability and maintainability.
+- **Exception-Based Parsing**: The parser throws exceptions (`ParseError`) when it encounters syntax errors. This approach provides clear and immediate feedback on issues encountered during parsing, making debugging easier.
 
-## Documentation of Major Classes and Functions
+### Flexibility in Handling Different Syntax Styles
+
+- **Decorator Support**: The parser includes support for handling Python-style decorators (e.g., `@property`, `@dataclass`). This flexibility allows the compiler to accept both Pythonic and traditional C/C++ syntax styles, enhancing compatibility.
+
+- **Storage Class Specifiers**: The parser skips over C/C++ storage class specifiers such as `static`, `extern`, `inline`, etc. This decision was made to maintain consistency across different programming paradigms supported by the compiler.
+
+## Documentation of Major Classes/Functions
 
 ### Parser Class
 
-**Purpose:** The `Parser` class is the main driver for parsing the tokenized input. It manages the position within the token list and provides methods for consuming tokens, checking their types, and skipping newlines.
+**Purpose**: Manages the parsing process, converting a sequence of tokens into an AST.
 
-**Behavior:**
-- **Constructor:** Initializes the parser with a vector of tokens.
-- **current():** Returns the current token being processed.
-- **peek(offset):** Returns the token at the specified offset ahead in the token list.
-- **consume():** Advances the parser's position and returns the current token.
-- **expect(t, msg):** Consumes the next token if it matches the expected type, otherwise throws a `ParseError`.
-- **check(t):** Checks if the current token matches the specified type.
-- **match(t):** Attempts to match and consume the next token if it matches the specified type.
-- **atEnd():** Determines if the parser has reached the end of the token list.
-- **skipNewlines():** Skips any newline tokens encountered during parsing.
-- **parse():** Parses the entire input, constructing an AST starting with a block statement.
-- **parseStatement():** Parses individual statements, handling various syntax constructs including variable declarations and expressions.
+**Behavior**:
+- Initializes with a vector of tokens.
+- Provides methods to access and manipulate the current token position.
+- Parses statements and constructs the AST accordingly.
 
-### Tradeoffs and Limitations
+### parse Method
 
-- **Flexibility vs Simplicity:** Allowing both Python-like decorators and C/C++ storage class specifiers increases the flexibility of the language but adds complexity to the parser.
-- **Error Handling:** The parser uses exceptions (`throw ParseError(...)`) to handle syntax errors, which simplifies error reporting but may not be suitable for all environments.
-- **Performance:** The recursive descent approach used in the parser can lead to performance issues for deeply nested structures, although this is mitigated by careful optimization.
+**Purpose**: Entry point for parsing the entire input stream.
+
+**Behavior**:
+- Creates a new `BlockStmt` node to hold all parsed statements.
+- Continuously parses statements until the end of the input is reached.
+- Returns the constructed AST.
+
+### parseStatement Method
+
+**Purpose**: Parses individual statements from the input.
+
+**Behavior**:
+- Skips any leading newlines or decorators.
+- Handles different statement types based on the current token type (e.g., `LET`, `CONST`).
+- Constructs and returns the appropriate AST node for the parsed statement.
+
+## Tradeoffs/Limitations
+
+- **Performance**: By using references instead of owning tokens, the parser avoids significant overhead associated with copying large numbers of tokens. However, this requires careful management of token lifetimes to prevent dangling references.
+
+- **Flexibility**: Supporting multiple syntax styles (Python-like decorators, C/C++ storage class specifiers) increases the compiler's versatility but adds complexity to the parsing logic.
+
+- **Error Reporting**: Exception-based error reporting provides immediate feedback but may not be suitable for all environments where compilers operate. Additionally, exception handling can add overhead compared to simpler error reporting mechanisms.
 
 ## Usage Example
 
-To use the `Parser.cpp` module, follow these steps:
-
-1. **Tokenize Input:** Use the lexer to tokenize your source code.
-2. **Create Parser Instance:** Pass the tokenized input to the `Parser` constructor.
-3. **Parse Code:** Call the `parse()` method to construct the AST.
+To use the parser, instantiate it with a vector of tokens and call the `parse()` method:
 
 ```cpp
-#include "Lexer.h"
-#include "Parser.h"
-
-int main() {
-    std::string sourceCode = "let x = 42;";
-    Lexer lexer(sourceCode);
-    std::vector<Token> tokens = lexer.tokenize();
-
-    Parser parser(tokens);
-    ASTNodePtr ast = parser.parse();
-
-    // Further processing of the AST...
-    return 0;
-}
+std::vector<Token> tokens = ...; // Initialize with tokenized input
+Parser parser(tokens);
+auto ast = parser.parse();
 ```
 
-This example demonstrates how to integrate `Parser.cpp` with the lexer to parse a simple quantum program.
+This will produce an AST representing the syntactic structure of the input program.
+
+## Conclusion
+
+`Parser.cpp` is a vital part of the Quantum Language compiler, ensuring that the input program adheres to its syntax rules. Through strategic design choices and comprehensive functionality, it supports both modern and traditional programming paradigms, providing a robust foundation for further compiler development.
