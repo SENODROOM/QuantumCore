@@ -1,123 +1,64 @@
-# QuantumLanguage Compiler - Parser.h
+# QuantumLanguage Compiler - Token.h
 
 ## Overview
 
-The `include/Parser.h` header file is a critical component of the QuantumLanguage compiler's architecture. It encapsulates the logic responsible for converting a sequence of tokens into an Abstract Syntax Tree (AST). The parser handles the syntactic analysis of the input code, ensuring it adheres to the language's grammar rules and constructs meaningful AST nodes from the parsed elements.
-
-This file serves as the bridge between the lexical analysis phase (tokenization) and the semantic analysis phase (building the AST). By accurately interpreting the syntax of the source code, the parser facilitates subsequent phases such as type checking, optimization, and code generation.
+The `include/Token.h` header file is a fundamental component of the QuantumLanguage compiler's architecture. It encapsulates the definition of tokens, which are the smallest units of meaningful elements in the language. These tokens serve as the building blocks for parsing and interpreting the source code. The `Token` struct holds information about the type, value, line number, and column position of each token, enabling precise error reporting and context-aware processing throughout the compilation process.
 
 ## Key Design Decisions
 
-### Error Handling
+### Token Types Enumeration
 
-**Design Decision:** The parser uses custom exceptions (`ParseError`) to handle errors during parsing. These exceptions store both the error message and the location in the source code (line and column).
+The `TokenType` enum class categorizes all possible token types into several categories:
 
-**Why:** Custom exceptions provide more context about the error, making debugging easier. They also allow for more precise control over error handling, enabling the compiler to report errors in a user-friendly manner.
+- **Literals**: Represents numeric, string, boolean, and nil values.
+- **Identifiers & Keywords**: Includes variable names, control flow statements, and other reserved words.
+- **C/C++ Style Type Keywords**: Mimics common C/C++ type specifiers to support interoperability.
+- **Operators**: Covers arithmetic, comparison, logical, bitwise, and assignment operators.
+- **Delimiters**: Such as parentheses, braces, brackets, commas, semicolons, colons, dots, arrows, and question marks.
+- **Special Tokens**: Includes end-of-file, unknown tokens, and Python-style indentation markers.
 
-### Pratt Parsing Algorithm
+**Why**: This comprehensive enumeration ensures that every syntactic element of the language can be accurately identified and processed during the lexical analysis phase. By grouping similar token types together, it simplifies the implementation and maintenance of the lexer.
 
-**Design Decision:** The expression parsing is implemented using the Pratt parsing algorithm, which supports operator precedence and associativity without requiring parentheses for all expressions.
+### Token Structure
 
-**Why:** Pratt parsing is highly flexible and efficient, allowing for complex expressions to be parsed correctly while keeping the implementation straightforward. This approach simplifies the parser and reduces the likelihood of bugs related to operator precedence.
+The `Token` struct is designed to store essential information about each token:
 
-### Recursive Descent Parsing
+- **type**: An instance of `TokenType` indicating the kind of token.
+- **value**: A `std::string` containing the actual text of the token.
+- **line**: An integer representing the line number where the token appears in the source code.
+- **col**: An integer representing the column position within the line.
 
-**Design Decision:** The parser employs a recursive descent parsing technique, where each non-terminal rule in the grammar corresponds to a function in the parser class.
+**Why**: Storing these details allows the compiler to maintain accurate context and generate meaningful error messages. The line and column numbers help pinpoint issues directly in the source code, improving debugging efficiency.
 
-**Why:** Recursive descent parsing is intuitive and easy to implement, especially for simple grammars. It allows for clear separation of concerns, making the code modular and easier to understand and maintain.
+## Documentation of Major Classes/Functions
 
-### Support for C-Type Variables
+### Token Class
 
-**Design Decision:** The parser includes specific support for declaring variables with C-type hints (e.g., `int x`, `int* p`).
+#### Purpose
 
-**Why:** This feature enables the parser to recognize and handle variables declared according to C-like syntax, providing compatibility and flexibility for developers familiar with C-based languages.
+The `Token` class represents a single token in the source code. It encapsulates the token's type, value, and location information.
 
-## Classes and Functions Documentation
+#### Behavior
 
-### ParseError Class
+- **Constructor**: Initializes the token with the given type, value, line number, and column position.
+- **toString Method**: Returns a string representation of the token, useful for debugging and logging purposes.
 
-**Purpose:** Represents a parsing error, storing the error message along with the line and column numbers where the error occurred.
+### toString Method
 
-**Behavior:** Inherits from `std::runtime_error` and adds additional fields for line and column information.
+#### Purpose
 
-### Parser Class
+The `toString` method provides a human-readable string representation of the `Token` object.
 
-**Purpose:** Manages the parsing process, converting a sequence of tokens into an AST.
+#### Behavior
 
-#### Constructor
-
-```cpp
-explicit Parser(std::vector<Token> tokens);
-```
-
-**Behavior:** Initializes the parser with a vector of tokens.
-
-#### parse Function
-
-```cpp
-ASTNodePtr parse();
-```
-
-**Purpose:** Parses the entire input stream and returns the root node of the AST.
-
-**Behavior:** Iterates through the tokens, invoking appropriate parsing functions based on the current token type.
-
-### Token Helpers
-
-- **current**: Retrieves the current token being processed.
-- **peek**: Looks ahead at a specified number of tokens without consuming them.
-- **consume**: Consumes the current token and advances the position.
-- **expect**: Ensures the next token matches the expected type, throwing an error if not.
-- **check**: Checks if the next token matches a specified type.
-- **match**: Attempts to consume the next token if it matches the specified type.
-- **atEnd**: Determines if the end of the token stream has been reached.
-- **skipNewlines**: Skips any newline characters encountered during parsing.
-
-### Statement Parsing Methods
-
-- **parseStatement**: Parses a single statement.
-- **parseBlock**: Parses a block of statements enclosed in curly braces.
-- **parseBodyOrStatement**: Parses either a block or a single statement, depending on whether curly braces are present.
-- **parseVarDecl**: Parses a variable declaration, optionally marking it as constant.
-- **parseFunctionDecl**: Parses a function declaration.
-- **parseClassDecl**: Parses a class declaration.
-- **parseIfStmt**: Parses an if statement.
-- **parseWhileStmt**: Parses a while loop.
-- **parseForStmt**: Parses a for loop.
-- **parseReturnStmt**: Parses a return statement.
-- **parsePrintStmt**: Parses a print statement.
-- **parseInputStmt**: Parses an input statement.
-- **parseCoutStmt**: Parses a `cout << ...` statement.
-- **parseCinStmt**: Parses a `cin >> ...` statement.
-- **parseImportStmt**: Parses an import statement, optionally specifying a module name.
-- **parseExprStmt**: Parses an expression followed by a semicolon.
-
-### Expression Parsing Methods
-
-- **parseExpr**: Parses a top-level expression.
-- **parseAssignment**: Parses an assignment expression.
-- **parseOr**: Parses logical OR expressions.
-- **parseAnd**: Parses logical AND expressions.
-- **parseBitwise**: Parses bitwise operations.
-- **parseEquality**: Parses equality comparisons.
-- **parseComparison**: Parses relational comparisons.
-- **parseShift**: Parses shift operations.
-- **parseAddSub**: Parses addition and subtraction operations.
-- **parseMulDiv**: Parses multiplication and division operations.
-- **parsePower**: Parses exponentiation operations.
-- **parseUnary**: Parses unary operators.
-- **parsePostfix**: Parses postfix expressions.
-- **parsePrimary**: Parses primary expressions (literals, identifiers, etc.).
-
-### Additional Helper Functions
-
-- **parseArrayLiteral**: Parses an array literal.
-- **parseDictLiteral**: Parses a dictionary literal.
-- **parseLambda**: Parses a lambda function.
-- **parseArrowFunction**: Parses an arrow function with specified parameters.
-- **parseArgList**: Parses a list of arguments.
-- **parseParamList**: Parses a list of function parameters, supporting references and default values.
+It constructs a string that includes the token's type, value, line number, and column position. This method aids in logging and visualization of tokens during development and debugging phases.
 
 ## Tradeoffs and Limitations
 
-- **Flexibility vs. Simplicity
+- **Memory Usage**: Storing the entire token value as a `std::string` can lead to increased memory consumption, especially for large programs.
+- **Performance**: Frequent construction and destruction of `std::string` objects might impact performance, particularly in scenarios involving high-frequency tokenization.
+- **Flexibility**: While the current set of token types covers most common language features, additional types may need to be introduced to support emerging language standards or custom extensions.
+
+## Conclusion
+
+The `include/Token.h` header file is a critical backbone of the QuantumLanguage compiler, providing a robust framework for tokenizing the source code. Its well-designed structure and comprehensive enumeration ensure that every aspect of the language's syntax is accounted for, facilitating efficient parsing and semantic analysis. However, developers should be aware of potential memory and performance implications when working with large volumes of source code.
