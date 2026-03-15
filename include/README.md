@@ -1,51 +1,99 @@
-# QuantumLanguage Compiler - Lexer.h
+# QuantumLanguage Compiler - Parser.h
 
 ## Overview
 
-The `include/Lexer.h` header file plays a crucial role in the QuantumLanguage compiler by handling the lexical analysis phase. This involves converting the source code into a sequence of tokens that can be further processed by the parser. The lexer is designed with efficiency and flexibility in mind, ensuring that it can accurately identify and categorize different elements of the language syntax.
+The `include/Parser.h` header file is a critical component of the QuantumLanguage compiler, responsible for converting sequences of lexical tokens into an Abstract Syntax Tree (AST). This process involves understanding the grammar rules of the language and constructing a hierarchical representation of the code structure that can be easily interpreted or executed.
 
-## Key Design Decisions and Why
+This file plays a pivotal role in the compiler pipeline, acting as the bridge between the lexer and the semantic analyzer. It ensures that the syntax is correct before moving on to further stages of compilation.
 
-### Efficient Tokenization
+### Key Design Decisions and Why
 
-- **C++ Standard Library**: Utilizing C++'s standard library containers such as `std::vector` and `std::unordered_map` allows for efficient storage and retrieval of tokens and keywords.
-- **State Machine Approach**: Implementing the lexer using a state machine approach ensures that transitions between states are handled cleanly and efficiently, making it easier to manage complex syntax rules.
+1. **Use of Pratt Parsing**: The parser employs Pratt parsing, a technique for handling operator precedence without recursion. This approach simplifies the implementation and avoids potential stack overflow issues that could arise with recursive descent parsers.
 
-### Flexibility and Extensibility
+2. **Separation of Concerns**: The file is organized into distinct sections, including token helpers and parsing methods. This separation makes the code more modular, easier to understand, and maintain.
 
-- **Macros Support**: The lexer includes support for C-style preprocessor macros (`#define`). This feature enhances the language's expressiveness and adaptability.
-- **F-String Expansion**: A mechanism for expanding f-strings (formatted string literals) is implemented using a vector of pending tokens. This allows for dynamic generation of tokens based on runtime expressions, providing powerful string formatting capabilities.
+3. **Exception Handling**: Custom exceptions (`ParseError`) are defined to provide detailed error information, including the line and column where the error occurred. This helps in debugging and improving user experience.
 
-### Error Handling
+4. **Flexibility in Parsing**: Functions like `parseBodyOrStatement()` allow for flexible parsing of blocks or individual statements, making it easier to handle different syntactic structures.
 
-- **Detailed Error Reporting**: While not explicitly shown in the provided code snippet, the lexer is designed to provide detailed error reporting. This helps developers understand where and why errors occur in their code, facilitating quicker debugging and maintenance.
+### Major Classes/Functions Overview
 
-## Major Classes/Functions Overview
+#### Class: `ParseError`
 
-### Lexer Class
+- **Inheritance**: Inherits from `std::runtime_error`.
+- **Purpose**: Represents errors encountered during parsing, providing additional context about the location of the error.
+- **Attributes**:
+  - `int line`: Line number where the error occurred.
+  - `int col`: Column number where the error occurred.
+- **Methods**:
+  - Constructor: Initializes the exception message along with line and column numbers.
 
-- **Constructor**: Initializes the lexer with the source code as input.
-- **tokenize() Function**: Performs the main lexical analysis process, returning a vector of tokens representing the source code.
+#### Class: `Parser`
 
-### Private Member Functions
+- **Constructor**: Accepts a vector of `Token`s representing the input source code.
+- **Method: `parse()`**
+  - **Purpose**: Parses the entire input sequence into an AST.
+  - **Returns**: A pointer to the root node of the constructed AST.
 
-- **current()**: Returns the character at the current position in the source code.
-- **peek(int offset)**: Returns the character at the specified offset relative to the current position without advancing the position.
-- **advance()**: Advances the position in the source code by one character and returns it.
-- **skipWhitespace()**: Skips over any whitespace characters in the source code.
-- **skipComment()**: Skips over single-line comments starting with `//`.
-- **skipBlockComment()**: Skips over multi-line comments enclosed within `/* */`.
+- **Private Methods**:
+  - **Token Accessors**:
+    - `Token &current()`: Returns the current token being processed.
+    - `Token &peek(int offset = 1)`: Returns the next token without advancing the position.
+    - `Token &consume()`: Consumes the current token and advances the position.
+    - `Token &expect(TokenType t, const std::string &msg)`: Ensures the current token matches the expected type; throws an error otherwise.
+    - `bool check(TokenType t) const`: Checks if the current token matches the specified type.
+    - `bool match(TokenType t)`: Matches the current token against the specified type and advances if successful.
+    - `bool atEnd() const`: Determines if the end of the token stream has been reached.
+    - `void skipNewlines()`: Skips over any newline characters in the token stream.
 
-- **readNumber()**: Reads a numeric literal from the source code.
-- **readString(char quote)**: Reads a string literal from the source code, handling both single and double quotes.
-- **readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol)**: Handles the reading of template literals, which allow for embedded expressions within strings.
-- **readIdentifierOrKeyword()**: Reads an identifier or keyword from the source code.
-- **readOperator()**: Reads an operator from the source code.
+  - **Parsing Statements**:
+    - `ASTNodePtr parseStatement()`
+    - `ASTNodePtr parseBlock()`
+    - `ASTNodePtr parseBodyOrStatement()`
+    - `ASTNodePtr parseVarDecl(bool isConst)`
+    - `ASTNodePtr parseFunctionDecl()`
+    - `ASTNodePtr parseClassDecl()`
+    - `ASTNodePtr parseIfStmt()`
+    - `ASTNodePtr parseWhileStmt()`
+    - `ASTNodePtr parseForStmt()`
+    - `ASTNodePtr parseReturnStmt()`
+    - `ASTNodePtr parsePrintStmt()`
+    - `ASTNodePtr parseInputStmt()`
+    - `ASTNodePtr parseCoutStmt()`
+    - `ASTNodePtr parseCinStmt()`
+    - `ASTNodePtr parseImportStmt(bool isFrom = false)`
+    - `ASTNodePtr parseExprStmt()`
 
-## Tradeoffs
+  - **Parsing Expressions**:
+    - `ASTNodePtr parseExpr()`
+    - `ASTNodePtr parseAssignment()`
+    - `ASTNodePtr parseOr()`
+    - `ASTNodePtr parseAnd()`
+    - `ASTNodePtr parseBitwise()`
+    - `ASTNodePtr parseEquality()`
+    - `ASTNodePtr parseComparison()`
+    - `ASTNodePtr parseShift()`
+    - `ASTNodePtr parseAddSub()`
+    - `ASTNodePtr parseMulDiv()`
+    - `ASTNodePtr parsePower()`
+    - `ASTNodePtr parseUnary()`
+    - `ASTNodePtr parsePostfix()`
+    - `ASTNodePtr parsePrimary()`
 
-- **Complexity vs. Performance**: The use of a state machine for tokenization adds complexity to the implementation but improves performance by reducing the number of conditional checks required during parsing.
-- **Flexibility vs. Simplicity**: Supporting macros and f-string expansion increases the language's flexibility but also complicates the lexer's implementation.
-- **Error Handling vs. Usability**: Detailed error reporting enhances usability by providing clear feedback, but may add overhead during normal operation.
+  - **Special Literals and Functions**:
+    - `ASTNodePtr parseArrayLiteral()`
+    - `ASTNodePtr parseDictLiteral()`
+    - `ASTNodePtr parseLambda()`
+    - `ASTNodePtr parseArrowFunction(std::vector<std::string> params, int ln)`
+    - `std::vector<ASTNodePtr> parseArgList()`
+    - `std::vector<std::string> parseParamList(std::vector<bool> *outIsRef = nullptr, std::vector<ASTNodePtr> *outDefaultArgs = nullptr, std::vector<std::string> *outParamTypes = nullptr)`
 
-Overall, the `Lexer.h` file is a critical component of the QuantumLanguage compiler, balancing performance, flexibility, and usability to ensure robust and effective lexical analysis.
+### Tradeoffs
+
+- **Complexity vs. Simplicity**: While Pratt parsing reduces complexity compared to recursive descent, it can introduce subtle bugs if not implemented carefully.
+  
+- **Performance**: Pratt parsing is generally faster than recursive descent due to its iterative nature, but both approaches have their performance implications depending on the specific use case and optimizations applied.
+
+- **Maintainability**: The separation of concerns in `Parser.h` improves maintainability by allowing developers to focus on specific aspects of parsing independently.
+
+Overall, `Parser
