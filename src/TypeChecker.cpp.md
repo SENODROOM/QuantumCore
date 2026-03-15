@@ -2,88 +2,57 @@
 
 ## Overview
 
-`TypeChecker.cpp` is an essential component of the Quantum Language compiler responsible for performing static type checking on the Abstract Syntax Tree (AST). This phase validates that all expressions and statements adhere to the defined types, thereby preventing runtime errors due to type mismatches.
+`TypeChecker.cpp` is a crucial part of the Quantum Language compiler, focusing on static type checking within the Abstract Syntax Tree (AST). This phase ensures that all expressions and statements conform to the specified types, thus preventing runtime errors caused by type mismatches.
 
 ## Role in the Compiler Pipeline
 
-The `TypeChecker` operates during the semantic analysis stage of the compilation process. It traverses the AST and checks the types of variables, function parameters, and return values. The type checker uses a symbol table (`TypeEnv`) to manage variable declarations and their associated types.
+The `TypeChecker` executes during the semantic analysis stage of the compilation process. Its primary function is to validate the types of variables, literals, function parameters, and return values throughout the program. By doing so, it helps catch potential errors early in the development cycle, improving overall code quality and reliability.
 
 ## Key Design Decisions
 
-### Symbol Table Management
+### Environment Management
 
-**Decision:** Use a shared pointer to a `TypeEnv` object for managing the symbol table.
-**Why:** This approach allows the type environment to be passed around and modified throughout the type checking process without copying it extensively. It also facilitates the creation of nested environments for function scopes, ensuring that local variables do not interfere with global ones.
+**Decision:** The use of environment management (`TypeEnv`) to track variable and function types.
+**Why:** This approach allows for dynamic scope resolution and type tracking across different parts of the AST. By maintaining separate environments for blocks and functions, we can accurately reflect the local scope and ensure type consistency within nested structures.
 
-### Type Inference
+### Built-in Function Handling
 
-**Decision:** Allow implicit type inference where possible, defaulting to `"any"` if no explicit type hint is provided.
-**Why:** Implicit type inference simplifies the syntax for users who prefer not to explicitly declare types. However, it introduces the risk of type mismatches, which the type checker aims to mitigate through warnings and error handling.
+**Decision:** Defining built-in functions like `print`, `input`, `len`, `sha256`, and `aes128` with default types.
+**Why:** Built-in functions often operate on specific data types, and providing default types ensures that the compiler can handle them correctly without additional user input. This simplifies the type-checking logic for these functions.
 
-### Error Handling
+### Flexible Type Hints
 
-**Decision:** Use standard error streams (`std::cerr`) for reporting type-related issues.
-**Why:** Standard error streams provide a clear and consistent way to report problems directly to the user. This decision avoids cluttering the output with unnecessary information and makes it easier to distinguish between regular output and error messages.
+**Decision:** Allowing users to provide type hints for variable declarations.
+**Why:** Type hints enhance code readability and allow developers to explicitly specify their intentions regarding variable types. However, they also introduce complexity as the compiler must reconcile these hints with actual type usage.
 
-## Documentation of Major Classes/Functions
+## Class and Function Documentation
 
-### Class: TypeChecker
+### TypeChecker Class
 
-**Purpose:** Manages the type checking process for the entire AST.
+**Purpose:** Manages the overall type-checking process, traversing the AST and validating types against the current environment.
 
-**Behaviour:**
-- Initializes the global type environment with built-in functions.
-- Provides methods to recursively check individual nodes and blocks within the AST.
-- Handles type mismatches by issuing warnings and potentially errors.
+**Behavior:**
+- **Constructor:** Initializes the global type environment with predefined built-in functions.
+- **check(const std::vector<ASTNodePtr>& nodes):** Iterates over a list of AST nodes and checks each one using `checkNode`.
+- **check(const ASTNodePtr& node):** Recursively checks individual AST nodes, handling blocks specially by creating a new sub-environment.
 
-### Function: check(const std::vector<ASTNodePtr>& nodes)
+### checkNode Function
 
-**Purpose:** Checks a list of AST nodes.
+**Purpose:** Validates the type of a single AST node based on its structure and the current environment.
 
-**Behaviour:**
-- Iterates over each node in the list and calls `checkNode` to validate its type.
-- Ensures that the entire program adheres to the specified types.
+**Behavior:**
+- **NumberLiteral:** Returns `"float"` as the type.
+- **StringLiteral:** Returns `"string"` as the type.
+- **BoolLiteral:** Returns `"bool"` as the type.
+- **Identifier:** Resolves the identifier's type in the current environment.
+- **VarDecl:** Checks the initializer's type against any provided type hint and defines the variable in the environment.
+- **FunctionDecl:** Sets up a new sub-environment for the function's body, defining parameters and the function itself.
+- **BlockStmt:** Creates a new sub-environment for the block, checking each statement within it.
 
-### Function: check(const ASTNodePtr& node)
+## Tradeoffs and Limitations
 
-**Purpose:** Checks a single AST node.
+- **Flexibility vs. Complexity:** Allowing type hints adds flexibility but increases the complexity of the type-checking logic. Users may provide incorrect hints leading to subtle bugs.
+- **Default Types for Built-ins:** While simplifying type handling for built-in functions, it might not always align with user expectations, especially when dealing with quantum operations which could require more specific types.
+- **Limited Support for Advanced Types:** The current implementation supports basic types (`float`, `string`, `bool`). Extending support for advanced types like arrays, structs, or custom types would require significant changes and testing.
 
-**Behaviour:**
-- Recursively checks the node's children if it's a block statement.
-- Validates the node's type based on its structure and content.
-
-### Function: std::string checkNode(const ASTNodePtr& node, std::shared_ptr<TypeEnv> env)
-
-**Purpose:** Validates the type of a specific AST node.
-
-**Behaviour:**
-- Determines the type of the node based on its literal value, identifier, declaration, or function body.
-- Updates the type environment with new variable declarations or function signatures.
-- Issues warnings for type mismatches when necessary.
-
-## Tradeoffs/Limitations
-
-- **Implicit Type Inference:** While convenient, implicit type inference can lead to subtle bugs and unexpected behavior. Users must be aware of these risks and use explicit type hints where appropriate.
-- **Performance Over Accuracy:** The current implementation prioritizes performance by using simple string comparisons for type validation. This may result in false positives or negatives, especially in complex scenarios involving generic types or advanced data structures.
-- **Limited Built-in Types:** The type system currently supports basic types like `float`, `string`, and `bool`. Extending this to include more complex types such as arrays, dictionaries, or custom structs would require additional logic and could complicate the type checker.
-
-## Usage Example
-
-To use the `TypeChecker` in your Quantum Language project, follow these steps:
-
-1. Include the header file:
-   ```cpp
-   #include "TypeChecker.h"
-   ```
-
-2. Create an instance of `TypeChecker`:
-   ```cpp
-   TypeChecker tc;
-   ```
-
-3. Check the AST nodes:
-   ```cpp
-   tc.check(nodes);
-   ```
-
-This will validate the types of all nodes in the AST, ensuring that they conform to the specified types.
+This README provides a comprehensive overview of the `TypeChecker.cpp` file, explaining its role, key design decisions, and functional details while acknowledging inherent tradeoffs and limitations.
