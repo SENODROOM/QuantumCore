@@ -1,94 +1,71 @@
-# QuantumLanguage Compiler - Error.h
+# QuantumLanguage Compiler - Interpreter.h
 
 ## Overview
 
-The `include/Error.h` header file is an integral part of the QuantumLanguage compiler, responsible for defining custom error classes to manage exceptions and errors encountered during compilation and execution. This file provides a structured way to report errors, including their type, message, and line number, which aids in debugging and improving user experience.
+The `include/Interpreter.h` header file is an integral part of the QuantumLanguage compiler, responsible for interpreting and executing abstract syntax tree (AST) nodes. It defines the core functionalities needed to process different types of statements and expressions, ensuring that the program logic is correctly evaluated and executed during the compilation phase.
 
 ## Key Design Decisions
 
-### Custom Exception Classes
+### Use of Smart Pointers
 
-Custom exception classes (`QuantumError`, `RuntimeError`, `TypeError`, `NameError`, `IndexError`) extend the standard `std::runtime_error` class. This decision was made to provide more specific error information and to allow for easier categorization and handling of different types of errors throughout the compiler.
+**Why:** To manage memory efficiently and avoid memory leaks, smart pointers (`std::shared_ptr`) are used extensively throughout the interpreter. This ensures automatic deallocation of resources when they are no longer needed, enhancing overall stability and performance of the compiler.
 
-### Line Number Tracking
+### Environment Management
 
-Each error class includes a `line` member variable, which tracks the line number where the error occurred. This feature is crucial for pinpointing issues in the source code, making it easier for developers to correct them.
+**Why:** The interpreter maintains an environment (`std::shared_ptr<Environment>`) to store variables, functions, and other state information. This allows for dynamic scoping and variable resolution, essential features of the QuantumLanguage.
 
-### Color Coding
+### Step Count Guard
 
-A namespace `Colors` is defined to hold ANSI escape codes for color coding error messages. This choice enhances the readability of error output by visually distinguishing between different types of errors.
+**Why:** A guard against infinite loops is implemented using a step count mechanism (`stepCount_`). This prevents the interpreter from running indefinitely on malformed input, thus safeguarding the system from potential crashes due to resource exhaustion.
 
-## Detailed Documentation
+## Class and Function Documentation
 
-### QuantumError Class
+### Interpreter Class
 
-**Purpose**: The base class for all custom errors in the QuantumLanguage compiler. It inherits from `std::runtime_error`.
+**Purpose:** Manages the execution context and provides methods to interpret AST nodes.
 
-**Behavior**:
-- Accepts three parameters: `kind` (the type of error), `msg` (the error message), and `line` (the line number where the error occurred).
-- Stores the error kind, message, and line number.
-- Inherits the constructor from `std::runtime_error` to provide a consistent interface for accessing the error message.
+**Behaviour:**
+- **Constructor:** Initializes the interpreter with global and local environments.
+- **execute(ASTNode &node):** Executes the given AST node.
+- **evaluate(ASTNode &node):** Evaluates the given AST node and returns its result.
+- **execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr):** Executes a block statement within a specified scope.
+- **registerNatives():** Registers built-in native functions and methods.
+- **Statement Executors:** Methods like `execVarDecl`, `execFunctionDecl`, etc., handle specific types of statements.
+- **Expression Evaluators:** Methods like `evalBinary`, `evalUnary`, etc., handle various expression types.
 
-### RuntimeError Class
+### QuantumValue Class
 
-**Purpose**: Represents runtime errors that occur during the execution of the compiled program.
+**Purpose:** Represents a value in the QuantumLanguage, supporting multiple types including integers, doubles, strings, arrays, dictionaries, and more.
 
-**Behavior**:
-- Inherits from `QuantumError`.
-- Initializes the error kind to "RuntimeError".
+**Behaviour:** Provides constructors and methods to create and manipulate values of different types.
 
-### TypeError Class
+### Tradeoffs and Limitations
 
-**Purpose**: Indicates type-related errors, such as mismatched types in operations.
-
-**Behavior**:
-- Inherits from `QuantumError`.
-- Initializes the error kind to "TypeError".
-
-### NameError Class
-
-**Purpose**: Used when a name (variable, function, etc.) is not found in the current scope.
-
-**Behavior**:
-- Inherits from `QuantumError`.
-- Initializes the error kind to "NameError".
-
-### IndexError Class
-
-**Purpose**: Denotes errors related to invalid indices, such as out-of-bounds array access.
-
-**Behavior**:
-- Inherits from `QuantumError`.
-- Initializes the error kind to "IndexError".
-
-### Colors Namespace
-
-**Purpose**: Provides ANSI escape codes for color coding error messages.
-
-**Contents**:
-- Various constants representing different colors and formatting options (e.g., RED, YELLOW, WHITE, CYAN, GREEN, BLUE, BOLD, RESET, MAGENTA).
-
-## Tradeoffs and Limitations
-
-- **Performance Overhead**: Using custom exception classes and tracking line numbers adds some overhead compared to using raw strings or simpler exception mechanisms. However, this overhead is minimal and significantly improves the clarity and maintainability of error reporting.
-  
-- **Complexity**: Adding multiple error classes increases the complexity of the codebase. Developers must be aware of the different error types and how they should be handled. While this may seem daunting, it leads to more robust and user-friendly error management.
-
-- **Readability vs. Flexibility**: The use of color coding for error messages enhances readability but limits flexibility in terms of customization. Future enhancements might consider allowing users to configure error message appearance.
+- **Memory Usage:** While smart pointers help manage memory, the overhead associated with them might impact performance, especially in scenarios with high memory allocation.
+- **Scalability:** The current implementation assumes a relatively small number of steps before detecting an infinite loop. For very complex programs, this limit might need to be adjusted or replaced with a more sophisticated detection mechanism.
+- **Error Handling:** Error handling is minimal within this header file. More robust error reporting and recovery mechanisms should be integrated into the interpreter for better reliability.
 
 ## Usage Example
 
-Here's a simple example demonstrating how to use these error classes:
+To use the interpreter, you would typically:
+
+1. Parse your QuantumLanguage code into an AST.
+2. Create an instance of the `Interpreter`.
+3. Call `execute()` or `evaluate()` on the root AST node to start processing.
 
 ```cpp
-try {
-    // Simulate a runtime error
-    throw RuntimeError("Division by zero", 10);
-} catch (const QuantumError &err) {
-    std::cerr << Colors::RED << err.what() << Colors::RESET << " at line " << err.line << std::endl;
+#include "Parser.h"
+#include "Interpreter.h"
+
+int main() {
+    Parser parser("your_code.q");
+    auto ast = parser.parse();
+
+    Interpreter interpreter;
+    interpreter.execute(*ast);
+
+    return 0;
 }
 ```
 
-This will output an error message in red, indicating a runtime error on line 10.
-
-By following these guidelines, the `include/Error.h` header file ensures that the QuantumLanguage compiler can effectively manage and report errors, thereby enhancing the overall reliability and usability of the compiler.
+This example demonstrates how to integrate the interpreter into a simple application that parses and executes QuantumLanguage code.
