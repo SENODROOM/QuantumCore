@@ -1,92 +1,42 @@
-# execBlock() Function Explanation
+# `execBlock` Function Explanation
 
-## Complete Code
+The `execBlock` function is a crucial component of the Quantum Language interpreter, responsible for executing a block of statements within a given environment. This function ensures that each statement in the block is executed sequentially, maintaining the order and dependencies between them.
 
-```cpp
-void Interpreter::execBlock(BlockStmt &s, std::shared_ptr<Environment> scope)
-{
-    auto prev = env;
-    env = scope ? scope : std::make_shared<Environment>(prev);
-    stepCount_ = 0;
-    for (auto &stmt : s.statements)
-    {
-        execute(*stmt);
-        stepCount_++;
-        if (stepCount_ > MAX_STEPS)
-            throw RuntimeError("Infinite loop detected");
-    }
-    env = prev;
-}
-```
+## What It Does
 
-## Code Explanation
+The primary purpose of `execBlock` is to iterate through a list of statements (`BlockStmt`) and execute each one within a specified environment (`std::shared_ptr<Environment>`). The function also handles exceptions gracefully, particularly at the top level where it suppresses `NameError`s to allow the program to continue running even if some variables are not defined.
 
-### Function Signature
--  `void Interpreter::execBlock(BlockStmt &s, std::shared_ptr<Environment> scope)` - Execute block statements
-  - `s`: Reference to BlockStmt containing statements to execute
-  - `scope`: Optional environment for the block (null for new scope)
-  - Returns void as blocks don't produce values
+## Why It Works This Way
 
-###
--  `{` - Opening brace
--  `auto prev = env;` - Save current environment
--  `env = scope ? scope : std::make_shared<Environment>(prev);` - Set new environment
-  - If scope provided, use it; otherwise create new environment with previous as parent
--  `stepCount_ = 0;` - Reset step counter for infinite loop detection
-- **Line 1642`: Empty line for readability
+1. **Environment Management**: By setting the current environment to the provided `scope`, the function allows for the execution of statements in a different context than the global scope. This is essential for handling local variables and nested blocks correctly.
+   
+2. **Fault Tolerance**: At the top level (`isTopLevel`), `execBlock` catches `NameError` exceptions and prints an error message to `stderr`. This design choice ensures that the interpreter can handle incomplete or erroneous programs without crashing, making it more robust and user-friendly.
 
-###
--  `for (auto &stmt : s.statements)` - Loop through all statements in block
--  `{` - Opening brace for loop
--  `execute(*stmt);` - Execute each statement
--  `stepCount_++;` - Increment step counter
--  `if (stepCount_ > MAX_STEPS)` - Check for infinite loop
--  `throw RuntimeError("Infinite loop detected");` - Throw error for infinite loop
--  `}` - Closing brace for loop
+3. **Sequential Execution**: The function iterates over each statement in the block using a range-based for loop, ensuring that they are executed in the order they appear. This sequential approach is critical for maintaining the correct flow of control and state in the program.
 
-###
--  `env = prev;` - Restore previous environment
--  `}` - Closing brace for function
+4. **Exception Handling**: The use of a nested try-catch block within the main loop provides a finer-grained control over exception handling. It allows individual statements to fail without interrupting the entire execution of the block.
 
-## Summary
+## Parameters/Return Value
 
-The `execBlock()` function handles execution of code blocks with proper scope management:
+- **Parameters**:
+  - `BlockStmt &s`: A reference to the block of statements to be executed.
+  - `std::shared_ptr<Environment> scope`: An optional shared pointer to the environment in which the statements should be executed. If not provided, a new environment based on the previous one is created.
 
-### Key Features
-- **Scope Management**: Creates new environment for block execution
-- **Infinite Loop Detection**: Prevents endless loops with step counting
-- **Environment Restoration**: Properly restores previous environment after execution
-- **Statement Execution**: Executes all statements in order
+- **Return Value**:
+  - None. The function executes the statements in place and returns nothing.
 
-### Block Execution Process
-1. **Environment Setup**: Save current environment and set new scope
-2. **Step Counter Reset**: Initialize infinite loop detection
-3. **Statement Loop**: Execute each statement sequentially
-4. **Loop Detection**: Check step count against MAX_STEPS
-5. **Environment Restore**: Return to previous environment
+## Edge Cases
 
-### Scope Management
-- **New Scope**: Creates child environment for local variables
-- **Optional Scope**: Can use provided scope or create new one
-- **Parent Chain**: Maintains proper parent-child environment relationships
-- **Variable Isolation**: Local variables don't affect outer scope
+- **Empty Block**: If the block contains no statements, the function simply exits without performing any operations.
+- **Nested Blocks**: When dealing with nested blocks, `execBlock` ensures that the inner block's environment is properly managed and restored after its execution.
+- **Top-Level Execution**: During top-level execution, `execBlock` suppresses `NameError`s to prevent the entire program from failing due to undefined variables.
 
-### Infinite Loop Protection
-- **Step Counting**: Tracks execution steps within block
-- **MAX_STEPS Limit**: Prevents infinite loops from hanging interpreter
-- **RuntimeError**: Thrown when step limit exceeded
-- **Per-Block Reset**: Counter reset for each block execution
+## Interactions With Other Components
 
-### Use Cases
-- **Function Bodies**: Execute function statements with local scope
-- **Control Flow**: Handle if/else, while, for statement blocks
-- **Nested Blocks**: Support for nested code blocks
-- **Program Entry**: Execute main program block
+- **Environment Class**: `execBlock` interacts closely with the `Environment` class to manage variable scopes and lookups. It sets the current environment to the provided `scope` or creates a new one based on the previous environment.
+  
+- **execute Method**: Within the loop, `execBlock` calls the `execute` method on each statement. This method is part of the `Statement` base class and is overridden in derived classes to handle specific types of statements (e.g., assignments, function calls).
 
-### Design Benefits
-- **Memory Safety**: Proper environment management prevents memory leaks
-- **Performance**: Efficient scope switching with smart pointers
-- **Safety**: Infinite loop protection prevents hanging
-- **Correctness**: Proper variable scoping semantics
+- **Exception Handling Mechanisms**: `execBlock` uses custom exception handling mechanisms such as `NameError` to provide more informative error messages during execution. These exceptions are caught and handled appropriately to ensure the interpreter remains functional.
 
-This function provides the foundation for executing code blocks with proper scope management and safety features, ensuring that the Quantum Language handles local variables and control flow correctly while protecting against infinite loops.
+By understanding how `execBlock` manages environments, handles exceptions, and executes statements sequentially, developers can better appreciate its role in the overall functionality of the Quantum Language interpreter.

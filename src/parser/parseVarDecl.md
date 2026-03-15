@@ -1,149 +1,109 @@
-# parseVarDecl() Function Explanation
+# `parseVarDecl` Function Explanation
 
-## Complete Code
+The `parseVarDecl` function in the Quantum Language compiler is responsible for parsing variable declarations. It can handle both single and multi-variable declarations, as well as constant declarations. The function also supports optional type hints and initialization expressions.
 
-```cpp
-ASTNodePtr Parser::parseVarDecl(bool isConst)
-{
-    int ln = current().line;
-    std::string name;
-    ASTNodePtr init;
-    
-    // Handle destructuring: [a, b] = array or {x, y} = object
-    if (check(TokenType::LBRACKET) || check(TokenType::LBRACE)) {
-        auto pattern = parseExpr(); // Parse array or object pattern
-        expect(TokenType::ASSIGN, "Expected '=' after destructuring pattern");
-        init = parseExpr();
-        return std::make_unique<ASTNode>(VarDecl{isConst, "", std::move(init), "", false}, ln);
-    }
-    
-    // Simple variable name
-    name = expect(TokenType::IDENTIFIER, "Expected variable name").value;
-    
-    // Optional type annotation: x: int = 5
-    std::string typeHint;
-    if (match(TokenType::COLON)) {
-        typeHint = expect(TokenType::IDENTIFIER, "Expected type name").value;
-    }
-    
-    // Optional initializer
-    if (match(TokenType::ASSIGN)) {
-        init = parseExpr();
-    }
-    
-    return std::make_unique<ASTNode>(VarDecl{isConst, name, std::move(init), typeHint, false}, ln);
-}
-```
+## Parameters
 
-## Code Explanation
+- `bool isConst`: A boolean flag indicating whether the declared variable should be treated as a constant. If `true`, the variable will not be modifiable after its initial assignment.
 
-###
--  `ASTNodePtr Parser::parseVarDecl(bool isConst)` - Parse variable declarations
-  - `isConst`: Whether this is a constant declaration
--  `{` - Opening brace
--  `int ln = current().line;` - Store current line number for AST nodes
--  `std::string name;` - Variable name string
--  `ASTNodePtr init;` - Optional initializer expression
+## Return Value
 
-###
--  `// Handle destructuring: [a, b] = array or {x, y} = object` - Comment about destructuring
--  `if (check(TokenType::LBRACKET) || check(TokenType::LBRACE)) {` - Check for destructuring patterns
--  `auto pattern = parseExpr(); // Parse array or object pattern` - Parse the pattern
--  `expect(TokenType::ASSIGN, "Expected '=' after destructuring pattern");` - Expect assignment
--  `init = parseExpr();` - Parse initialization expression
--  `return std::make_unique<ASTNode>(VarDecl{isConst, "", std::move(init), "", false}, ln);` - Create destructuring declaration
-  - Empty name for destructuring (pattern contains variable names)
-  - `false` for isPointer (not a pointer declaration)
+- `ASTNodePtr`: A pointer to an abstract syntax tree (AST) node representing the parsed variable declaration. This node can either be a simple `VarDecl` or a `BlockStmt` containing multiple `VarDecl`s.
 
-###
--  `// Simple variable name` - Comment about simple case
--  `name = expect(TokenType::IDENTIFIER, "Expected variable name").value;` - Parse variable name
-  - `expect()` throws error if not an identifier
-  - `.value` extracts the string value from token
+## How It Works
 
-###
--  `// Optional type annotation: x: int = 5` - Comment about type hints
--  `std::string typeHint;` - Type hint string
--  `if (match(TokenType::COLON)) {` - Check for type annotation colon
--  `typeHint = expect(TokenType::IDENTIFIER, "Expected type name").value;` - Parse type name
+### Single Variable Declaration
 
-###
--  `// Optional initializer` - Comment about initialization
--  `if (match(TokenType::ASSIGN)) {` - Check for assignment operator
--  `init = parseExpr();` - Parse initialization expression
--  `}` - Closing brace for initializer handling
+When parsing a single variable declaration, the function follows these steps:
 
-###
--  `return std::make_unique<ASTNode>(VarDecl{isConst, name, std::move(init), typeHint, false}, ln);` - Create variable declaration AST node
-  - `isConst`: Constant flag from parameter
-  - `name`: Variable name (or empty for destructuring)
-  - `std::move(init)`: Optional initializer (moved for efficiency)
-  - `typeHint`: Optional type annotation
-  - `false`: isPointer flag (not a pointer declaration)
--  `}` - Closing brace for function
+1. **Check for Identifier**: First, it checks if the current token is an identifier (e.g., `let` or `const`). If so, it consumes the token and assigns its value to the `name` variable.
+   
+   ```cpp
+   if (check(TokenType::IDENTIFIER))
+       name = consume().value;
+   ```
 
-## Summary
+2. **Optional Type Hint**: Next, it looks for an optional colon (`:`). If found, it consumes the colon and expects another identifier or CType keyword, which it assigns to the `typeHint` variable.
+   
+   ```cpp
+   if (check(TokenType::COLON))
+   {
+       consume(); // eat :
+       if (check(TokenType::IDENTIFIER) || isCTypeKeyword(current().type))
+           typeHint = consume().value;
+   }
+   ```
 
-The `parseVarDecl()` function handles variable and constant declarations with multiple syntax styles:
+3. **Initialization Expression**: If an equals sign (`=`) is encountered, it indicates that there is an initialization expression. The function parses this expression using the `parseExpr` method and assigns it to the `init` variable.
+   
+   ```cpp
+   if (match(TokenType::ASSIGN))
+       init = parseExpr();
+   ```
 
-### Key Features
-- **Destructuring Support**: Array and object destructuring patterns
-- **Type Annotations**: Optional type hints like `x: int`
-- **Optional Initialization**: Variables can be declared without initial values
-- **Constant Support**: Handles both `let` and `const` declarations
-- **Memory Efficiency**: Uses move semantics for AST nodes
+4. **Create AST Node**: Finally, it creates an `ASTNode` of type `VarDecl` with the parsed information (whether it's a constant, the variable name, initialization expression, and type hint) and returns it.
+   
+   ```cpp
+   return std::make_unique<ASTNode>(VarDecl{isConst, name, std::move(init), typeHint}, ln);
+   ```
 
-### Declaration Styles Supported
+### Multi-Variable Declaration
 
-#### Simple Declaration
-```cpp
-let x;
-const y = 5;
-```
+For multi-variable declarations, such as `let x = 1, y = 2`, the function uses a loop to process each variable individually:
 
-#### Type Annotation
-```cpp
-let x: int;
-const y: string = "hello";
-```
+1. **Initialize Block Statement**: It starts by creating a unique pointer to a `BlockStmt` AST node, which will contain all the individual variable declarations.
+   
+   ```cpp
+   auto block = std::make_unique<ASTNode>(BlockStmt{}, ln);
+   ```
 
-#### Destructuring
-```cpp
-let [a, b] = array;
-const {x, y} = object;
-```
+2. **First Variable Declaration**: It processes the first variable declaration as described above, adding it to the block statement.
+   
+   ```cpp
+   block->as<BlockStmt>().statements.push_back(
+       std::make_unique<ASTNode>(VarDecl{isConst, name, std::move(init), typeHint}, ln));
+   ```
 
-#### With Initialization
-```cpp
-let x = 10;
-const y: double = 3.14;
-```
+3. **Loop Through Remaining Variables**: After processing the first variable, it enters a loop that continues until a comma is no longer found:
+   
+   ```cpp
+   while (match(TokenType::COMMA))
+   {
+       skipNewlines();
+       if (atEnd() || check(TokenType::NEWLINE) || check(TokenType::SEMICOLON))
+           break;
+       
+       // Process subsequent variables similarly...
+   }
+   ```
 
-### AST Structure
-- **VarDecl Node**: Contains all declaration information
-- **Fields**:
-  - `isConst`: Whether variable is constant
-  - `name`: Variable name (empty for destructuring)
-  - `initializer`: Optional initialization expression
-  - `typeHint`: Optional type annotation
-  - `isPointer`: Whether this is a pointer declaration
+4. **Skip Newlines and Semicolons**: Inside the loop, it skips any newlines or semicolons and then processes each subsequent variable declaration in the same manner as the first one.
 
-### Parsing Strategy
-- **Pattern Recognition**: Detects destructuring vs simple declarations
-- **Optional Components**: Handles type hints and initializers as optional
-- **Error Handling**: Clear error messages for malformed declarations
-- **Flexibility**: Supports multiple declaration syntaxes
+5. **Return Block Statement**: Once all variable declarations have been processed, it skips any remaining newlines or semicolons and returns the `BlockStmt` containing all the `VarDecl`s.
 
-### Error Cases Handled
-- Missing variable name
-- Missing type name after colon
-- Missing initializer for destructuring patterns
-- Invalid tokens in destructuring patterns
+   ```cpp
+   return block;
+   ```
 
-### Design Benefits
-- **Multi-Paradigm**: Supports JavaScript and Python-style declarations
-- **Type Safety**: Optional type hints for better error checking
-- **Modern Features**: Destructuring for convenient data extraction
-- **Clear Structure**: Well-organized parsing logic
+## Edge Cases
 
-This function enables the Quantum Language to support modern variable declaration patterns while maintaining compatibility with multiple programming language styles.
+- **Missing Identifier**: If the current token is neither an identifier nor a CType keyword, the function throws a `ParseError` indicating that a variable name was expected.
+  
+  ```cpp
+  else
+      throw ParseError("Expected variable name (got '" + current().value + "')", current().line, current().col);
+  ```
+
+- **Invalid Type Hint**: If a colon is found but followed by a non-identifier or non-CType keyword, the function may throw a `ParseError`.
+
+- **Unexpected Token**: If the parser encounters unexpected tokens during the parsing process, it may throw a `ParseError` to indicate a syntax error.
+
+## Interactions with Other Components
+
+- **Lexer**: The `parseVarDecl` function relies on the lexer to provide the next token in the source code. The lexer identifies identifiers, keywords, colons, and other relevant tokens.
+
+- **Expression Parser**: When an initialization expression is present (`=`), the `parseVarDecl` function calls the `parseExpr` method to parse the expression. The `parseExpr` method handles various types of expressions, including arithmetic operations, function calls, and more complex constructs.
+
+- **Abstract Syntax Tree (AST)**: The parsed variable declarations are represented as `ASTNode` objects within an `AST`. These nodes are used to construct the AST, which serves as the intermediate representation of the source code before further compilation stages.
+
+By handling both single and multi-variable declarations, as well as constants and type hints, the `parseVarDecl` function provides a robust mechanism for parsing variable declarations in the Quantum Language compiler. Its interaction with the lexer and expression parser ensures that the source code is accurately translated into an AST, facilitating subsequent compilation steps.

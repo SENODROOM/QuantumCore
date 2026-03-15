@@ -1,106 +1,45 @@
-# parseAssignment() Function Explanation
+# parseAssignment Function Explanation
 
-## Complete Code
+The `parseAssignment` function in the Quantum Language compiler is responsible for parsing assignment statements. It handles both simple assignments and more complex conditional assignments using Python-like syntax (`expr IF condition ELSE other_expr`) and JavaScript-like syntax (`condition ? thenExpr : elseExpr`). This function is crucial for interpreting and constructing abstract syntax trees (ASTs) that represent the code being compiled.
 
-```cpp
-ASTNodePtr Parser::parseAssignment()
-{
-    int ln = current().line;
-    auto left = parseOr();
-    while (check(TokenType::ASSIGN) || check(TokenType::PLUS_ASSIGN) || 
-           check(TokenType::MINUS_ASSIGN) || check(TokenType::STAR_ASSIGN) || 
-           check(TokenType::SLASH_ASSIGN) || check(TokenType::AND_ASSIGN) || 
-           check(TokenType::OR_ASSIGN) || check(TokenType::XOR_ASSIGN) || 
-           check(TokenType::MOD_ASSIGN))
-    {
-        auto op = consume();
-        auto right = parseAssignment(); // Right-associative
-        left = std::make_unique<ASTNode>(AssignExpr{op.value, std::move(left), std::move(right)}, ln);
-    }
-    return left;
-}
-```
+## What it Does
 
-## Code Explanation
+The primary purpose of `parseAssignment` is to recognize and parse assignment expressions from the source code. These expressions can assign values to variables or update existing variable values based on conditions. The function ensures that the parsed AST accurately reflects the structure and semantics of the assignment statement.
 
-###
--  `ASTNodePtr Parser::parseAssignment()` - Parse assignment expressions
--  `{` - Opening brace
--  `int ln = current().line;` - Store current line number for AST nodes
--  `auto left = parseOr();` - Parse left-hand side (higher precedence)
-  - Calls `parseOr()` to parse the left operand
-  - Assignment has lower precedence than logical OR
+## Why it Works this Way
 
-###
--  `while (check(TokenType::ASSIGN) || check(TokenType::PLUS_ASSIGN) ||` - Check for assignment operators
--  `check(TokenType::MINUS_ASSIGN) || check(TokenType::STAR_ASSIGN) ||` - Check for arithmetic assignments
--  `check(TokenType::SLASH_ASSIGN) || check(TokenType::AND_ASSIGN) ||` - Check for more assignments
--  `check(TokenType::OR_ASSIGN) || check(TokenType::XOR_ASSIGN) ||` - Check for bitwise assignments
--  `check(TokenType::MOD_ASSIGN))` - Check for modulo assignment
--  `{` - Opening brace for assignment handling
--  `auto op = consume();` - Consume the assignment operator
--  `auto right = parseAssignment(); // Right-associative` - Parse right-hand side
-  - Calls `parseAssignment()` recursively for right-associativity
-  - Allows chained assignments like `a = b = c`
+This implementation allows the parser to handle different types of assignment syntax seamlessly. By checking for the presence of `TokenType::IF` and `TokenType::QUESTION`, the function determines whether the assignment is a simple one or a conditional one. For conditional assignments, it further checks if the syntax is Python-like or JavaScript-like to correctly parse the entire expression.
 
-###
--  `left = std::make_unique<ASTNode>(AssignExpr{op.value, std::move(left), std::move(right)}, ln);` - Create assignment AST node
-  - `AssignExpr{}` creates assignment expression structure
-  - `op.value` stores the operator string (e.g., "=", "+=")
-  - `std::move(left)` transfers ownership of left side
-  - `std::move(right)` transfers ownership of right side
--  `}` - Closing brace for assignment handling
--  `}` - Closing brace for function (this is incorrect in actual code - should be after return)
+### Handling Conditional Assignments
 
-###
--  `return left;` - Return the parsed assignment expression
--  `}` - Closing brace for function
+- **Python-like Syntax**: The function looks ahead in the token stream to determine if the assignment is part of a ternary expression. It checks for the presence of an `else` keyword within brackets, parentheses, or braces to confirm the syntax. If found, it constructs a `TernaryExpr` node containing the condition, the original expression (`left`), and the `elseExpr`.
 
-## Summary
+- **JavaScript-like Syntax**: If the syntax starts with a question mark (`?`), the function assumes it is a JavaScript ternary expression. It parses the `thenExpr` following the question mark, expecting a colon (`:`) to separate the two parts of the ternary expression. The `elseExpr` is then parsed after the colon.
 
-The `parseAssignment()` function handles assignment expressions with all compound assignment operators:
+For both types of syntax, the function ensures that the correct tokens are consumed and that the resulting AST nodes accurately reflect the parsed expression.
 
-### Key Features
-- **Multiple Operators**: Supports all compound assignment operators
-  - `=` - Simple assignment
-  - `+=`, `-=` - Addition/subtraction assignment
-  - `*=`, `/=` - Multiplication/division assignment
-  - `&=`, `|=`, `^=` - Bitwise assignment
-  - `%=` - Modulo assignment
+## Parameters/Return Value
 
-### Right-Associative Parsing
-- **Chained Assignments**: Supports `a = b = c = 5`
-- **Recursive Structure**: Right side parsed with same function
-- **Correct Precedence**: Lower precedence than logical operations
+- **Parameters**:
+  - None
 
-### AST Structure
-- **AssignExpr Node**: Contains operator, left side, and right side
-- **Line Numbers**: Preserved for error reporting
-- **Memory Management**: Smart pointers prevent memory leaks
+- **Return Value**:
+  - An `ASTNodePtr` representing the parsed assignment statement. If the assignment is conditional, it returns a `TernaryExpr` node; otherwise, it returns the result of `parseOr()`.
 
-### Operator Precedence
-Assignment has lower precedence than:
-- Logical OR (`||`)
-- Logical AND (`&&`)
-- Bitwise operations
-- Comparisons
-- Arithmetic operations
+## Edge Cases
 
-But higher precedence than:
-- Semicolons and statement terminators
+- **Simple Assignment**: When encountering a straightforward assignment without any conditions, the function simply calls `parseOr()` to parse the left-hand side and right-hand side of the assignment.
 
-### Examples
-```cpp
-x = 5                    // Simple assignment
-x += 1                   // Compound assignment
-a = b = c = 10           // Chained assignment
-x *= y + z               // Assignment with expression
-```
+- **Conditional Assignment**: The function must correctly identify and parse both Python-like and JavaScript-like ternary expressions. It uses lookahead to ensure that the `else` keyword is present in the correct context.
 
-### Design Benefits
-- **Comprehensive**: Handles all assignment operators
-- **Correct Associativity**: Right-associative parsing
-- **Efficient**: Single pass with loop structure
-- **Extensible**: Easy to add new assignment operators
+- **Missing Tokens**: If the expected tokens (`else`, `?`, `:`) are missing, the function throws an error indicating the expected token.
 
-This function enables the Quantum Language to support both simple and compound assignment operations with proper precedence and associativity rules.
+## Interactions with Other Components
+
+- **Tokenizer**: The function relies on the tokenizer to provide the sequence of tokens for parsing. The tokenizer breaks down the input source code into individual tokens, which are then processed by the parser.
+
+- **Error Handling**: The function includes mechanisms for error handling, such as consuming tokens and throwing errors when unexpected tokens are encountered. This interaction with error handling components ensures that the parser can gracefully handle incorrect syntax.
+
+- **AST Construction**: After parsing the assignment statement, the function constructs an appropriate AST node (`TernaryExpr` or the result of `parseOr()`). This interaction with AST construction components allows the compiler to build a structured representation of the code, facilitating subsequent compilation steps.
+
+Overall, the `parseAssignment` function plays a vital role in the Quantum Language compiler by accurately parsing assignment statements and constructing their corresponding AST nodes. Its ability to handle multiple assignment syntaxes makes it versatile and robust, ensuring that the compiler can process a wide range of valid code inputs.

@@ -1,120 +1,76 @@
-# execute() Function Explanation
+# `execute` Function Explanation
 
-## Complete Code
+The `execute` function in the Quantum Language compiler is responsible for interpreting and executing an abstract syntax tree (AST) node. This function uses a visitor pattern to handle different types of AST nodes such as blocks, variable declarations, function declarations, class declarations, conditional statements, loops, returns, prints, inputs, imports, expressions, breaks, continues, and raises exceptions.
 
-```cpp
-void Interpreter::execute(ASTNode &node)
-{
-    std::visit([&](auto &n)
-               {
-        using T = std::decay_t<decltype(n)>;
-        if constexpr (std::is_same_v<T, BlockStmt>)
-            execBlock(n);
-        else if constexpr (std::is_same_v<T, VarDecl>)
-            execVarDecl(n);
-        else if constexpr (std::is_same_v<T, FunctionDecl>)
-            execFunctionDecl(n);
-        else if constexpr (std::is_same_v<T, ClassDecl>)
-            execClassDecl(n);
-        else if constexpr (std::is_same_v<T, IfStmt>)
-            execIf(n);
-        else if constexpr (std::is_same_v<T, WhileStmt>)
-            execWhile(n);
-        else if constexpr (std::is_same_v<T, ForStmt>)
-            execFor(n);
-        else if constexpr (std::is_same_v<T, ReturnStmt>)
-            execReturn(n);
-        else if constexpr (std::is_same_v<T, PrintStmt>)
-            execPrint(n);
-        else if constexpr (std::is_same_v<T, InputStmt>)
-            execInput(n);
-        else if constexpr (std::is_same_v<T, ImportStmt>)
-            execImport(n);
-        else if constexpr (std::is_same_v<T, ExprStmt>)
-            execExprStmt(n);
-    }, node.node);
-}
-```
+## Parameters
 
-## Code Explanation
+- **`ASTNode &node`**: A reference to the current AST node that needs to be executed.
 
-### Function Signature
--  `void Interpreter::execute(ASTNode &node)` - Main statement execution dispatcher
-  - `node`: Reference to AST node representing a statement
-  - Returns void as statements don't produce values
+## Return Value
 
-###
--  `{` - Opening brace
--  `std::visit([&](auto &n)` - Use visitor pattern to handle different statement types
-  - `std::visit` applies lambda to the active type in the variant
-  - `&` captures by reference to access member functions
-  - `auto &n` gets reference to the actual statement type
+- The function has a void return type, meaning it does not return any value directly. However, it may throw exceptions or modify the environment (`env`) indirectly through its execution.
 
-###
--  `{` - Opening brace for lambda
--  `using T = std::decay_t<decltype(n)>;` - Get the actual type of the statement
-  - Removes references and const qualifiers
-  - Used for compile-time type checking
+## How It Works
 
-###
--  `if constexpr (std::is_same_v<T, BlockStmt>)` - Check if block statement
--  `execBlock(n);` - Execute block statement
--  `else if constexpr (std::is_same_v<T, VarDecl>)` - Check if variable declaration
--  `execVarDecl(n);` - Execute variable declaration
--  `else if constexpr (std::is_same_v<T, FunctionDecl>)` - Check if function declaration
--  `execFunctionDecl(n);` - Execute function declaration
--  `else if constexpr (std::is_same_v<T, ClassDecl>)` - Check if class declaration
--  `execClassDecl(n);` - Execute class declaration
--  `else if constexpr (std::is_same_v<T, IfStmt>)` - Check if if statement
--  `execIf(n);` - Execute if statement
--  `else if constexpr (std::is_same_v<T, WhileStmt>)` - Check if while statement
--  `execWhile(n);` - Execute while statement
--  `else if constexpr (std::is_same_v<T, ForStmt>)` - Check if for statement
--  `execFor(n);` - Execute for statement
--  `else if constexpr (std::is_same_v<T, ReturnStmt>)` - Check if return statement
--  `execReturn(n);` - Execute return statement
--  `else if constexpr (std::is_same_v<T, PrintStmt>)` - Check if print statement
--  `execPrint(n);` - Execute print statement
+The `execute` function leverages the `std::visit` mechanism to dispatch the execution based on the type of the AST node. Here’s how each type of node is handled:
 
-###
--  `else if constexpr (std::is_same_v<T, InputStmt>)` - Check if input statement
--  `execInput(n);` - Execute input statement
--  `else if constexpr (std::is_same_v<T, ImportStmt>)` - Check if import statement
--  `execImport(n);` - Execute import statement
--  `else if constexpr (std::is_same_v<T, ExprStmt>)` - Check if expression statement
--  `execExprStmt(n);` - Execute expression statement
-- **Line 1576`: Empty line for readability
--  `}, node.node);` - Close lambda and apply to AST node variant
--  `}` - Closing brace for function
+1. **Block Statements (`BlockStmt`)**:
+   - If the node is a block statement, it calls `execBlock(node)` without creating a new environment. This means that all variables declared within the block will have the same scope as the surrounding context.
 
-## Summary
+2. **Variable Declarations (`VarDecl`)**:
+   - For variable declarations, it calls `execVarDecl(node)`, which handles the declaration and initialization of variables.
 
-The `execute()` function is the main dispatcher for statement execution in the interpreter:
+3. **Function Declarations (`FunctionDecl`)**:
+   - When encountering a function declaration, it calls `execFunctionDecl(node)`. This function sets up the function definition in the environment, allowing subsequent calls to the function.
 
-### Key Features
-- **Type-Safe Dispatch**: Uses `std::visit` and `if constexpr` for compile-time type checking
-- **Comprehensive Coverage**: Handles all statement types in the language
-- **Zero Overhead**: Compile-time dispatch with no runtime type checking
-- **Clean Architecture**: Each statement type has its own execution function
+4. **Class Declarations (`ClassDecl`)**:
+   - Similar to function declarations, it calls `execClassDecl(node)` to define classes in the environment. Classes can then be instantiated and used throughout the program.
 
-### Statement Types Handled
-- **Block Statements**: Code blocks with local scope
-- **Declarations**: Variables, functions, and classes
-- **Control Flow**: If, while, for, return statements
-- **I/O Operations**: Print and input statements
-- **Imports**: Module and library imports
-- **Expressions**: Expression statements for side effects
+5. **Conditional Statements (`IfStmt`)**:
+   - Conditional statements are handled by calling `execIf(node)`, which evaluates the condition and executes the appropriate branch of the code.
 
-### Design Benefits
-- **Performance**: Compile-time dispatch eliminates runtime overhead
-- **Maintainability**: Each statement type has dedicated handler
-- **Extensibility**: Easy to add new statement types
-- **Type Safety**: Compile-time checking prevents type errors
+6. **Loops (`WhileStmt` and `ForStmt`)**:
+   - Both while and for loops are executed using `execWhile(node)` and `execFor(node)`, respectively. These functions manage loop conditions and iterations, ensuring that the loop body is executed repeatedly until the condition fails.
 
-### Execution Flow
-1. **Type Detection**: `std::visit` determines the actual statement type
-2. **Compile-Time Dispatch**: `if constexpr` selects appropriate handler
-3. **Statement Execution**: Calls specific execution function
-4. **Environment Management**: Handlers manage scope and variables
+7. **Return Statements (`ReturnStmt`)**:
+   - Upon encountering a return statement, it calls `execReturn(node)`, which evaluates the expression (if present) and returns the result from the current function.
 
-This function provides the foundation for executing all statements in the Quantum Language, ensuring proper type handling and efficient dispatch to the appropriate execution logic.
+8. **Print Statements (`PrintStmt`)**:
+   - Print statements are executed by calling `execPrint(node)`, which evaluates the expression to be printed and outputs it.
+
+9. **Input Statements (`InputStmt`)**:
+   - Input statements invoke `execInput(node)`, prompting the user for input, evaluating the expression, and storing the result.
+
+10. **Import Statements (`ImportStmt`)**:
+    - Import statements are processed by calling `execImport(node)`, which loads and initializes imported modules into the environment.
+
+11. **Expression Statements (`ExprStmt`)**:
+    - Expression statements are evaluated by calling `execExprStmt(node)`, which simply evaluates the expression but discards the result unless it affects the state of the program (e.g., modifying a variable).
+
+12. **Break Statements (`BreakStmt`)**:
+    - Break statements cause the interpreter to exit the current loop prematurely by throwing a `BreakSignal`.
+
+13. **Continue Statements (`ContinueStmt`)**:
+    - Continue statements skip the rest of the current iteration of a loop and proceed to the next iteration by throwing a `ContinueSignal`.
+
+14. **Raise Statements (`RaiseStmt`)**:
+    - Raise statements handle exception raising. If the raise statement includes an error message, it extracts the error type and message from the associated expression (if available). It then throws a `QuantumError` with the specified details.
+
+## Edge Cases
+
+- **Empty Nodes**: The function should gracefully handle empty nodes without causing errors.
+- **Invalid Expressions**: During evaluation, invalid expressions should lead to appropriate error handling.
+- **Scope Management**: Care must be taken to ensure correct management of variable scopes, especially when dealing with nested blocks and functions.
+- **Exception Handling**: Proper exception handling is crucial to maintain the robustness of the interpreter.
+
+## Interactions with Other Components
+
+- **Environment (`env`)**: The `env` parameter represents the current execution environment. It is modified during the execution of variable declarations, function definitions, and class definitions. Variable lookups and assignments also interact with the environment.
+  
+- **Evaluator**: The `evaluate` function is called internally to evaluate expressions. This function interacts with various parts of the compiler, including type checking and semantic analysis.
+
+- **Control Flow Signals**: The `BreakSignal` and `ContinueSignal` are thrown to control the flow of loops. These signals need to be caught and handled appropriately by the loop structures.
+
+- **Error Reporting**: The `QuantumError` is thrown when exceptions occur. Error reporting mechanisms rely on catching these exceptions and displaying them to the user.
+
+Overall, the `execute` function serves as the core interpreter loop, coordinating the execution of different types of AST nodes and managing the execution environment efficiently.

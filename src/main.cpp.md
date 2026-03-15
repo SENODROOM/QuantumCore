@@ -2,42 +2,57 @@
 
 ## Overview
 
-`src/main.cpp` is the primary entry point for the Quantum Language compiler. This file orchestrates the entire compilation process, managing the initialization and interaction between various components including the lexer, parser, interpreter, type checker, and error handler. It also handles command-line arguments and directs the execution flow based on user inputs.
+`src/main.cpp` serves as the primary entry point for the Quantum Language compiler. This file manages the entire compilation process, coordinating interactions between the lexer, parser, interpreter, type checker, and error handler. It also handles command-line arguments and directs the execution flow based on user inputs.
 
-## Key Design Decisions
+### Role in Compiler Pipeline
 
-### Modular Architecture
+The `main.cpp` file acts as the central hub that initiates and controls the stages of the compilation process:
+1. **Lexical Analysis**: Converts raw source code into tokens using the `Lexer`.
+2. **Parsing**: Constructs an abstract syntax tree (AST) from the tokens using the `Parser`.
+3. **Type Checking**: Validates the types within the AST using the `TypeChecker`.
+4. **Interpretation**: Executes the program represented by the AST using the `Interpreter`.
+5. **Error Handling**: Manages any errors encountered during the above steps using the `ErrorHandler`.
 
-**WHY:** By adopting a modular architecture, the Quantum Language compiler can be easily extended and maintained. Each component (lexer, parser, interpreter, etc.) operates independently, allowing developers to focus on specific aspects without impacting others. This separation enhances testability and scalability, making it easier to add new features or fix bugs in isolated parts of the compiler.
+### Key Design Decisions and Why
 
-### Command-Line Argument Handling
+#### Modular Architecture
 
-**WHY:** Implementing robust command-line argument handling ensures flexibility and usability. Users can specify options such as input files, output formats, and testing modes directly from the command line, providing a powerful interface for controlling the compiler's behavior. This approach avoids hardcoding configuration settings within the source code, promoting better maintainability and adaptability.
+The compiler's architecture is designed to be modular, with each component (`Lexer`, `Parser`, `Interpreter`, `TypeChecker`) encapsulating specific functionalities. This separation enhances maintainability and scalability.
 
-## Major Classes and Functions
+#### Command-Line Arguments
 
-### `printBanner()`
+Handling command-line arguments allows users to specify options such as input files, output formats, and test modes. This flexibility is crucial for both development and deployment scenarios.
 
-**Purpose:** Prints the banner text at the start of the program, introducing the Quantum Language compiler.
+#### Cross-Platform Compatibility
 
-**Behavior:** Outputs a colorful ASCII art banner with the version information and a brief description of the language.
+Using standard C++ libraries and conditional compilation directives ensures that the compiler can run on multiple platforms, including Windows, Linux, and macOS.
 
-### `printAura()`
+### Major Classes/Functions Overview
 
-**Purpose:** Displays an achievement summary, highlighting the key milestones and features implemented in the Quantum Language compiler.
+#### `printBanner()`
+- **Purpose**: Displays the banner for the Quantum Language compiler.
+- **Why**: Provides visual identification and branding for the compiler.
 
-**Behavior:** Outputs a colorful ASCII art section listing completed features like C++17 compiler implementation, tree-walk interpreter engine, lexical analysis, recursive descent parser, abstract syntax tree, dynamic type system, and REPL interactive mode.
+#### `printAura()`
+- **Purpose**: Lists achievements and features of the Quantum Language compiler.
+- **Why**: Highlights the capabilities and progress made in the project.
 
-### Global Variables
+#### `g_testMode`
+- **Role**: A global flag indicating whether the compiler is running in test mode.
+- **Why**: Facilitates automated testing by bypassing interactive input.
 
-- **`g_testMode`**: A boolean flag used during testing to make the `input()` function return immediately instead of blocking on standard input.
+### Tradeoffs
 
-## Tradeoffs and Limitations
+#### Complexity vs. Maintainability
+- **Complexity**: The modular approach increases complexity due to additional interfaces and dependencies.
+- **Maintainability**: Improved maintainability through clear separation of concerns.
 
-- **Performance:** While the modular design promotes scalability, it may introduce some overhead due to increased function calls and data transfers between modules.
-- **Complexity:** With multiple components interacting, the overall complexity of the project increases, which can lead to more challenging debugging and maintenance tasks.
-- **Resource Usage:** Running the Quantum Language compiler might consume more memory and processing power compared to simpler compilers, especially when dealing with large programs or complex ASTs.
+#### Performance vs. Flexibility
+- **Performance**: Some optimizations might sacrifice flexibility in certain features.
+- **Flexibility**: The ability to handle different input sources and configurations comes at the cost of potential performance overhead.
 
-## Conclusion
+#### Platform Support vs. Standard Compliance
+- **Platform Support**: Targeting multiple platforms requires careful handling of platform-specific issues.
+- **Standard Compliance**: Adhering strictly to C++ standards might limit platform support.
 
-`src/main.cpp` plays a crucial role in coordinating the various components of the Quantum Language compiler, ensuring a smooth and efficient compilation process. Its modular architecture and flexible command-line argument handling contribute significantly to its scalability and usability. However, these advantages come with tradeoffs in terms of performance, complexity, and resource usage.
+Overall, `src/main.cpp` plays a pivotal role in orchestrating the Quantum Language compiler's operations, ensuring a robust and flexible system capable of handling diverse programming tasks across different environments.

@@ -1,208 +1,114 @@
-# callFunction() Function Explanation
+# `callFunction` Function Explanation
 
-## Complete Code
+The `callFunction` method in the Quantum Language compiler is responsible for executing a quantum function within a given environment. This method ensures that the function is called correctly, handling both pass-by-value and pass-by-reference parameters, as well as default arguments.
+
+## Parameters
+
+- **`std::shared_ptr<QuantumFunction> fn`**: A shared pointer to the `QuantumFunction` object that needs to be executed. This object contains details about the function such as its parameters, closure, and body.
+  
+- **`std::vector<QuantumValue> args`**: A vector of `QuantumValue` objects representing the arguments passed to the function. These values can be either plain quantum data or pointers to quantum data.
+
+## Return Value
+
+- **`QuantumValue`**: The result of the function execution, returned as a `QuantumValue`.
+
+## How It Works
+
+### Step 1: Create an Environment
+
+The first step in `callFunction` is to create a new `Environment` object. This environment will serve as the scope during the function execution. The environment is initialized with the closure of the function, which includes any variables defined in outer scopes that the function might reference.
 
 ```cpp
-QuantumValue Interpreter::callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)
+auto scope = std::make_shared<Environment>(fn->closure);
+```
+
+### Step 2: Handle Each Parameter
+
+For each parameter in the function, the method checks whether the parameter should be passed by reference (`isRef`) and assigns a value accordingly.
+
+#### Pass-by-Reference Handling
+
+If a parameter is marked for pass-by-reference, the method checks if the corresponding argument is already a pointer. If it is, the method binds the parameter name to the existing cell pointed to by the pointer. If not, the method creates a new `QuantumValue` cell containing the passed value and binds the parameter name to this new cell. After the function call, the method synchronizes the changes back to the original argument.
+
+```cpp
+if (isRef)
 {
-    auto scope = std::make_shared<Environment>(fn->closure);
-    for (size_t i = 0; i < fn->params.size(); i++)
+    if (v.isPointer())
     {
-        if (i < args.size())
+        auto ptr = v.asPointer();
+        if (!ptr->isNull())
         {
-            if (fn->paramIsRef[i])
-            {
-                // Reference parameter - store L-value reference
-                setLValue(*fn->params[i], args[i], "=");
-            }
-            else
-            {
-                // Regular parameter - store by value
-                scope->define(fn->params[i], args[i]);
-            }
-        }
-        else if (fn->defaultArgs[i])
-        {
-            // Use default argument
-            auto defaultValue = evaluate(*fn->defaultArgs[i]);
-            scope->define(fn->params[i], defaultValue);
-        }
-        else
-        {
-            throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");
+            scope->defineRef(fn->params[i], ptr->cell);
+            continue;
         }
     }
-    
-    // Check for too many arguments
-    if (args.size() > fn->params.size())
-        throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));
-    
-    auto prev = env;
-    env = scope;
-    stepCount_ = 0;
-    
-    try
+    auto cell = std::make_shared<QuantumValue>(v);
+    scope->defineRef(fn->params[i], cell);
+    continue;
+}
+```
+
+#### Destructuring Handling
+
+If a parameter is a destructuring pattern (e.g., `[dr, dc]`), the method extracts the individual variable names and assigns them the corresponding values from the argument. This allows for unpacking multiple values into separate variables within the function.
+
+```cpp
+if (fn->params[i].front() == '[' && fn->params[i].back() == ']')
+{
+    std::string inner = fn->params[i].substr(1, fn->params[i].size() - 2);
+    std::vector<std::string> keys;
+    size_t start = 0, found;
+    while ((found = inner.find(',', start)) != std::string::npos)
     {
-        execute(*fn->body);
-        return QuantumValue(); // Implicit return
+        keys.push_back(inner.substr(start, found - start));
+        start = found + 1;
     }
-    catch (const ReturnSignal &ret)
+    keys.push_back(inner.substr(start));
+
+    QuantumValue argValue = i < args.size() ? args[i] : QuantumValue();
+    for (const auto& key : keys)
     {
-        env = prev;
-        return ret.value;
+        if (argValue.isDictionary())
+        {
+            scope->define(key, argValue.getDictionary()->getValue(key));
+        }
     }
 }
 ```
 
-## Code Explanation
+#### Default Argument Handling
 
-### Function Signature
--  `QuantumValue Interpreter::callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)` - Call user-defined functions
-  - `fn`: Shared pointer to QuantumFunction object
-  - `args`: Vector of function arguments
-  - Returns QuantumValue result of function call
+If the number of provided arguments is less than the number of parameters, the method uses default arguments specified in the function definition. Default arguments are evaluated using the interpreter's evaluation mechanism.
 
-###
--  `{` - Opening brace
--  `auto scope = std::make_shared<Environment>(fn->closure);` - Create local scope with closure
+```cpp
+bool isRef = (i < fn->paramIsRef.size()) && fn->paramIsRef[i];
+QuantumValue v = i < args.size() ? args[i] : (fn->defaultArgs.size() > i && fn->defaultArgs[i] ? evaluate(*(fn->defaultArgs[i])) : QuantumValue());
+```
 
-###
--  `for (size_t i = 0; i < fn->params.size(); i++)` - Loop through parameters
--  `{` - Opening brace for parameter loop
--  `if (i < args.size())` - Check if argument provided
+### Step 3: Execute the Function
 
-###
--  `{` - Opening brace for argument case
--  `if (fn->paramIsRef[i])` - Check if reference parameter
--  `{` - Opening brace for reference case
--  `// Reference parameter - store L-value reference` - Comment about reference parameters
--  `setLValue(*fn->params[i], args[i], "=");` - Store L-value reference
--  `}` - Closing brace for reference case
--  `else` - Regular parameter case
--  `{` - Opening brace for regular case
--  `// Regular parameter - store by value` - Comment about regular parameters
--  `scope->define(fn->params[i], args[i]);` - Store parameter by value
--  `}` - Closing brace for regular case
--  `}` - Closing brace for argument case
+Once all parameters are bound to their respective values in the new environment, the method executes the function body. The result of the function execution is captured and returned.
 
-###
--  `else if (fn->defaultArgs[i])` - Check if default argument exists
--  `{` - Opening brace for default case
--  `// Use default argument` - Comment about default arguments
--  `auto defaultValue = evaluate(*fn->defaultArgs[i]);` - Evaluate default expression
--  `scope->define(fn->params[i], defaultValue);` - Store default value
--  `}` - Closing brace for default case
--  `else` - Missing argument case
--  `throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");` - Error for missing argument
+```cpp
+QuantumValue result = fn->body(scope);
+```
 
-###
--  `}` - Closing brace for parameter loop
--  `// Check for too many arguments` - Comment about argument count
--  `if (args.size() > fn->params.size())` - Check if too many arguments
--  `throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));` - Error for too many arguments
+## Edge Cases
 
-###
--  Empty line for readability
--  `auto prev = env;` - Save current environment
--  `env = scope;` - Set current environment to function scope
--  `stepCount_ = 0;` - Reset step counter for infinite loop detection
+- **Empty Arguments Vector**: If fewer arguments are provided than expected, the method uses default arguments where available.
+  
+- **Non-Pointer Values for Reference Parameters**: When passing non-pointer values for reference parameters, the method wraps these values in a new `QuantumValue` cell and binds them to the parameter name. After the function call, these cells are synchronized back to the original arguments.
 
-###
--  Empty line for readability
--  `try` - Start try block for function execution
--  `{` - Opening brace for try block
--  `execute(*fn->body);` - Execute function body
--  `return QuantumValue(); // Implicit return` - Return nil for implicit return
--  `}` - Closing brace for try block
--  `catch (const ReturnSignal &ret)` - Catch return signals
--  `{` - Opening brace for catch block
--  `env = prev;` - Restore previous environment
--  `return ret.value;` - Return explicit return value
--  `}` - Closing brace for catch block
--  `}` - Closing brace for function
+- **Destructuring Patterns**: The method supports destructuring patterns for parameters, allowing for unpacking dictionary values into separate variables.
 
-## Summary
+## Interactions with Other Components
 
-The `callFunction()` function handles user-defined function calls in the Quantum Language:
+- **Environment Class**: The `Environment` class is used to manage the scope during function execution. It holds bindings between variable names and their corresponding values.
 
-### Key Features
-- **Closure Support**: Functions execute with captured environment
-- **Parameter Types**: Support for regular and reference parameters
-- **Default Arguments**: Support for optional parameters with defaults
-- **Return Handling**: Both explicit and implicit returns supported
+- **Evaluation Mechanism**: The `evaluate` method is used to resolve default arguments when fewer arguments are provided than expected.
 
-### Function Call Process
-1. **Scope Creation**: Create local environment with closure
-2. **Parameter Binding**: Bind arguments to parameters
-3. **Environment Setup**: Set current environment to function scope
-4. **Body Execution**: Execute function statements
-5. **Return Handling**: Process return signals
-6. **Environment Restore**: Return to previous environment
+- **QuantumFunction Class**: The `QuantumFunction` class encapsulates information about a quantum function, including its parameters, closure, and body.
 
-### Parameter Types
-- **Regular Parameters**: Passed by value, stored in local scope
-- **Reference Parameters**: Passed by reference, modify caller's variables
-- **Default Parameters**: Optional parameters with default values
-- **Required Parameters**: Must be provided by caller
+- **QuantumValue Class**: The `QuantumValue` class represents quantum data, which can be either plain values or pointers. It provides methods for accessing and manipulating quantum data.
 
-### Argument Binding
-- **Positional Binding**: Arguments bound to parameters by position
-- **Reference Binding**: Reference parameters create L-value bindings
-- **Default Binding**: Missing arguments use default values
-- **Error Handling**: Clear errors for missing or extra arguments
-
-### Closure Semantics
-- **Environment Capture**: Functions capture variables from declaration scope
-- **Lexical Scoping**: Proper variable resolution through closure
-- **Variable Access**: Functions can access outer scope variables
-- **Memory Management**: Smart pointers manage closure lifetime
-
-### Return Handling
-- **Implicit Return**: Functions without explicit return return nil
-- **Explicit Return**: Return statements provide specific values
-- **Exception-Based**: Uses ReturnSignal for non-local control flow
-- **Environment Restoration**: Proper cleanup after return
-
-### Design Benefits
-- **Memory Safety**: Proper environment management
-- **Type Safety**: Comprehensive parameter and return type handling
-- **Flexibility**: Support for advanced parameter features
-- **Performance**: Efficient closure and parameter handling
-
-### Use Cases
-- **Function Calls**: All user-defined function invocations
-- **Method Calls**: Instance method calls (through wrapper)
-- **Recursive Functions**: Functions that call themselves
-- **Higher-Order Functions**: Functions passed as arguments
-
-### Integration with Other Components
-- **Environment System**: Uses Environment for variable storage
-- **Closure System**: Captures lexical environment
-- **Parameter System**: Supports advanced parameter features
-- **Return System**: Uses ReturnSignal for control flow
-
-### Performance Characteristics
-- **Parameter Binding**: O(n) where n is parameter count
-- **Environment Setup**: O(1) environment creation
-- **Closure Access**: O(1) variable access through closure
-- **Return Handling**: Efficient exception-based control flow
-
-### Function Examples
-- **Simple Function**: `function add(a, b) { return a + b; }`
-- **Reference Parameter**: `function increment(&x) { x = x + 1; }`
-- **Default Parameter**: `function greet(name="World") { print(name); }`
-- **Recursive Function**: `function factorial(n) { return n <= 1 ? 1 : n * factorial(n-1); }`
-
-### Error Handling
-- **Missing Arguments**: TypeError with parameter name
-- **Too Many Arguments**: TypeError with expected/got counts
-- **Type Errors**: Handled by individual operations
-- **Runtime Errors**: Propagate through function execution
-
-### Memory Management
-- **Shared Pointers**: Environments use std::shared_ptr
-- **Closure Lifetime**: Managed by reference counting
-- **Scope Cleanup**: Automatic cleanup when function returns
-- **Parameter Storage**: Efficient parameter storage in local scope
-
-This function provides the foundation for function execution in the Quantum Language, enabling proper lexical scoping through closures while supporting advanced parameter features and maintaining memory safety throughout the function call process.
+This comprehensive approach ensures that functions are called correctly in the Quantum Language compiler, supporting both pass-by-value and pass-by-reference semantics, as well as default arguments.
