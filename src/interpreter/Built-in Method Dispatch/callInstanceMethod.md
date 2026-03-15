@@ -1,223 +1,49 @@
-# callInstanceMethod() Function Explanation
+# `callInstanceMethod` Function Explanation
 
-## Complete Code
+The `callInstanceMethod` function is a crucial method in the Quantum Language compiler's interpreter component. It is responsible for executing an instance method on a given quantum instance (`inst`) using a specified quantum function (`fn`). This function takes three parameters and returns a `QuantumValue`.
 
-```cpp
-QuantumValue Interpreter::callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)
-{
-    QuantumValue instVal(inst);
-    auto scope = std::make_shared<Environment>(fn->closure);
-    
-    // Define 'this' as the instance
-    scope->define("this", instVal);
-    
-    for (size_t i = 0; i < fn->params.size(); i++)
-    {
-        if (i < args.size())
-        {
-            if (fn->paramIsRef[i])
-            {
-                // Reference parameter - store L-value reference
-                setLValue(*fn->params[i], args[i], "=");
-            }
-            else
-            {
-                // Regular parameter - store by value
-                scope->define(fn->params[i], args[i]);
-            }
-        }
-        else if (fn->defaultArgs[i])
-        {
-            // Use default argument
-            auto defaultValue = evaluate(*fn->defaultArgs[i]);
-            scope->define(fn->params[i], defaultValue);
-        }
-        else
-        {
-            throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");
-        }
-    }
-    
-    // Check for too many arguments
-    if (args.size() > fn->params.size())
-        throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));
-    
-    auto prev = env;
-    env = scope;
-    stepCount_ = 0;
-    
-    try
-    {
-        execute(*fn->body);
-        return QuantumValue(); // Implicit return
-    }
-    catch (const ReturnSignal &ret)
-    {
-        env = prev;
-        return ret.value;
-    }
-}
-```
+## Parameters
 
-## Code Explanation
+- **`std::shared_ptr<QuantumInstance> inst`**: A shared pointer to the quantum instance on which the method will be executed. The quantum instance represents the object or entity that has the method being called.
+  
+- **`std::shared_ptr<QuantumFunction> fn`**: A shared pointer to the quantum function that defines the method to be executed. The quantum function includes details such as its parameters, body, and closure environment.
+  
+- **`std::vector<QuantumValue> args`**: A vector of `QuantumValue` objects representing the arguments passed to the method. These arguments are used to populate the parameter list of the quantum function during execution.
 
-### Function Signature
--  `QuantumValue Interpreter::callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)` - Call instance methods
-  - `inst`: Shared pointer to object instance
-  - `fn`: Shared pointer to method function
-  - `args`: Vector of method arguments
-  - Returns QuantumValue result of method call
+## Return Value
 
-###
--  `{` - Opening brace
--  `QuantumValue instVal(inst);` - Create QuantumValue wrapper for instance
--  `auto scope = std::make_shared<Environment>(fn->closure);` - Create local scope with closure
+The function returns a `QuantumValue`, which is the result of executing the method. If the method does not explicitly return a value, the function returns an empty `QuantumValue`.
 
-###
--  Empty line for readability
--  `// Define 'this' as the instance` - Comment about this pointer
--  `scope->define("this", instVal);` - Define this pointer in scope
+## How It Works
 
-###
--  Empty line for readability
--  `for (size_t i = 0; i < fn->params.size(); i++)` - Loop through parameters
--  `{` - Opening brace for parameter loop
+1. **Create Instance Value**: The function first creates a `QuantumValue` object (`instVal`) from the provided quantum instance (`inst`). This value represents the object on which the method will operate.
+   
+2. **Set Up Scope**: A new `Environment` object (`scope`) is created using the closure environment of the quantum function (`fn->closure`). The closure environment contains variables that are accessible within the method's scope.
+   
+3. **Define Self and This**: Within the scope, two variables named `"self"` and `"this"` are defined and assigned the value of `instVal`. These aliases allow the method to refer to itself using either name, providing flexibility in method implementation.
+   
+4. **Parameter Binding**: The function then binds the parameters of the quantum function to the corresponding values from the argument list (`args`). If there are fewer arguments than parameters, any remaining parameters are bound to an empty `QuantumValue`.
+   
+5. **Execute Method Body**: The method body of the quantum function is executed within the newly set up scope using the `execBlock` function. This function handles the actual execution of the code statements within the block.
+   
+6. **Handle Return Signal**: During execution, if a `ReturnSignal` is encountered, indicating that the method has returned a value, the function catches this signal and returns the value contained in the signal.
+   
+7. **Default Return**: If the method completes execution without encountering a `ReturnSignal`, the function returns an empty `QuantumValue`.
 
-###
--  `if (i < args.size())` - Check if argument provided
--  `{` - Opening brace for argument case
--  `if (fn->paramIsRef[i])` - Check if reference parameter
--  `{` - Opening brace for reference case
--  `// Reference parameter - store L-value reference` - Comment about reference parameters
--  `setLValue(*fn->params[i], args[i], "=");` - Store L-value reference
--  `}` - Closing brace for reference case
--  `else` - Regular parameter case
--  `{` - Opening brace for regular case
--  `// Regular parameter - store by value` - Comment about regular parameters
--  `scope->define(fn->params[i], args[i]);` - Store parameter by value
--  `}` - Closing brace for regular case
--  `}` - Closing brace for argument case
+## Edge Cases
 
-###
--  `else if (fn->defaultArgs[i])` - Check if default argument exists
--  `{` - Opening brace for default case
--  `// Use default argument` - Comment about default arguments
--  `auto defaultValue = evaluate(*fn->defaultArgs[i]);` - Evaluate default expression
--  `scope->define(fn->params[i], defaultValue);` - Store default value
--  `}` - Closing brace for default case
--  `else` - Missing argument case
--  `throw TypeError("Missing argument for parameter '" + fn->params[i] + "'");` - Error for missing argument
+- **Empty Argument List**: If the argument list (`args`) is empty, the function still attempts to bind all parameters to their respective positions, filling in with empty `QuantumValue`s where necessary.
+  
+- **Mismatched Parameter Count**: If the number of arguments provided does not match the expected number of parameters, the function will still execute, but some parameters may remain unbound or default to empty values.
+  
+- **Exception Handling**: The function includes exception handling to manage any errors or exceptions thrown during the execution of the method body. These exceptions can be caught and handled appropriately by the caller.
 
-###
--  `}` - Closing brace for parameter loop
--  `// Check for too many arguments` - Comment about argument count
--  `if (args.size() > fn->params.size())` - Check if too many arguments
--  `throw TypeError("Too many arguments: expected " + std::to_string(fn->params.size()) + ", got " + std::to_string(args.size()));` - Error for too many arguments
+## Interactions with Other Components
 
-###
--  Empty line for readability
--  `auto prev = env;` - Save current environment
--  `env = scope;` - Set current environment to method scope
--  `stepCount_ = 0;` - Reset step counter for infinite loop detection
+- **Environment Management**: The `callInstanceMethod` function interacts closely with the `Environment` class to manage variable bindings and scopes. The environment provides a structured way to store and access variables during the execution of the method.
+  
+- **Execution Block**: The function uses the `execBlock` function to execute the method body. This function is part of the interpreter's core logic and handles the sequential execution of statements within a block.
+  
+- **Return Signal**: The `callInstanceMethod` function relies on the `ReturnSignal` class to propagate return values from the method body back to the caller. This ensures that the method's results are correctly captured and returned.
 
-###
--  Empty line for readability
--  `try` - Start try block for method execution
--  `{` - Opening brace for try block
--  `execute(*fn->body);` - Execute method body
--  `return QuantumValue(); // Implicit return` - Return nil for implicit return
--  `}` - Closing brace for try block
--  `catch (const ReturnSignal &ret)` - Catch return signals
--  `{` - Opening brace for catch block
--  `env = prev;` - Restore previous environment
--  `return ret.value;` - Return explicit return value
--  `}` - Closing brace for catch block
--  `}` - Closing brace for function
-
-## Summary
-
-The `callInstanceMethod()` function handles instance method calls in the Quantum Language:
-
-### Key Features
-- **This Pointer**: Automatically defines 'this' for method access
-- **Instance Binding**: Methods execute with proper instance context
-- **Parameter Support**: Full parameter features including references and defaults
-- **Closure Integration**: Methods access class-level variables through closure
-
-### Method Call Process
-1. **Instance Wrapping**: Create QuantumValue wrapper for instance
-2. **Scope Creation**: Create local environment with closure
-3. **This Setup**: Define 'this' pointer in method scope
-4. **Parameter Binding**: Bind arguments to method parameters
-5. **Environment Setup**: Set current environment to method scope
-6. **Body Execution**: Execute method statements
-7. **Return Handling**: Process return signals
-8. **Environment Restore**: Return to previous environment
-
-### This Pointer Semantics
-- **Automatic Definition**: 'this' automatically available in methods
-- **Instance Access**: Methods can access instance through 'this'
-- **Field Access**: 'this.field' accesses instance fields
-- **Method Calls**: 'this.method()' calls other instance methods
-
-### Parameter Types
-- **Regular Parameters**: Standard pass-by-value parameters
-- **Reference Parameters**: Pass-by-reference parameters
-- **Default Parameters**: Optional parameters with defaults
-- **Required Parameters**: Must be provided by caller
-
-### Instance Binding
-- **Context Awareness**: Methods execute with instance context
-- **Field Access**: Direct access to instance fields
-- **Method Access**: Access to other instance methods
-- **Inheritance**: Methods can access base class members
-
-### Closure Integration
-- **Class Variables**: Methods access class-level variables
-- **Static Methods**: Can access static class members
-- **Method Resolution**: Proper method lookup through inheritance
-- **Scope Chain**: Proper variable resolution through environments
-
-### Design Benefits
-- **Object-Oriented**: Proper method binding and instance access
-- **This Pointer**: Automatic 'this' pointer like in OOP languages
-- **Memory Safety**: Proper environment and memory management
-- **Inheritance Support**: Works with class inheritance
-
-### Use Cases
-- **Instance Methods**: `obj.method(args)` - call instance methods
-- **Field Access**: Methods can access and modify instance fields
-- **Method Chaining**: Methods can return 'this' for chaining
-- **Inheritance**: Methods work with derived class instances
-
-### Integration with Other Components
-- **Instance System**: Uses QuantumInstance for object access
-- **Method System**: Uses QuantumFunction for method code
-- **Environment System**: Uses Environment for variable storage
-- **This Pointer**: Automatic instance binding
-
-### Performance Characteristics
-- **This Setup**: O(1) this pointer definition
-- **Parameter Binding**: O(n) where n is parameter count
-- **Environment Setup**: O(1) environment creation
-- **Method Execution**: Same performance as regular functions
-
-### Method Examples
-- **Simple Method**: `class Person { method getName() { return this.name; } }`
-- **Field Modification**: `method setName(name) { this.name = name; }`
-- **Method Chaining**: `method setName(name) { this.name = name; return this; }`
-- **With Parameters**: `method add(x, y) { return x + y; }`
-
-### Error Handling
-- **Missing Arguments**: TypeError with parameter name
-- **Too Many Arguments**: TypeError with expected/got counts
-- **Type Errors**: Handled by individual operations
-- **Instance Errors**: Proper instance validation
-
-### Memory Management
-- **Shared Pointers**: Instances and environments use shared pointers
-- **This Pointer**: Proper lifetime management
-- **Scope Cleanup**: Automatic cleanup when method returns
-- **Closure Lifetime**: Managed by reference counting
-
-This function provides the foundation for object-oriented programming in the Quantum Language, enabling proper instance method execution with automatic 'this' pointer binding while maintaining memory safety and supporting advanced parameter features throughout the method call process.
+Overall, the `callInstanceMethod` function plays a vital role in enabling the execution of methods on quantum instances within the Quantum Language compiler. Its design allows for flexible parameter binding, robust error handling, and efficient scope management, ensuring that methods are executed correctly and their results are accurately propagated.
