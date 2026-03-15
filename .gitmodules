@@ -1,0 +1,3 @@
+[submodule "QuantumDocsSyncer"]
+	path = QuantumDocsSyncer
+	url = https://github.com/SENODROOM/QuantumDocsSyncer.git
