@@ -1,92 +1,129 @@
-# QuantumLanguage Compiler - Value.h
+# QuantumLanguage Compiler - AST.h
 
 ## Overview
 
-The `include/Value.h` header file serves as a fundamental building block for the QuantumLanguage compiler, defining data structures and types that represent values within the language. This includes basic types like integers, doubles, strings, arrays, dictionaries, functions, native functions, instances, classes, and pointers. By managing these value semantics effectively, the compiler can accurately evaluate expressions, handle function calls, and maintain state across different stages of compilation.
+The `include/AST.h` header file is an essential component of the QuantumLanguage compiler, responsible for defining the Abstract Syntax Tree (AST) structure. The AST represents the syntactic structure of a program written in QuantumLanguage, allowing the compiler to parse and understand the code at a high level before generating machine code. Each node in the AST corresponds to a construct in the source code, such as variables, expressions, statements, and function definitions.
+
+This file plays a crucial role in the compiler pipeline by providing a structured representation of the input code. It enables subsequent stages of the compilation process, including semantic analysis, optimization, and code generation, to operate on a consistent and predictable format.
 
 ## Key Design Decisions
 
-### Use of `std::variant`
-The decision to use `std::variant` for the `QuantumValue::Data` type was driven by the need for a flexible and type-safe way to store multiple possible value types in a single container. This approach avoids the overhead of dynamic casting while providing compile-time safety and ensuring that all potential value types are accounted for.
+### Use of `std::variant` for Expressions
 
-### Smart Pointers
-Utilizing smart pointers (`std::shared_ptr`) for managing memory ensures automatic deallocation when a value is no longer needed, reducing the risk of memory leaks. Additionally, shared ownership allows for efficient sharing of resources between different parts of the compiler without manual reference counting.
+One of the primary design decisions in `AST.h` is the use of `std::variant` to represent different types of expressions within the AST. This choice allows for a flexible and extensible way to define various expression types without resorting to multiple inheritance or complex visitor patterns. By using `std::variant`, we can easily add new expression types in the future without breaking existing code.
 
-### Non-Owning Pointers for Function Bodies
-Choosing non-owning pointers (`ASTNode*`) for storing function bodies in the `QuantumFunction` struct optimizes memory usage by avoiding unnecessary duplication of nodes. This decision balances the need for quick access to function definitions during interpretation against the cost of managing additional pointers.
+**Why:** `std::variant` provides a safe and efficient way to store one of several possible types in a single variable, making it ideal for representing the diverse range of expressions found in a programming language.
 
-## Documentation
+### Forward Declarations and Unique Pointers
 
-### QuantumNil
-**Purpose:** Represents the `nil` value in QuantumLanguage.
-**Behaviour:** A simple empty structure indicating the absence of a value.
+Another significant decision is the use of forward declarations and `std::unique_ptr` for managing memory in the AST nodes. Forward declarations reduce compile-time dependencies and improve performance by deferring the actual definition of `ASTNode` until it's needed. Using `std::unique_ptr` ensures that all AST nodes are properly managed and automatically deallocated when they go out of scope, preventing memory leaks and dangling pointers.
 
-### QuantumFunction
-**Purpose:** Encapsulates information about a user-defined function.
-**Members:**
-- `name`: The name of the function.
-- `params`: A vector of parameter names.
-- `paramIsRef`: A vector indicating whether each parameter should be passed by reference.
-- `defaultArgs`: A vector of default argument values.
-- `body`: A non-owning pointer to the function's body node.
-- `closure`: A shared pointer to the environment in which the function was defined.
+**Why:** These practices help maintain a clean and modular codebase, improving both build times and overall reliability.
 
-**Behaviour:** Stores details necessary for interpreting a function call.
+## Documentation of Major Classes/Functions
 
-### QuantumClass
-**Purpose:** Represents a user-defined class in QuantumLanguage.
-**Members:**
-- Not fully defined in the provided snippet.
+### ASTNode
 
-**Behaviour:** Placeholder for class-related data structures.
+**Purpose:** Base class for all AST nodes. Provides a common interface for accessing and manipulating nodes.
 
-### QuantumInstance
-**Purpose:** Represents an instance of a user-defined class.
-**Members:**
-- Not fully defined in the provided snippet.
+**Behaviour:** All AST nodes inherit from `ASTNode`. Concrete node types override virtual methods to implement specific functionality.
 
-**Behaviour:** Placeholder for instance-related data structures.
+### NumberLiteral
 
-### QuantumNativeFunc
-**Purpose:** A type alias for a native function in QuantumLanguage.
-**Type:** `std::function<QuantumValue(std::vector<QuantumValue>)>`
-**Behaviour:** Defines a callable entity that takes a vector of `QuantumValue`s and returns a `QuantumValue`.
+**Purpose:** Represents numeric literals in the source code.
 
-### QuantumNative
-**Purpose:** Encapsulates information about a native function.
-**Members:**
-- `name`: The name of the native function.
-- `fn`: A pointer to the function implementation.
+**Behaviour:** Stores the numerical value of the literal.
 
-**Behaviour:** Allows the compiler to invoke native functions seamlessly.
+### StringLiteral
 
-### QuantumPointer
-**Purpose:** Represents a pointer to a variable in QuantumLanguage.
-**Members:**
-- `cell`: A shared pointer to the actual variable storage.
-- `varName`: The name of the variable for display/debug purposes.
-- `offset`: An integer used for pointer arithmetic.
+**Purpose:** Represents string literals in the source code.
 
-**Functions:**
-- `isNull() const`: Checks if the pointer is null.
-- `deref() const`: Dereferences the pointer, throwing an exception if it is null.
+**Behaviour:** Stores the string value of the literal.
 
-**Behaviour:** Manages references to variables, enabling pointer arithmetic and debugging capabilities.
+### BoolLiteral
 
-### QuantumValue
-**Purpose:** A versatile container for holding any valid value in QuantumLanguage.
-**Members:**
-- `data`: A variant containing one of several possible value types.
+**Purpose:** Represents boolean literals in the source code.
 
-**Constructors:**
-- Various constructors are provided for initializing `QuantumValue` with different types of data.
+**Behaviour:** Stores the boolean value (`true` or `false`) of the literal.
 
-**Behaviour:** Acts as a polymorphic wrapper around various value types, facilitating easy manipulation and storage of values throughout the compiler pipeline.
+### NilLiteral
 
-## Tradeoffs and Limitations
+**Purpose:** Represents the `nil` literal in the source code.
 
-- **Memory Overhead:** Using smart pointers introduces some memory overhead compared to raw pointers.
-- **Performance:** Dynamic dispatch through `std::variant` can introduce slight performance penalties compared to static typing.
-- **Complexity:** Managing multiple value types and their associated operations adds complexity to the compiler's codebase.
+**Behaviour:** No additional information is stored since `nil` typically indicates the absence of a value.
 
-These tradeoffs reflect the balance between flexibility, safety, and performance required in a modern compiler.
+### Identifier
+
+**Purpose:** Represents identifiers (variable names, function names, etc.) in the source code.
+
+**Behaviour:** Stores the name of the identifier.
+
+### BinaryExpr
+
+**Purpose:** Represents binary arithmetic or logical operations.
+
+**Behaviour:** Contains the operation symbol (`op`), and pointers to the left and right operands (`left` and `right`). This allows for easy evaluation of expressions involving two sub-expressions.
+
+### UnaryExpr
+
+**Purpose:** Represents unary arithmetic or logical operations.
+
+**Behaviour:** Contains the operation symbol (`op`) and a pointer to the operand (`operand`). This facilitates handling expressions with a single sub-expression.
+
+### AssignExpr
+
+**Purpose:** Represents assignment operations.
+
+**Behaviour:** Contains the assignment operator (`op`, e.g., `=`, `+=`, `-=`), a pointer to the target variable (`target`), and a pointer to the value being assigned (`value`). This structure supports compound assignments.
+
+### CallExpr
+
+**Purpose:** Represents function calls.
+
+**Behaviour:** Contains a pointer to the callee (the function being called) and a vector of pointers to arguments. This allows for flexibility in handling varying numbers of arguments.
+
+### IndexExpr
+
+**Purpose:** Represents indexing operations (e.g., array access).
+
+**Behaviour:** Contains a pointer to the object being indexed and a pointer to the index itself. This structure supports dynamic indexing.
+
+### SliceExpr
+
+**Purpose:** Represents slicing operations (e.g., Python's list slicing syntax).
+
+**Behaviour:** Contains a pointer to the object being sliced, optional pointers to the start, stop, and step indices. Default values are provided for omitted parts (start defaults to 0, stop to the end of the object, and step to 1). This structure handles complex slicing scenarios gracefully.
+
+### MemberExpr
+
+**Purpose:** Represents member access operations (e.g., struct fields).
+
+**Behaviour:** Contains a pointer to the object and the name of the member field. This structure supports accessing properties of objects.
+
+### ArrayLiteral
+
+**Purpose:** Represents array literals.
+
+**Behaviour:** Contains a vector of pointers to the elements of the array. This structure allows for dynamically sized arrays.
+
+### DictLiteral
+
+**Purpose:** Represents dictionary literals.
+
+**Behaviour:** Contains a vector of key-value pairs, where each pair consists of pointers to the key and value. This structure supports associative arrays.
+
+### LambdaExpr
+
+**Purpose:** Represents lambda functions.
+
+**Behaviour:** Contains a vector of parameter names (`params`), a vector of parameter types (`paramTypes`), a vector of default argument values (`defaultArgs`), the return type (`returnType`), and a pointer to the function body (`body`). This structure encapsulates the entire lambda function definition.
+
+### TernaryExpr
+
+**Purpose:** Represents ternary conditional expressions.
+
+**Behaviour:** Contains a pointer to the condition, a pointer to the expression executed if the condition is true (`thenExpr`), and a pointer to the expression executed if the condition is false (`elseExpr`). This structure supports concise conditional logic.
+
+### SuperExpr
+
+**Purpose:** Represents calls to the superclass constructor or
