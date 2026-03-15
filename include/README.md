@@ -1,62 +1,65 @@
-# QuantumLanguage Compiler - AST.h
+# QuantumLanguage Compiler - Error.h
 
 ## Overview
 
-The `include/AST.h` header file is a crucial component of the QuantumLanguage compiler, responsible for defining and managing the Abstract Syntax Tree (AST). The AST represents the syntactic structure of a program in a tree-like format, making it easier for the compiler to analyze, transform, and generate code. This file plays a pivotal role in the compiler pipeline, serving as the intermediate representation between the source code and the final executable.
+The `include/Error.h` header file is a crucial component of the QuantumLanguage compiler, designed to manage and report errors encountered during compilation and execution. This file provides a structured approach to error handling by defining custom exception classes that inherit from `std::runtime_error`. Each class corresponds to a specific type of error, making it easier to identify and respond to different issues within the compiler.
 
-### Key Design Decisions
+### Role in Compiler Pipeline
 
-1. **Use of Variants**: The AST nodes are defined using `std::variant`, allowing for a flexible and extensible representation of different expression and statement types without the need for multiple inheritance or polymorphism. This decision simplifies the implementation and reduces memory overhead compared to traditional approaches.
+- **Compilation Errors**: These occur during the parsing or semantic analysis phases when the source code does not conform to the language grammar or rules.
+- **Runtime Errors**: These happen during the execution phase when invalid operations are performed, such as accessing out-of-bounds indices or calling undefined functions.
 
-2. **Smart Pointers**: All AST node pointers are managed using `std::unique_ptr`. This ensures that each node is properly deallocated when it goes out of scope, preventing memory leaks and improving resource management.
+## Key Design Decisions and Why
 
-3. **Forward Declarations**: To reduce compilation time and dependency issues, forward declarations are used where possible. This approach minimizes the inclusion of unnecessary headers and promotes better modularity.
+1. **Custom Exception Classes**: By creating separate classes for each type of error (`QuantumError`, `RuntimeError`, `TypeError`, `NameError`, `IndexError`), the compiler can provide more specific information about the nature of the error. This helps in debugging and improving user experience.
+   
+2. **Line Number Information**: Each error class includes a line number attribute (`line`). This allows the compiler to pinpoint exactly where the error occurred in the source code, facilitating quicker resolution.
 
-4. **Type Hints and Reference Parameters**: For enhanced type safety and flexibility, many AST node structures include optional type hints and support for reference parameters. These features help in generating more efficient and correct code during the compilation process.
+3. **Color Coding**: The `Colors` namespace contains constants for color codes, which can be used to format error messages in the console output. This makes error messages visually distinct and easier to read, especially in large codebases.
 
 ## Major Classes/Functions Overview
 
-### Expression Types
+### QuantumError Class
 
-- **NumberLiteral**: Represents a numeric literal with a double value.
-- **StringLiteral**: Represents a string literal with a `std::string`.
-- **BoolLiteral**: Represents a boolean literal (`true` or `false`).
-- **NilLiteral**: Represents a null literal (`nil`).
-- **Identifier**: Represents a variable or function identifier with a `std::string`.
-- **BinaryExpr**: Represents a binary expression with an operator and two operands.
-- **UnaryExpr**: Represents a unary expression with an operator and one operand.
-- **AssignExpr**: Represents an assignment expression with an operator, target, and value.
-- **CallExpr**: Represents a function call with a callee and arguments.
-- **IndexExpr**: Represents an array or dictionary indexing expression.
-- **SliceExpr**: Represents a slicing expression similar to Python's syntax, supporting optional start, stop, and step values.
-- **MemberExpr**: Represents a member access expression through an object.
-- **ArrayLiteral**: Represents an array literal with a list of elements.
-- **DictLiteral**: Represents a dictionary literal with key-value pairs.
-- **LambdaExpr**: Represents a lambda function with parameters, parameter types, default arguments, return type, and body.
-- **TernaryExpr**: Represents a ternary conditional expression with a condition, true branch, and false branch.
-- **SuperExpr**: Represents a super constructor or method call expression.
+- **Inheritance**: Inherits from `std::runtime_error`.
+- **Attributes**:
+  - `int line`: Line number where the error occurred.
+  - `std::string kind`: Type of error (e.g., "RuntimeError").
+- **Constructor**: Takes a kind, message, and optional line number.
 
-### C++ Pointer Expression Types
+### RuntimeError Class
 
-- **AddressOfExpr**: Represents an address-of operation (`&var`).
-- **DerefExpr**: Represents a dereference operation (`*ptr`).
-- **ArrowExpr**: Represents a member access through a pointer (`ptr->member`).
+- **Inheritance**: Inherits from `QuantumError`.
+- **Purpose**: Used for runtime errors, which occur during the execution phase.
+- **Constructor**: Simplified constructor that sets the kind to "RuntimeError".
 
-### Statement Types
+### TypeError Class
 
-- **VarDecl**: Represents a variable declaration with an optional initializer and type hint.
-- **FunctionDecl**: Represents a function declaration with parameters, parameter types, default arguments, return type, and body.
-- **ReturnStmt**: Represents a return statement with an optional value.
-- **IfStmt**: Represents an if statement with a condition and a then branch. Additional branches can be added via an `elifChains` field.
+- **Inheritance**: Inherits from `QuantumError`.
+- **Purpose**: Used for type-related errors, such as mismatched operand types.
+- **Constructor**: Simplified constructor that sets the kind to "TypeError".
+
+### NameError Class
+
+- **Inheritance**: Inherits from `QuantumError`.
+- **Purpose**: Used for errors related to variable or function names, such as using an undefined name.
+- **Constructor**: Simplified constructor that sets the kind to "NameError".
+
+### IndexError Class
+
+- **Inheritance**: Inherits from `QuantumError`.
+- **Purpose**: Used for errors related to index access, such as accessing an array element outside its bounds.
+- **Constructor**: Simplified constructor that sets the kind to "IndexError".
+
+### Colors Namespace
+
+- **Constants**: Provides constants for ANSI escape codes to change text color and style.
+- **Usage**: Can be used to format error messages in the console, enhancing readability and visual distinction.
 
 ## Tradeoffs
 
-- **Flexibility vs. Complexity**: Using `std::variant` provides a high degree of flexibility but can introduce complexity in terms of handling and querying specific node types.
-  
-- **Memory Management**: Smart pointers ensure proper memory management, reducing the risk of memory leaks. However, they add some overhead compared to raw pointers.
+- **Complexity**: Adding multiple custom exception classes increases the complexity of the codebase but improves maintainability and error reporting.
+- **Performance**: While the additional overhead of these classes may have a slight impact on performance, the benefits in terms of clarity and ease of debugging often outweigh this cost.
+- **Readability**: Color coding enhances the readability of error messages, making them stand out and easier to understand quickly.
 
-- **Performance**: While `std::variant` offers convenience, it might impact performance slightly due to its runtime type information checks. Careful optimization techniques can mitigate these effects.
-
-- **Readability vs. Conciseness**: The use of forward declarations and smart pointers improves readability and maintainability. However, it might sacrifice some conciseness in certain cases.
-
-Overall, the `AST.h` file is designed to provide a robust and scalable foundation for the QuantumLanguage compiler, balancing flexibility, performance, and readability.
+Overall, the `include/Error.h` header file plays a vital role in the QuantumLanguage compiler by providing a robust framework for error management and reporting, ensuring that developers can effectively diagnose and fix issues in their code.
