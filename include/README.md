@@ -1,39 +1,62 @@
-# QuantumLanguage Compiler - Value.h
+# QuantumLanguage Compiler - AST.h
 
 ## Overview
 
-The `include/Value.h` header file is an essential part of the QuantumLanguage compiler, focusing on defining and managing various data types and values within the language. This file serves as the foundation for the interpreter's ability to handle expressions, statements, and function calls efficiently. By leveraging C++'s type system and features like `std::variant`, it encapsulates all possible value types into a single unified structure, ensuring flexibility and robustness in the compiler's execution phase.
+The `include/AST.h` header file is a crucial component of the QuantumLanguage compiler, responsible for defining and managing the Abstract Syntax Tree (AST). The AST represents the syntactic structure of a program in a tree-like format, making it easier for the compiler to analyze, transform, and generate code. This file plays a pivotal role in the compiler pipeline, serving as the intermediate representation between the source code and the final executable.
 
-## Key Design Decisions
+### Key Design Decisions
 
-### Use of `std::variant`
-The decision to use `std::variant` was pivotal because it allows for compile-time polymorphism without sacrificing performance. Unlike dynamic casting, which incurs runtime overhead, `std::variant` provides a safer and more efficient way to manage multiple data types within a single container. This choice enhances the safety and reliability of the compiler, making it easier to reason about the types of values being handled at any given point.
+1. **Use of Variants**: The AST nodes are defined using `std::variant`, allowing for a flexible and extensible representation of different expression and statement types without the need for multiple inheritance or polymorphism. This decision simplifies the implementation and reduces memory overhead compared to traditional approaches.
 
-### Non-Owning Pointers for Function Bodies
-By using non-owning pointers (`std::weak_ptr`) for function bodies instead of owning pointers (`std::shared_ptr`), we optimize memory usage. Non-owning pointers do not increase the reference count of the function body, thus preventing unnecessary memory allocation when functions are defined but not immediately invoked. This approach balances memory efficiency with the need to access function bodies during interpretation.
+2. **Smart Pointers**: All AST node pointers are managed using `std::unique_ptr`. This ensures that each node is properly deallocated when it goes out of scope, preventing memory leaks and improving resource management.
 
-## Documentation of Major Classes/Functions
+3. **Forward Declarations**: To reduce compilation time and dependency issues, forward declarations are used where possible. This approach minimizes the inclusion of unnecessary headers and promotes better modularity.
 
-### QuantumNil
-**Purpose**: Represents the `nil` value in QuantumLanguage, similar to `null` in other languages.
-**Behaviour**: Acts as a placeholder for empty or uninitialized values. No specific operations are defined since `nil` is essentially a marker.
+4. **Type Hints and Reference Parameters**: For enhanced type safety and flexibility, many AST node structures include optional type hints and support for reference parameters. These features help in generating more efficient and correct code during the compilation process.
 
-### QuantumFunction
-**Purpose**: Encapsulates information about a user-defined function in QuantumLanguage.
-**Behaviour**: Contains details such as the function's name, parameters, default arguments, and the body of the function. The `closure` member holds a shared pointer to the environment in which the function was defined, allowing it to maintain state across invocations.
+## Major Classes/Functions Overview
 
-### QuantumPointer
-**Purpose**: Represents a pointer to a variable in QuantumLanguage.
-**Behaviour**: Holds a shared pointer to the actual variable storage (`cell`) and additional metadata like the variable's name (`varName`) and an offset for pointer arithmetic. Provides methods to check if the pointer is null and to dereference the pointer safely.
+### Expression Types
 
-### QuantumValue
-**Purpose**: A versatile structure capable of holding any valid value in QuantumLanguage.
-**Behaviour**: Utilizes `std::variant` to store different types of values, including basic types (`bool`, `double`, `std::string`), arrays, dictionaries, functions, native functions, instances, classes, and pointers. Offers constructors for initializing various types of values and methods to retrieve their contents safely.
+- **NumberLiteral**: Represents a numeric literal with a double value.
+- **StringLiteral**: Represents a string literal with a `std::string`.
+- **BoolLiteral**: Represents a boolean literal (`true` or `false`).
+- **NilLiteral**: Represents a null literal (`nil`).
+- **Identifier**: Represents a variable or function identifier with a `std::string`.
+- **BinaryExpr**: Represents a binary expression with an operator and two operands.
+- **UnaryExpr**: Represents a unary expression with an operator and one operand.
+- **AssignExpr**: Represents an assignment expression with an operator, target, and value.
+- **CallExpr**: Represents a function call with a callee and arguments.
+- **IndexExpr**: Represents an array or dictionary indexing expression.
+- **SliceExpr**: Represents a slicing expression similar to Python's syntax, supporting optional start, stop, and step values.
+- **MemberExpr**: Represents a member access expression through an object.
+- **ArrayLiteral**: Represents an array literal with a list of elements.
+- **DictLiteral**: Represents a dictionary literal with key-value pairs.
+- **LambdaExpr**: Represents a lambda function with parameters, parameter types, default arguments, return type, and body.
+- **TernaryExpr**: Represents a ternary conditional expression with a condition, true branch, and false branch.
+- **SuperExpr**: Represents a super constructor or method call expression.
 
-## Tradeoffs/Limitations
+### C++ Pointer Expression Types
 
-- **Memory Efficiency**: Using non-owning pointers for function bodies optimizes memory usage but requires careful management to avoid dangling references.
-- **Type Safety**: While `std::variant` provides strong type safety, handling errors related to invalid type accesses (e.g., dereferencing a null pointer) necessitates robust exception handling mechanisms.
-- **Performance**: Although `std::variant` offers compile-time polymorphism, accessing variant members can still introduce some runtime overhead compared to traditional unions.
+- **AddressOfExpr**: Represents an address-of operation (`&var`).
+- **DerefExpr**: Represents a dereference operation (`*ptr`).
+- **ArrowExpr**: Represents a member access through a pointer (`ptr->member`).
 
-These considerations reflect the balance between functionality, performance, and resource utilization that characterizes the design of the `Value.h` header file in the QuantumLanguage compiler.
+### Statement Types
+
+- **VarDecl**: Represents a variable declaration with an optional initializer and type hint.
+- **FunctionDecl**: Represents a function declaration with parameters, parameter types, default arguments, return type, and body.
+- **ReturnStmt**: Represents a return statement with an optional value.
+- **IfStmt**: Represents an if statement with a condition and a then branch. Additional branches can be added via an `elifChains` field.
+
+## Tradeoffs
+
+- **Flexibility vs. Complexity**: Using `std::variant` provides a high degree of flexibility but can introduce complexity in terms of handling and querying specific node types.
+  
+- **Memory Management**: Smart pointers ensure proper memory management, reducing the risk of memory leaks. However, they add some overhead compared to raw pointers.
+
+- **Performance**: While `std::variant` offers convenience, it might impact performance slightly due to its runtime type information checks. Careful optimization techniques can mitigate these effects.
+
+- **Readability vs. Conciseness**: The use of forward declarations and smart pointers improves readability and maintainability. However, it might sacrifice some conciseness in certain cases.
+
+Overall, the `AST.h` file is designed to provide a robust and scalable foundation for the QuantumLanguage compiler, balancing flexibility, performance, and readability.
