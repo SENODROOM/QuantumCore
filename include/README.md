@@ -1,98 +1,77 @@
-# QuantumLanguage Compiler - AST.h
+# QuantumLanguage Compiler - Error.h
 
 ## Overview
 
-The `include/AST.h` header file is a crucial component of the QuantumLanguage compiler's architecture. It encapsulates the definition of various abstract syntax tree (AST) node types essential for representing the structure of the language's source code. These nodes include literals, expressions, statements, and more complex constructs like function declarations and lambda expressions. This file plays a vital role in the compiler pipeline by serving as the foundation for parsing, semantic analysis, and code generation phases.
+The `include/Error.h` header file is an integral part of the QuantumLanguage compiler's architecture, focusing on defining various error handling mechanisms. This file serves as a central repository for custom exception classes tailored to specific error conditions encountered during compilation and execution phases. By extending standard library exceptions like `std::runtime_error`, it provides a structured way to manage errors, including their type, message, and line number where they occurred. Additionally, it includes a namespace for color codes to enhance error output readability in terminal environments.
 
 ## Key Design Decisions
 
-### Use of `std::variant`
-- **Why**: The `std::variant` type was chosen to represent different kinds of AST nodes in a single unified type. This approach simplifies the handling of multiple node types without requiring explicit casting or branching logic.
+- **Custom Exception Classes**: The decision to create custom exception classes (`QuantumError`, `RuntimeError`, `TypeError`, `NameError`, `IndexError`) over using generic exceptions was made to provide more context-specific information about errors. This allows for easier debugging and error reporting.
   
-### Smart Pointers (`std::unique_ptr`)
-- **Why**: By using smart pointers, the file ensures automatic memory management and avoids manual deletion of dynamically allocated AST nodes. This reduces the risk of memory leaks and makes the code cleaner and safer.
+- **Inheritance from Standard Exceptions**: Extending standard library exceptions ensures compatibility and interoperability with existing error handling frameworks in C++. It also leverages the robustness and performance optimizations provided by these libraries.
 
-### Forward Declarations
-- **Why**: Forward declarations are used extensively to break circular dependencies between header files. This allows for a modular design where each header can focus on its specific functionality without being burdened by the details of other components.
+- **Color Coding for Terminal Output**: Adding a namespace for color codes (`Colors`) was designed to improve the visual distinction between different types of errors in terminal outputs. This makes it easier for developers to quickly identify and address issues.
 
 ## Documentation of Major Classes/Functions
 
-### ASTNode
-- **Purpose**: Base class for all AST nodes. Provides a common interface for traversing and manipulating the AST.
-- **Behaviour**: All concrete AST node types inherit from `ASTNode`. Each subclass implements methods to handle specific node operations.
+### QuantumError
 
-### NumberLiteral
-- **Purpose**: Represents numeric literals in the source code.
-- **Behaviour**: Holds a `double` value which corresponds to the literal number.
+**Purpose**: Base class for all custom QuantumLanguage exceptions. It inherits from `std::runtime_error` and adds additional attributes to store the error type and line number.
 
-### StringLiteral
-- **Purpose**: Represents string literals in the source code.
-- **Behaviour**: Holds a `std::string` value which corresponds to the literal string.
+**Behaviour**: 
+- Takes three parameters: `kind` (type of error), `msg` (error message), and `line` (line number where the error occurred).
+- Initializes the base class with the error message and stores the error type and line number.
 
-### BoolLiteral
-- **Purpose**: Represents boolean literals in the source code.
-- **Behaviour**: Holds a `bool` value which corresponds to the literal boolean.
+### RuntimeError
 
-### NilLiteral
-- **Purpose**: Represents the `nil` literal in the source code.
-- **Behaviour**: No additional members since it represents an empty or null value.
+**Purpose**: Represents runtime errors that occur during the execution of QuantumLanguage programs.
 
-### Identifier
-- **Purpose**: Represents variable identifiers in the source code.
-- **Behaviour**: Holds a `std::string` name which identifies the variable.
+**Behaviour**: Inherits from `QuantumError` and initializes with the "RuntimeError" kind.
 
-### BinaryExpr
-- **Purpose**: Represents binary arithmetic or logical expressions.
-- **Behaviour**: Contains an operation string (`op`) and two operands (`left`, `right`). Used for expressions like `a + b` or `x && y`.
+### TypeError
 
-### UnaryExpr
-- **Purpose**: Represents unary arithmetic or logical expressions.
-- **Behaviour**: Contains an operation string (`op`) and one operand (`operand`). Used for expressions like `-a` or `!x`.
+**Purpose**: Indicates type-related errors, such as attempting to perform operations on incompatible types.
 
-### AssignExpr
-- **Purpose**: Represents assignment expressions.
-- **Behaviour**: Contains an operation string (`op`) indicating the type of assignment (e.g., `=`, `+=`, etc.), a target variable, and a value expression. Used for expressions like `a = b` or `c += d`.
+**Behaviour**: Inherits from `QuantumError` and initializes with the "TypeError" kind.
 
-### CallExpr
-- **Purpose**: Represents function calls.
-- **Behaviour**: Contains a callee expression and a vector of argument expressions. Used for calling functions like `f(x, y)`.
+### NameError
 
-### IndexExpr
-- **Purpose**: Represents indexing into collections.
-- **Behaviour**: Contains an object expression and an index expression. Used for accessing elements like `array[index]`.
+**Purpose**: Used when an undefined variable or function name is accessed.
 
-### SliceExpr
-- **Purpose**: Represents slicing operations on sequences.
-- **Behaviour**: Contains an object expression and optional start, stop, and step expressions. Used for slicing like `array[start:stop:step]`.
+**Behaviour**: Inherits from `QuantumError` and initializes with the "NameError" kind.
 
-### MemberExpr
-- **Purpose**: Represents member access on objects.
-- **Behaviour**: Contains an object expression and a member name. Used for accessing properties like `object.member`.
+### IndexError
 
-### ArrayLiteral
-- **Purpose**: Represents array literals.
-- **Behaviour**: Contains a vector of element expressions. Used for creating arrays like `[1, 2, 3]`.
+**Purpose**: Captures errors related to accessing elements outside the bounds of arrays or lists.
 
-### DictLiteral
-- **Purpose**: Represents dictionary literals.
-- **Behaviour**: Contains a vector of key-value pairs, where both keys and values are expressions. Used for creating dictionaries like `{key1: value1, key2: value2}`.
+**Behaviour**: Inherits from `QuantumError` and initializes with the "IndexError" kind.
 
-### LambdaExpr
-- **Purpose**: Represents anonymous function literals (lambda expressions).
-- **Behaviour**: Contains a list of parameter names, their types, default arguments, return type, and a body expression. Used for defining functions inline like `(x, y) -> x + y`.
+### Colors Namespace
 
-### TernaryExpr
-- **Purpose**: Represents conditional expressions (ternaries).
-- **Behaviour**: Contains a condition expression, a then expression, and an else expression. Used for expressions like `condition ? then_expr : else_expr`.
+**Purpose**: Provides a set of ANSI escape codes for text coloring in terminal outputs.
 
-### SuperExpr
-- **Purpose**: Represents super constructor or method calls.
-- **Behaviour**: Contains an optional method name. If empty, it represents a super constructor call. Used for calling parent constructors or methods like `super()` or `super.method()`.
+**Contents**:
+- Various color constants (`RED`, `YELLOW`, `WHITE`, `CYAN`, `GREEN`, `BLUE`, `BOLD`, `RESET`, `MAGENTA`) to style error messages.
+- Each constant represents a different color or formatting option in the terminal.
 
 ## Tradeoffs/Limitations
 
-- **Flexibility vs. Complexity**: Using `std::variant` simplifies the AST representation but adds complexity when dealing with new node types.
-- **Memory Management**: While smart pointers provide automatic memory management, they can introduce overhead compared to raw pointers.
-- **Circular Dependencies**: Forward declarations help manage circular dependencies but can make the code harder to understand if not properly documented.
+- **Performance Overhead**: Using custom exception classes might introduce a slight performance overhead compared to using raw strings or other lightweight mechanisms. However, this is generally negligible and outweighed by the benefits of improved error management and clarity.
+  
+- **Complexity**: While providing more detailed error information, the introduction of multiple custom exception classes increases the complexity of the codebase. Developers must be aware of the various error types and handle them appropriately.
 
-This file is a fundamental building block for the QuantumLanguage compiler, providing a robust framework for representing and manipulating the language's syntax.
+- **Terminal Compatibility**: The use of ANSI escape codes for color coding may not work on all terminals or platforms, potentially limiting the effectiveness of this feature.
+
+## Usage Example
+
+Here's how you might use the `RuntimeError` class in your compiler:
+
+```cpp
+try {
+    // Some code that might throw a runtime error
+} catch (const RuntimeError &e) {
+    std::cerr << Colors::RED << "Runtime Error at line " << e.line << ": " << e.what() << Colors::RESET << std::endl;
+}
+```
+
+This example demonstrates catching a `RuntimeError` and printing it with a red color, highlighting the line number where the error occurred.
