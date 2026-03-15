@@ -1,95 +1,147 @@
-# QuantumLanguage Compiler - Interpreter.h
+# QuantumLanguage Compiler - Lexer.h
 
 ## Overview
 
-The `include/Interpreter.h` header file is an essential part of the QuantumLanguage compiler, focusing on the interpretation and execution of abstract syntax tree (AST) nodes. This file defines the `Interpreter` class, which is responsible for evaluating expressions and executing statements based on the AST structure. It also includes utility functions to handle different types of values and operations encountered during the compilation process.
+The `include/Lexer.h` header file is an essential part of the QuantumLanguage compiler, serving as the lexical analyzer or lexer. Its primary responsibility is to convert the raw source code into a sequence of tokens, which are then processed by the parser. This process involves recognizing patterns in the source code, such as keywords, identifiers, operators, numbers, and strings, and converting them into corresponding token types.
 
 ## Key Design Decisions
 
-### Use of Smart Pointers
+### Use of Token Types
 
-**Why:** The use of smart pointers (`std::shared_ptr`) ensures automatic memory management and helps prevent memory leaks by automatically deallocating memory when it's no longer needed. This is particularly important in a compiler where many objects are dynamically allocated and managed throughout the compilation lifecycle.
+**Why:** The use of predefined token types ensures consistency and clarity in how different elements of the source code are represented. It simplifies the parsing process by providing a clear mapping between syntactic constructs and their semantic representations.
 
-### Environment Management
+### Support for F-Strings
 
-**Why:** An environment (`std::shared_ptr<Environment>`) is used to manage variable scopes and symbol tables. This allows the interpreter to keep track of variables at different levels of the program, ensuring correct access and modification of variables within their respective scopes.
+**Why:** F-strings (formatted string literals) provide a powerful way to embed expressions inside string literals for formatting. By implementing support for f-strings, the lexer can handle complex string interpolation scenarios, making the compiler more versatile and user-friendly.
 
-### Step Count Limitation
+### Preprocessor Macros
 
-**Why:** To guard against potential infinite loops, especially in cases like empty input streams, a maximum step count (`MAX_STEPS`) is enforced. This limit prevents the interpreter from running indefinitely and ensures robustness in handling edge cases.
+**Why:** Preprocessor macros allow for text substitution during compilation, which can be useful for defining constants, conditional compilation, and other common tasks. Implementing a mechanism to handle macros in the lexer helps in maintaining cleaner and more maintainable source code.
 
 ## Class and Function Documentation
 
-### Interpreter Class
+### Lexer Class
 
-**Purpose:** The main interpreter class that handles the evaluation of AST nodes and the execution of quantum language programs.
+**Purpose:** The `Lexer` class is the main component responsible for tokenizing the source code.
 
-**Behavior:**
-- **Constructor (`Interpreter()`):** Initializes the interpreter with default settings.
-- **execute (`void execute(ASTNode &node`):** Executes the given AST node.
-- **evaluate (`QuantumValue evaluate(ASTNode &node`):** Evaluates the given AST node and returns its result.
-- **execBlock (`void execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr`):** Executes a block statement with an optional custom scope.
-- **registerNatives (`void registerNatives()`):** Registers built-in native functions.
-- **Statement Executors:** Functions like `execVarDecl`, `execFunctionDecl`, etc., handle specific types of statements.
-- **Expression Evaluators:** Functions like `evalBinary`, `evalUnary`, etc., evaluate specific types of expressions.
-- **C++ Pointer Evaluators:** Functions like `evalAddressOf`, `evalDeref`, etc., handle pointer-related operations in C++.
-- **callFunction (`QuantumValue callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args`):** Calls a user-defined function with arguments.
-- **callNative (`QuantumValue callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args`):** Calls a native function with arguments.
-- **callInstanceMethod (`QuantumValue callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args`):** Calls a method on an instance object.
-- **Built-in Method Dispatch:** Functions like `callMethod`, `callArrayMethod`, etc., dispatch calls to appropriate methods based on the type of object.
-- **setLValue (`void setLValue(ASTNode &target, QuantumValue val, const std::string &op`):** Sets the value of a left-hand side expression.
+#### Constructor
 
-### Major Functions
+```cpp
+explicit Lexer(const std::string &source);
+```
 
-#### `void execute(ASTNode &node)`
+**Behaviour:** Initializes the lexer with the given source code and sets up internal state variables.
 
-**Purpose:** Executes the provided AST node.
+#### tokenize Method
 
-**Behavior:** Depending on the type of node, either evaluates the expression or executes the statement.
+```cpp
+std::vector<Token> tokenize();
+```
 
-#### `QuantumValue evaluate(ASTNode &node)`
+**Behaviour:** Converts the source code into a vector of tokens by repeatedly calling private methods to recognize and create tokens.
 
-**Purpose:** Evaluates the provided AST node and returns its result.
+### Private Methods
 
-**Behavior:** Recursively evaluates the node and returns the corresponding `QuantumValue`.
+#### current Method
 
-#### `void execBlock(BlockStmt &s, std::shared_ptr<Environment> scope = nullptr)`
+```cpp
+char current() const;
+```
 
-**Purpose:** Executes a block statement with an optional custom scope.
+**Behaviour:** Returns the character at the current position in the source code.
 
-**Behavior:** Iterates through the statements in the block and executes them, using the provided scope if available.
+#### peek Method
 
-#### `QuantumValue callFunction(std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)`
+```cpp
+char peek(int offset = 1) const;
+```
 
-**Purpose:** Calls a user-defined function with arguments.
+**Behaviour:** Returns the character at the specified offset relative to the current position without advancing the lexer.
 
-**Behavior:** Invokes the function with the specified arguments and returns the result.
+#### advance Method
 
-#### `QuantumValue callNative(std::shared_ptr<QuantumNative> fn, std::vector<QuantumValue> args)`
+```cpp
+char advance();
+```
 
-**Purpose:** Calls a native function with arguments.
+**Behaviour:** Advances the lexer's position to the next character and returns it.
 
-**Behavior:** Invokes the native function with the specified arguments and returns the result.
+#### skipWhitespace Method
 
-#### `QuantumValue callInstanceMethod(std::shared_ptr<QuantumInstance> inst, std::shared_ptr<QuantumFunction> fn, std::vector<QuantumValue> args)`
+```cpp
+void skipWhitespace();
+```
 
-**Purpose:** Calls a method on an instance object.
+**Behaviour:** Skips over any whitespace characters in the source code.
 
-**Behavior:** Invokes the method on the specified instance with the provided arguments and returns the result.
+#### skipComment Method
 
-#### `QuantumValue callMethod(QuantumValue &obj, const std::string &method, std::vector<QuantumValue> args)`
+```cpp
+void skipComment();
+```
 
-**Purpose:** Dispatches calls to appropriate methods based on the type of object.
+**Behaviour:** Skips over a single-line comment starting with `//`.
 
-**Behavior:** Determines the type of the object and calls the corresponding method with the provided arguments.
+#### skipBlockComment Method
 
-#### `void setLValue(ASTNode &target, QuantumValue val, const std::string &op)`
+```cpp
+void skipBlockComment();
+```
 
-**Purpose:** Sets the value of a left-hand side expression.
+**Behaviour:** Skips over a multi-line comment enclosed within `/* */`.
 
-**Behavior:** Handles assignment operations and updates the target variable with the new value.
+#### readNumber Method
+
+```cpp
+Token readNumber();
+```
+
+**Behaviour:** Recognizes and creates a token representing a numeric literal.
+
+#### readString Method
+
+```cpp
+Token readString(char quote);
+```
+
+**Behaviour:** Recognizes and creates a token representing a string literal, handling both single and double quotes.
+
+#### readTemplateLiteral Method
+
+```cpp
+void readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol);
+```
+
+**Behaviour:** Handles the recognition and creation of template literals, which are used for f-string expansion. The method appends the resulting tokens to the provided output vector.
+
+#### readIdentifierOrKeyword Method
+
+```cpp
+Token readIdentifierOrKeyword();
+```
+
+**Behaviour:** Recognizes and creates a token representing either an identifier or a keyword.
+
+#### readOperator Method
+
+```cpp
+Token readOperator();
+```
+
+**Behaviour:** Recognizes and creates a token representing an operator.
 
 ## Tradeoffs and Limitations
 
-- **Memory Management:** While smart pointers provide automatic memory management, they may introduce overhead compared to manual memory management.
-- **Infinite Loop Prevention:** The step count limitation prevents infinite loops but may be too restrictive
+### Complexity of F-String Handling
+
+**Tradeoff:** Supporting f-strings adds complexity to the lexer, requiring additional logic to handle embedded expressions within string literals. **Limitation:** While f-strings enhance readability and flexibility, they may introduce performance overhead during the tokenization phase.
+
+### Limited Preprocessor Macro Expansion
+
+**Tradeoff:** The current implementation of macro expansion is straightforward but lacks advanced features like recursive expansion or macro parameter handling. **Limitation:** This limitation means that macros with complex behavior cannot be fully expanded during the lexical analysis stage, potentially affecting the overall efficiency and correctness of the compiler.
+
+### Lack of Error Recovery
+
+**Tradeoff:** The lexer currently does not implement error recovery mechanisms, which can lead to premature termination of the tokenization process upon encountering syntax errors. **Limitation:** Without robust error handling, the compiler may fail to produce meaningful output even when the source code contains minor issues.
+
+In summary, the `Lexer.h` file plays a critical role in the QuantumLanguage compiler by breaking down the source code into manageable tokens. The design choices made, including support for f-strings and preprocessor macros, aim to improve the usability and functionality of the compiler. However, these enhancements come with increased complexity and potential limitations, which require careful consideration during implementation and testing phases.
