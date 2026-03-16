@@ -1,50 +1,27 @@
 # `define` Function in Quantum Language Compiler
 
 ## Overview
-The `define` function is utilized to add a new variable or constant to the current scope of the quantum language compiler. This function plays a crucial role in managing the symbol table and ensuring that variables and constants can be accessed and manipulated throughout the program.
+The `define` function is used to introduce a new variable or constant into the current scope of the quantum language compiler. It is essential for maintaining the symbol table and enabling variables and constants to be accessed throughout the program.
 
 ## Parameters
-- **name**: A string representing the name of the variable or constant being defined.
-- **val**: An r-value reference to a `Value` object, which represents the initial value assigned to the variable or constant.
-- **isConst**: A boolean flag indicating whether the entity being defined should be treated as a constant. If `true`, the variable cannot be modified after its initial assignment; if `false`, the variable can be reassigned.
+- `name`: A string representing the name of the variable or constant being defined.
+- `val`: The value associated with the variable or constant, which can be any data type supported by the compiler.
+- `isConst`: A boolean indicating whether the defined entity should be treated as a constant (i.e., its value cannot be changed after definition).
 
 ## Return Value
-This function does not return any value (`void`). It modifies the internal state of the compiler's symbol table by adding a new entry.
+This function does not return a value; it modifies the internal state of the compiler's symbol table.
+
+## How It Works
+When the `define` function is called, it performs two main actions:
+1. **Adding a Variable/Constant**: It inserts the provided `name` and `val` pair into the `vars` map. If `isConst` is set to `true`, it also marks this entry in the `constants` map as a constant.
+2. **Symbol Table Management**: By updating these maps, the `define` function ensures that the newly introduced variable or constant is accessible within the current scope. The `vars` map holds all non-constant entities, while the `constants` map keeps track of those that should not have their values modified.
 
 ## Edge Cases
-1. **Duplicate Names**: If a variable or constant with the same name already exists in the current scope, attempting to define it again will overwrite the existing entry. However, this behavior may vary depending on the compiler's implementation and error handling mechanisms.
-2. **Empty Name**: Passing an empty string as the `name` parameter will likely result in an error or undefined behavior, as it is impossible to create a variable or constant without a valid name.
-3. **Invalid Values**: The `val` parameter must be a valid `Value` object. Passing an invalid or uninitialized `Value` could lead to runtime errors or unexpected behavior.
+- **Duplicate Names**: If an attempt is made to define a variable or constant with a name that already exists in the current scope, the existing entry will be overwritten.
+- **Scope Management**: The function assumes that the current scope is correctly managed by the compiler. If the scope is incorrect, the behavior of the `define` function may lead to unexpected results.
 
 ## Interactions with Other Components
-- **Symbol Table Management**: The `define` function interacts directly with the compiler's symbol table, which stores information about all variables and constants declared within the program. By adding new entries to this table, the function facilitates the lookup and manipulation of these entities during subsequent compilation phases.
-- **Error Handling**: Depending on the compiler's design, the `define` function might include checks to ensure that the provided `name` and `val` are valid. These checks could involve verifying that the `name` is not already in use or that the `val` is properly initialized.
-- **Optimization Opportunities**: When defining constants, the `define` function marks them in the `constants` map. This marking can later be used by optimization passes to identify and potentially eliminate redundant computations involving those constants.
+- **Symbol Table**: The `define` function directly interacts with the compiler's symbol table (`vars` and `constants`). These tables are crucial for resolving references to variables and constants during compilation.
+- **Code Generation**: When a variable or constant is referenced in the code, the compiler uses the information stored in the symbol table to generate appropriate machine code instructions. The `define` function ensures that this information is up-to-date and accurate.
 
-## Implementation Details
-The `define` function performs two main operations:
-1. **Variable Assignment**: It assigns the provided `val` to the `name` key in the `vars` map. Using `std::move` ensures that the ownership of the `Value` object is transferred to the symbol table, preventing unnecessary copies and improving performance.
-2. **Constant Flagging**: If the `isConst` flag is set to `true`, the function also adds an entry to the `constants` map, associating the `name` with a boolean value (`true`) indicating that the entity is a constant.
-
-Here is a simplified version of how the `define` function might be implemented:
-
-```cpp
-void SymbolTable::define(const std::string& name, Value&& val, bool isConst) {
-    // Check if the name is already in use
-    if (vars.find(name) != vars.end()) {
-        throw std::runtime_error("Name already in use");
-    }
-
-    // Assign the value to the variable
-    vars[name] = std::move(val);
-
-    // Mark the variable as a constant if necessary
-    if (isConst) {
-        constants[name] = true;
-    }
-}
-```
-
-In this example, the `SymbolTable` class has a private member `vars` for storing variables and another member `constants` for tracking constants. The `define` function first checks if the `name` is already present in the `vars` map to prevent duplicate definitions. If the check passes, it moves the `val` into the `vars` map and optionally flags the variable as a constant in the `constants` map.
-
-By understanding the purpose and behavior of the `define` function, developers can better manage the symbol table and optimize their code effectively.
+In summary, the `define` function is vital for managing the symbol table in the quantum language compiler. It allows for the introduction of new variables and constants, ensuring they are accessible within the current scope and preventing their modification if marked as constants. The function's implementation is straightforward, leveraging the `std::map` containers to store and manage these entities efficiently.
