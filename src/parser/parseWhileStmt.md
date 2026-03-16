@@ -2,38 +2,57 @@
 
 ## Purpose
 
-The `parseWhileStmt` function is responsible for parsing a while loop statement in the Quantum Language compiler. It constructs an AST (Abstract Syntax Tree) node representing the parsed while loop and returns it.
+The `parseWhileStmt` function is designed to parse a while loop statement in the Quantum Language compiler. Its primary goal is to construct an Abstract Syntax Tree (AST) node that accurately represents the parsed while loop structure and then return it.
 
 ## Functionality
 
-1. **Retrieve Line Number**: The function starts by retrieving the line number of the current token using `current().line`.
-2. **Parse Condition**: It then calls `parseExpr()` to parse the condition expression of the while loop. This expression determines whether the loop should continue executing.
-3. **Match Optional Colon**: The function attempts to match an optional Python-style colon (`:`) after the condition expression using `match(TokenType::COLON)`. If the colon is not present, the function proceeds without error.
-4. **Skip Newlines**: To ensure that the code within the while loop is correctly indented and recognized as part of the loop body, the function skips any newlines using `skipNewlines()`.
-5. **Parse Body or Statement**: Finally, it parses the body of the while loop using `parseBodyOrStatement()`, which can either be a single statement or a block of statements enclosed in curly braces (`{}`). The result is stored in the variable `body`.
+### Step 1: Retrieve Line Number
+
+- **Action**: The function begins by retrieving the current line number using the `current().line` method call. This ensures that the line number information is preserved for the AST node being constructed.
+- **Why**: Keeping track of the line numbers helps in debugging and error reporting, as it allows the compiler to provide context-specific error messages when issues arise during compilation.
+
+### Step 2: Parse Condition Expression
+
+- **Action**: The function calls `parseExpr()` to parse the condition expression of the while loop. This expression determines whether the loop should continue executing or not.
+- **Why**: The condition expression is crucial for controlling the flow of the program. By parsing it here, the function can ensure that the correct syntax and semantics are applied to the condition, preventing runtime errors due to invalid conditions.
+
+### Step 3: Handle Optional Python-Style Colon
+
+- **Action**: The function attempts to match a colon (`:`) token using the `match(TokenType::COLON)` method. This step is optional and is included to support Python-like syntax where a colon is used after the condition.
+- **Why**: Supporting different syntax styles enhances the flexibility of the language and makes it more accessible to developers familiar with various programming paradigms.
+
+### Step 4: Skip Newlines
+
+- **Action**: After handling the optional colon, the function calls `skipNewlines()` to consume any newline characters that may appear before the body of the loop.
+- **Why**: Skipping newlines ensures that the parser remains on the same logical line as the rest of the code, maintaining the integrity of the AST structure.
+
+### Step 5: Parse Loop Body
+
+- **Action**: The function then parses the body of the while loop using `parseBodyOrStatement()`. This method is responsible for constructing the AST subtree that represents the actions to be executed within the loop.
+- **Why**: Parsing the loop body is essential because it defines the operations that will be repeated until the condition evaluates to false. By correctly parsing the body, the function ensures that the loop's functionality is accurately represented in the AST.
+
+### Step 6: Construct and Return AST Node
+
+- **Action**: Finally, the function constructs a unique pointer to an `ASTNode` object containing a `WhileStmt` node. The `WhileStmt` node is initialized with the parsed condition expression and body, along with the previously retrieved line number.
+- **Why**: Returning a unique pointer to an `ASTNode` ensures proper memory management and encapsulates the parsed while loop structure within a standardized AST node format. This facilitates further processing and analysis of the parsed code by subsequent stages of the compiler.
 
 ## Parameters/Return Value
 
 - **Parameters**:
-  - None explicitly stated in the provided code snippet, but implicitly relies on global state such as the current token position and input stream.
-
+  - None explicitly stated; however, the function relies on global state such as the current token and methods like `match()` and `skipNewlines()` which modify this state.
+  
 - **Return Value**:
-  - Returns a `std::unique_ptr<ASTNode>` containing an instance of `WhileStmt`. The `WhileStmt` object holds two members:
-    - `cond`: A `std::unique_ptr<Expression>` representing the condition expression of the while loop.
-    - `body`: A `std::unique_ptr<StatementList>` representing the body of the while loop.
-  - The line number (`ln`) is passed to the `WhileStmt` constructor to maintain context information about where the loop was defined in the source code.
+  - A `std::unique_ptr<ASTNode>` containing an `ASTNode` representing the parsed while loop statement.
 
 ## Edge Cases
 
-- **Missing Colon**: If the Python-style colon (`:`) is missing after the condition expression, the function will still proceed, assuming the next tokens represent the loop body.
-- **Empty Body**: An empty body (i.e., no statement following the colon) would result in a `StatementList` with zero elements. This is handled gracefully by `parseBodyOrStatement()`.
-- **Syntax Errors**: If there is a syntax error during parsing (e.g., mismatched brackets, unexpected token types), the function will throw an exception indicating the error location and type.
+- **Empty Condition**: If the condition expression is empty, the function should handle this gracefully without throwing an exception. Instead, it might produce a warning or an error message indicating that the condition is missing.
+- **Missing Body**: If there is no body specified for the while loop (i.e., the loop continues indefinitely), the function should still construct a valid AST node. However, it might issue a warning or an error message suggesting that the loop body is missing.
+- **Syntax Errors**: In case of syntax errors (e.g., mismatched tokens, incorrect expression syntax), the function should raise appropriate exceptions or warnings to alert the user about the problem.
 
 ## Interactions with Other Components
 
-- **Tokenizer**: `current()` retrieves the current token from the tokenizer, which is used to determine the start of the while loop.
-- **Expression Parser**: `parseExpr()` is called to parse the condition expression, utilizing the expression parser's capabilities to handle various arithmetic, logical, and relational expressions.
-- **Statement List Parser**: `parseBodyOrStatement()` is invoked to parse the body of the while loop. Depending on the input, it may call `parseSingleStatement()` or `parseBlock()`, interacting with these functions to construct the appropriate AST nodes.
-- **Error Handling**: Throughout the parsing process, the function checks for syntax errors and throws exceptions if necessary, ensuring robust error handling during compilation.
-
-This function is crucial for accurately parsing while loops in the Quantum Language, allowing the compiler to generate correct intermediate representations and ultimately compile the program into executable quantum instructions.
+- **Tokenizer**: The function relies on the tokenizer to retrieve the next token and determine the syntax of the while loop.
+- **Error Handling**: The function interacts with the error handling component to report syntax errors or missing elements in the while loop structure.
+- **Scope Management**: While not directly shown in the provided code snippet, the function likely interacts with scope management components to ensure that variables declared within the loop are properly handled and scoped.
+- **Optimization Passes**: The constructed AST node may be passed to optimization passes later in the compilation process to improve performance or eliminate unnecessary computations.
