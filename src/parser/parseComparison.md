@@ -2,53 +2,36 @@
 
 ## Overview
 
-The `parseComparison` function is part of the Quantum Language compiler's parser and is responsible for parsing comparison expressions. These expressions include relational operators (`<`, `>`, `<=`, `>=`) as well as membership tests (`in`, `is`, `is not`). The function constructs an Abstract Syntax Tree (AST) node representing the parsed comparison expression.
+The `parseComparison` function is an essential component of the Quantum Language compiler's parser, designed to handle the parsing of comparison expressions. These expressions involve relational operators such as `<`, `>`, `<=`, `>=`, and membership tests like `in`, `is`, and `is not`. The function ensures that these complex expressions are correctly parsed into Abstract Syntax Tree (AST) nodes, facilitating further compilation steps.
 
-## Parameters
+### Why It Works This Way
 
-- None explicitly declared; however, it relies on global state managed by the parser, such as the current token being processed.
+The function operates iteratively, starting with the initial call to `parseShift()` to get the left-hand side of the comparison expression. It then enters a loop where it checks for any of the supported comparison tokens using the `check()` method. If a token is found, it consumes the token and recursively calls itself to parse the right-hand side of the expression. Depending on the type of token encountered, the function constructs different types of AST nodes:
 
-## Return Value
+- For `is` and `is not` operators, it creates a `BinaryExpr` node with the appropriate operator string ("is" or "is not") and moves the parsed left and right sides into it.
+- For `in` and `not in` operators, it also creates a `BinaryExpr` node but with the operator strings "in" or "not in".
+- For all other relational operators (`<`, `>`, `<=`, `>=`), it simply uses the operator string directly.
 
-- Returns a unique pointer to an `ASTNode` representing the parsed comparison expression.
+This design allows the function to flexibly handle various comparison scenarios without requiring significant changes in its structure. By consuming tokens and recursively calling itself, it can build nested comparison expressions efficiently.
 
-## How It Works
+### Parameters/Return Value
 
-1. **Initial Parsing**: The function starts by calling `parseShift()` to parse the left-hand side (LHS) of the comparison expression. This LHS can be any valid expression that the `parseShift` method can handle.
+- **Parameters**:
+  - None explicitly listed in the provided code snippet. However, it implicitly relies on the global state maintained by the parser, including the current token being processed and methods to consume tokens (`consume()`) and check their type (`check(TokenType)`).
 
-2. **Loop for Comparison Operators**: The function enters a loop that continues as long as the next token matches one of the comparison or membership test operators (`<`, `>`, `<=`, `>=`, `in`, `is`, `is not`). For each matching operator:
-   - It consumes the current token.
-   - Depending on the operator type, it further processes the tokens:
-     - If the operator is `is` or `is not`, it checks for a subsequent `not` keyword. If found, it parses the right-hand side (RHS) using `parseShift()`, creates a `BinaryExpr` node with the appropriate operator, and updates the `left` variable.
-     - If the operator is `in` or `not in`, it directly parses the RHS using `parseShift()`, creates a `BinaryExpr` node with the operator, and updates the `left` variable.
-     - For all other relational operators, it simply parses the RHS and creates a `BinaryExpr` node with the operator.
+- **Return Value**:
+  - Returns a unique pointer to an `ASTNode` representing the entire comparison expression. This node contains either a `BinaryExpr` or another type of node depending on the complexity of the expression.
 
-3. **Edge Cases**:
-   - The function handles the special case of `is not` by checking for the `not` keyword immediately following `is`. If `not` is found, it constructs a `BinaryExpr` with "is not"; otherwise, it constructs a `BinaryExpr` with "is".
-   - The function ensures that "not in" is treated as a single two-token operator by checking for both "not" and "in" sequentially. If "not" is followed by something other than "in", it throws a `ParseError`.
+### Edge Cases
 
-4. **Interactions with Other Components**:
-   - The function interacts with the `consume()` method to advance the token stream and retrieve the current token.
-   - It uses the `check()` method to determine if the next token matches a particular type of operator.
-   - The `match()` method is used to consume a token if it matches a specified type, ensuring that the correct sequence of tokens is processed.
-   - The `BinaryExpr` class is used to create AST nodes that represent binary operations, including comparisons and membership tests.
+1. **Nested Comparisons**: The function handles nested comparisons gracefully, allowing for complex expressions like `(a < b) and (c > d)`.
+2. **Invalid Tokens**: If an unexpected token is encountered, the function throws a `ParseError` indicating the expected token and the line/column number where the error occurred.
+3. **Empty Expression**: While the function does not explicitly handle empty expressions, the recursive nature of its implementation means that it will eventually reach the end of input and return the parsed expression.
 
-## Example Usage
+### Interactions with Other Components
 
-Here’s how you might use this function within the context of the parser:
+- **Tokenizer**: The function interacts with the tokenizer to retrieve and process individual tokens. The tokenizer provides the stream of tokens that the parser consumes.
+- **Error Handling**: The function uses the `ParseError` class to report syntax errors. This class is likely defined elsewhere in the compiler to encapsulate error information.
+- **AST Construction**: The function builds the AST by creating `BinaryExpr` nodes. These nodes represent binary operations in the source code and are used by subsequent stages of the compiler for semantic analysis and code generation.
 
-```cpp
-auto rootNode = parseComparison();
-if (rootNode)
-{
-    // Process the parsed AST node
-}
-else
-{
-    // Handle parsing error
-}
-```
-
-In this example, `parseComparison()` is called to parse a comparison expression starting at the current token position. The returned AST node can then be analyzed or compiled further depending on the needs of the Quantum Language compiler.
-
-This function is crucial for accurately parsing complex expressions involving comparisons and membership tests, ensuring that they are correctly represented in the AST for subsequent compilation steps.
+In summary, the `parseComparison` function is a crucial part of the Quantum Language compiler's parser, handling the parsing of various comparison expressions into AST nodes. Its flexible design and iterative approach make it capable of processing complex nested expressions and reporting errors effectively.

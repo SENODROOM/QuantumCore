@@ -1,51 +1,57 @@
 # `evalMember` Function Explanation
 
-The `evalMember` function in the Quantum Language compiler evaluates a member expression, which typically involves accessing a field or method of an object. This function is crucial for handling dynamic member access during runtime, ensuring that the correct value or callable is returned based on the type of the object being accessed.
+The `evalMember` function in the Quantum Language compiler evaluates a member expression, which typically involves accessing a field or method of an object. This function is crucial for handling dynamic member access during runtime, ensuring that the correct value is retrieved or method is invoked based on the provided expression.
 
 ## What It Does
 
-The primary purpose of `evalMember` is to resolve a member expression into its corresponding value or callable. This can involve several types of objects, including instances, classes, dictionaries, strings, and arrays. Depending on the object type, the function retrieves the specified member either directly from the object or through its class hierarchy.
+The `evalMember` function takes a `MemberExpression` as input and returns a `QuantumValue`. The `MemberExpression` contains two main parts:
+1. An `object`: The target object whose member needs to be accessed.
+2. A `member`: The name of the field or method to access.
+
+The function performs the following steps:
+- Evaluates the `object` part of the expression.
+- If the evaluated `object` is a pointer, dereferences it to get the actual object.
+- Checks if the object is `nil`. If so, it returns an empty `QuantumValue`.
+- If the object is an instance of a class, attempts to retrieve the field using `getField`. If the field is not found, it searches through the class hierarchy for the field in its base classes.
+- If the object is a class itself, checks for static methods or fields with the given name.
+- If the object is a dictionary, retrieves the value associated with the key.
+- For string objects, provides special access to the `length` property.
+- For array objects, also provides special access to the `length` property.
+- Handles native object member access, such as `String.fromCharCode`, `Array.from`, `Object.keys`, etc., by returning a bound callable that captures the object and member name.
 
 ## Why It Works This Way
 
-1. **Object Evaluation**: The function starts by evaluating the object part of the member expression using the `evaluate` method. This ensures that any expressions within the object part are resolved before attempting to access its members.
+This implementation ensures that member expressions are evaluated correctly across different types of objects, including instances, classes, dictionaries, strings, and arrays. By handling each type separately, the function can provide appropriate behavior for accessing members, whether they are fields, methods, or special properties like `length`.
 
-2. **Dereferencing Pointers**: If the evaluated object is a pointer, the function dereferences it to get the actual object it points to. This is necessary because pointers allow indirect access to objects.
+The use of optional chaining (`nil?.member`) allows the function to handle cases where the object might be `nil` without throwing an error. Instead, it simply returns an empty `QuantumValue`. This behavior is useful for safely accessing nested properties without having to check each level individually.
 
-3. **Instance Access**: For instance objects, the function attempts to retrieve the member directly from the instance's fields. If the member is not found, it checks the class hierarchy starting from the instance's class up to its base classes. This allows for inheritance-based member resolution.
+The search through the class hierarchy for instance fields is essential for supporting inheritance in the Quantum Language. By checking both the current class and its base classes, the function ensures that all accessible fields are considered.
 
-4. **Static Member Access**: For class objects, the function looks for the member in the class's static methods and fields. If the member is not found at the class level, it recursively searches the base classes until the member is found or the hierarchy ends.
-
-5. **Dictionary Access**: For dictionary objects, the function simply looks up the key in the dictionary. If the key exists, the corresponding value is returned; otherwise, an empty `QuantumValue` is returned.
-
-6. **String Properties**: Special handling is provided for string objects, allowing access to the `length` property, which returns the size of the string.
-
-7. **Native Object Member Access**: The function also supports accessing native object properties and methods, such as `String.fromCharCode`, `Array.from`, `Object.keys`, etc. These are handled by returning a bound callable that captures the object and member name.
+Handling native object member access through bound callables allows the Quantum Language to seamlessly integrate with existing JavaScript libraries and functions. This feature enhances the language's utility and interoperability with web development frameworks and tools.
 
 ## Parameters/Return Value
 
-- **Parameters**:
-  - `MemberExpr &e`: A reference to the member expression node that needs to be evaluated.
+### Parameters
+- `e`: A reference to a `MemberExpression` object containing the object and member to be accessed.
 
-- **Return Value**:
-  - `QuantumValue`: The result of evaluating the member expression, which can be a value, callable, or an empty `QuantumValue` if the member does not exist.
+### Return Value
+- Returns a `QuantumValue` representing the result of evaluating the member expression.
 
 ## Edge Cases
 
-1. **Null Pointer Dereference**: If the object part of the member expression is a null pointer, the function will handle this gracefully by returning an empty `QuantumValue`.
-
-2. **Non-existent Member**: If the member does not exist in the object or its class hierarchy, the function throws a `TypeError`. This ensures that errors related to undefined member access are caught early and appropriately handled.
-
-3. **Special Properties**: The function handles special properties like `length` for strings and arrays, providing a straightforward way to access these properties without additional logic.
+- **Null Pointer**: If the object is a pointer and points to `null`, the function returns an empty `QuantumValue`.
+- **Non-Existent Field/Method**: If the specified field or method does not exist on the object, the function throws a `TypeError`.
+- **Empty Dictionary Key**: If the key specified in the dictionary does not exist, the function returns an empty `QuantumValue`.
+- **Invalid Member Access**: If the object type does not support member access (e.g., a number), the function throws a `TypeError`.
 
 ## Interactions With Other Components
 
-- **Evaluator**: The `evalMember` function interacts with the `evaluate` method, which is responsible for resolving any sub-expressions within the object part of the member expression.
+The `evalMember` function interacts with several other components within the Quantum Language compiler:
 
-- **Type System**: The function uses various aspects of the type system, including checking if an object is a pointer, instance, class, or dictionary, to determine how to proceed with member evaluation.
+- **Evaluator Class**: The function uses the `evaluate` method of the `Evaluator` class to evaluate the `object` part of the `MemberExpression`.
+- **QuantumValue Class**: The function operates on `QuantumValue` objects, which represent values in the Quantum Language. These objects can hold various data types, including pointers, instances, classes, dictionaries, strings, arrays, and more.
+- **Class and Instance Classes**: The function accesses the `staticMethods`, `staticFields`, and `fields` of `Class` and `Instance` objects to find the specified member.
+- **Dictionary Class**: The function searches for keys in a `Dictionary` object to retrieve the corresponding values.
+- **Field and Method Classes**: The function uses the `getField` and `getMethod` methods of `Instance` and `Class` objects to access fields and methods, respectively.
 
-- **Field Access**: When accessing fields of an instance or class, the function interacts with the field storage mechanisms, such as instance fields and static fields.
-
-- **Callable Binding**: For native object member access, the function binds the callable to the captured object and member name, allowing for subsequent calls to the member.
-
-This comprehensive approach ensures that `evalMember` can handle a wide range of scenarios related to member access in the Quantum Language, making it a robust and versatile component of the interpreter.
+Overall, the `evalMember` function plays a critical role in the Quantum Language compiler by providing a robust mechanism for evaluating member expressions at runtime. Its ability to handle different object types and provide optional chaining makes it a versatile and powerful tool for dynamic programming in the language.

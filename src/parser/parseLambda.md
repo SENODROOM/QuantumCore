@@ -4,40 +4,52 @@
 
 The `parseLambda` function is designed to parse a lambda expression in the Quantum Language compiler's syntax. A lambda expression is an anonymous function defined inline, often used for short, simple functions that can be passed as arguments to higher-order functions.
 
-## Functionality
+## Parameters
 
-1. **Initialization**: The function starts by retrieving the current line number (`ln`) where the parsing begins.
-2. **Parameter List Parsing**: It then calls `parseParamList`, passing `nullptr` as the first argument and pointers to two vectors (`&defaultArgs` and `&paramTypes`) as the second and third arguments respectively. This method parses the list of parameters for the lambda function, including their types and any default values.
-3. **Colon Matching**: The function matches the colon token (`:`) which separates the parameter list from the return type or body of the lambda expression. This is typical in languages like Python where lambdas are defined using the `def` keyword followed by a colon.
-4. **Arrow Token Matching**: Next, the function attempts to match either the fat arrow (`->`) or the regular arrow (`=>`). In JavaScript, these symbols are used to denote an arrow function, while in Quantum Language, it could represent a different kind of function definition. The presence of either token indicates the end of the parameter list and the start of the return type or body.
-5. **Skipping Newlines**: After matching the arrow token, the function skips any newline characters that may appear before the lambda's body. This ensures that the parser continues correctly without being interrupted by whitespace.
-6. **Body Parsing**: The function then calls `parseBlock` to parse the body of the lambda expression. This block represents the code that will be executed when the lambda is called.
-7. **Lambda Expression Construction**: Once all parts of the lambda expression have been parsed, a new `LambdaExpr` object is constructed. This object contains:
-   - `params`: The parsed list of parameters.
-   - `paramTypes`: The types associated with each parameter.
-   - `defaultArgs`: Any default values provided for the parameters.
-   - `body`: The parsed body of the lambda expression.
-8. **Return Value**: Finally, the function returns a unique pointer to an `ASTNode` containing the constructed `LambdaExpr` object, along with the initial line number (`ln`).
+- **None**: The `parseLambda` function does not take any explicit parameters. It relies on global state and context provided by the parser, such as the current token being processed (`current()`).
 
-## Parameters and Return Value
+## Return Value
 
-- **Parameters**:
-  - None explicitly listed; however, it relies on the `current()` function to get the current token and interacts with `parseParamList` and `parseBlock`.
-  
-- **Return Value**:
-  - Returns a `unique_ptr<ASTNode>` representing the parsed lambda expression. The `ASTNode` encapsulates the `LambdaExpr`.
+- **`std::unique_ptr<ASTNode>`**: The function returns a unique pointer to an abstract syntax tree (AST) node representing the parsed lambda expression. This AST node contains information about the parameters, parameter types, default arguments, and the body of the lambda function.
+
+## How It Works
+
+1. **Initialization**:
+   - The function starts by recording the current line number (`ln`) where the lambda expression begins.
+   - Three vectors are initialized to store default arguments (`defaultArgs`), parameter types (`paramTypes`), and the parameters themselves (`params`).
+
+2. **Parsing Parameter List**:
+   - The function calls `parseParamList(nullptr, &defaultArgs, &paramTypes)` to parse the list of parameters for the lambda function. This method fills the `params`, `defaultArgs`, and `paramTypes` vectors based on the tokens consumed during parsing.
+
+3. **Matching Colon**:
+   - The function then matches the colon (`:`) token, which separates the parameter list from the function body. This is typical in languages like Python when defining a lambda function using the `def` keyword.
+
+4. **Matching Arrow**:
+   - Following the colon, the function attempts to match the fat arrow (`->`) token, which indicates the start of the function body in languages like JavaScript. If the fat arrow is not found, it falls back to matching the regular arrow (`-->`) token, which is used in the Quantum Language for lambda expressions.
+
+5. **Skipping Newlines**:
+   - After matching the arrow, the function skips any newline characters using `skipNewlines()`. This ensures that the parser continues processing without interruption due to whitespace.
+
+6. **Parsing Function Body**:
+   - The function then calls `parseBlock()` to parse the block of code that represents the body of the lambda function. This method returns another AST node containing the parsed statements.
+
+7. **Constructing Lambda Expression Node**:
+   - With all necessary parts parsed, the function constructs a `LambdaExpr` object (`le`). This object stores the parsed parameters, parameter types, default arguments, and the body of the lambda function.
+   - An `ASTNode` is created with the `LambdaExpr` object and the recorded line number (`ln`).
+   - Finally, the function returns a unique pointer to this newly created `ASTNode`.
 
 ## Edge Cases
 
-- **Missing Colon**: If the colon (`:`) token is missing between the parameter list and the return type/body, the function will throw an error.
-- **Incorrect Arrow Token**: If neither the fat arrow (`->`) nor the regular arrow (`=>`) token is found after the colon, the function will also throw an error.
-- **Empty Body**: If the body of the lambda expression is empty, the `parseBlock` function should handle this case gracefully.
+- **Missing Colon**: If the colon (`:`) separating the parameter list and the function body is missing, the parser will raise an error.
+- **Incorrect Arrow Syntax**: If neither the fat arrow (`->`) nor the regular arrow (`-->`) is found after the colon, the parser will also raise an error.
+- **Empty Parameter List**: The function can handle an empty parameter list gracefully, allowing the creation of a lambda function with no arguments.
+- **Whitespace Handling**: The `skipNewlines()` call ensures that the parser correctly handles any whitespace between the arrow and the function body, preventing premature termination or errors.
 
 ## Interactions with Other Components
 
-- **Tokenizer**: The `current()` function retrieves the current token from the tokenizer, enabling the parser to determine the next step based on the token type.
-- **Parameter Parser**: `parseParamList` is responsible for parsing the list of parameters, their types, and default values. This interaction is crucial for understanding the structure and requirements of the lambda function.
-- **Block Parser**: `parseBlock` handles the parsing of the lambda's body, converting the source code into an abstract syntax tree (AST). This interaction allows the lambda's functionality to be represented accurately within the compiler's internal data structures.
-- **Error Handling**: Throughout the parsing process, the function includes mechanisms to check for correct tokens and handle errors appropriately, ensuring robustness against malformed input.
+- **Token Consumption**: The function consumes tokens from the global parser state, ensuring that subsequent parsing steps proceed correctly.
+- **Error Handling**: The parser infrastructure should include mechanisms to handle errors raised by `parseParamList()` and `parseBlock()`, providing feedback to the user or developer about issues encountered during parsing.
+- **Scope Management**: While not explicitly shown in the snippet, the parsed lambda expression may need to interact with scope management systems within the compiler to ensure proper variable resolution and lifetime tracking.
+- **Code Generation**: The resulting AST node will likely be used by later stages of the compiler, including code generation, to produce executable code or intermediate representations of the lambda function.
 
-This detailed explanation covers the purpose, implementation, and context of the `parseLambda` function within the Quantum Language compiler, providing insight into its role and how it integrates with other components of the system.
+This comprehensive approach ensures that the `parseLambda` function accurately captures the structure and semantics of lambda expressions in the Quantum Language, facilitating further analysis and transformation within the compiler.

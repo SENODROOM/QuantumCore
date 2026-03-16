@@ -1,39 +1,36 @@
 # callNative Function Explanation
 
-The `callNative` function is an essential component of the Quantum Language compiler's interpreter module. It facilitates the execution of native functions within the quantum programming environment. This function plays a crucial role in bridging the gap between the high-level quantum language and the underlying hardware or software that performs actual quantum computations.
+The `callNative` function is a critical component of the Quantum Language compiler's interpreter module. It enables the execution of native functions directly within the quantum programming environment. This functionality is vital for integrating classical operations seamlessly into quantum programs, thereby enhancing their utility and applicability.
 
-## Function Purpose
-The primary purpose of the `callNative` function is to invoke a native quantum function (`fn`) with specified arguments (`args`). Native functions typically represent lower-level operations that cannot be directly expressed in the quantum language but are necessary for executing complex quantum algorithms efficiently.
+## What it Does
 
-## Function Parameters
-1. **`std::shared_ptr<QuantumNative> fn`**: This parameter represents a shared pointer to a `QuantumNative` object. The `QuantumNative` class encapsulates information about a native quantum function, including its implementation details and any required resources. By using a shared pointer, the function ensures proper memory management and avoids potential issues related to dangling pointers.
+The primary purpose of the `callNative` function is to invoke native functions that are not part of the quantum language itself but can be executed using the host system's resources. These native functions might include I/O operations, mathematical calculations, or any other task that would benefit from leveraging the capabilities of the host machine rather than being implemented purely within the quantum framework.
 
-2. **`std::vector<QuantumValue> args`**: This parameter is a vector containing the arguments to be passed to the native function. Each argument is represented as a `QuantumValue`, which can hold various types of data relevant to quantum computing, such as qubits, classical registers, or control parameters.
+## Why it Works This Way
 
-## Return Value
-The `callNative` function returns a `QuantumValue`. This return type allows the caller to capture the results produced by the native function, which may include updated qubit states, measurement outcomes, or other relevant data.
+The `callNative` function operates by taking a pointer to a `NativeFunction` object (`fn`) and a vector of arguments (`args`). The `NativeFunction` object encapsulates the details of the native function to be called, including its implementation. By invoking `fn->fn(std::move(args))`, the function executes the native function with the provided arguments. Using `std::move` ensures that the arguments are efficiently transferred to the native function, reducing overhead and improving performance.
 
-## How it Works
-The `callNative` function operates by delegating the task of invoking the native function to the `fn` object itself. Specifically, it calls the `fn` method on the `fn` object, passing the `args` vector as an argument. The `fn` method is responsible for handling the execution of the native function, potentially involving optimizations, error checking, or interfacing with external libraries.
+## Parameters/Return Value
 
-By leveraging polymorphism, the `callNative` function can handle different types of native functions without requiring explicit code for each one. This approach enhances modularity and maintainability of the interpreter.
+- **Parameters**:
+  - `fn`: A pointer to a `NativeFunction` object representing the native function to be invoked.
+  - `args`: A `std::vector<Argument>` containing the arguments to pass to the native function. Each argument can be of different types, such as integers, doubles, strings, or even quantum states.
+
+- **Return Value**:
+  - The function returns the result of the native function invocation. The type of the return value depends on the implementation of the `NativeFunction`. Typically, it could be a simple data type like an integer or double, or it could be more complex, such as a quantum state or a string.
 
 ## Edge Cases
-1. **Empty Arguments Vector**: If the `args` vector is empty, the `fn` method should be designed to handle this case gracefully. For example, some native functions might have default values or simply ignore empty inputs.
 
-2. **Invalid Argument Types**: The `fn` method should validate the types of arguments passed to ensure they match the expected input format. If there is a mismatch, the function should throw an appropriate exception or handle the error in a defined manner.
-
-3. **Resource Management**: When dealing with native functions that require significant resources (e.g., qubits), the `callNative` function must manage these resources carefully. Proper resource allocation and deallocation are critical to prevent resource leaks or overutilization.
+1. **Invalid Native Function Pointer**: If the `fn` parameter is `nullptr`, the function should handle this case gracefully, possibly throwing an exception or returning a default value.
+2. **Incorrect Argument Types**: If the arguments passed do not match the expected types defined in the `NativeFunction`, the behavior is undefined. However, the function should ideally perform some form of type checking and throw an appropriate error message.
+3. **Resource Limitations**: Executing native functions might lead to resource limitations on the host machine. For example, high memory usage or long-running processes could affect the overall performance of the quantum program. The function should be designed to monitor these conditions and handle them appropriately.
 
 ## Interactions with Other Components
-The `callNative` function interacts with several other components within the Quantum Language compiler:
 
-1. **QuantumValue Class**: The `QuantumValue` class is used to represent the input and output values of the native function. It provides a unified interface for handling different data types relevant to quantum computing.
+The `callNative` function interacts closely with several other components within the Quantum Language compiler:
 
-2. **QuantumNative Class**: The `QuantumNative` class encapsulates the implementation details of a native quantum function. It includes methods for executing the function, managing resources, and handling errors.
+- **Interpreter Module**: This module manages the execution flow of quantum programs. When a native function call is encountered during interpretation, the `callNative` function is invoked to execute the corresponding native function.
+- **NativeFunction Class**: This class represents a native function, encapsulating its implementation and metadata such as the number and types of arguments it accepts. The `callNative` function uses instances of this class to determine how to invoke the native function.
+- **Memory Management**: Since native functions might consume significant resources, the `callNative` function interacts with the memory management subsystem to ensure efficient use of memory and proper cleanup after function execution.
 
-3. **Interpreter Class**: The `Interpreter` class acts as the central hub for interpreting and executing quantum programs. It uses the `callNative` function to invoke native functions when encountered during program execution.
-
-4. **Error Handling Mechanism**: The `callNative` function relies on the error handling mechanism provided by the `QuantumNative` class. Any exceptions thrown by the `fn` method are propagated up through the `callNative` function, allowing the interpreter to handle them appropriately.
-
-In summary, the `callNative` function serves as a bridge between the quantum programming language and the underlying hardware/software for executing native quantum functions. Its design emphasizes flexibility, modularity, and robust error handling, ensuring efficient and reliable execution of complex quantum algorithms.
+By facilitating the execution of native functions, the `callNative` function enhances the flexibility and power of quantum programs, allowing developers to integrate classical operations seamlessly into their quantum workflows. This integration is particularly useful for tasks that require classical computation or interaction with external systems.

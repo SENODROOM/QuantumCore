@@ -1,60 +1,43 @@
 # `evalIndex` Function Explanation
 
-The `evalIndex` function is responsible for evaluating an index expression in the context of quantum programming. This function takes an `IndexExpr` object as input and returns a `QuantumValue`. The primary purpose of this function is to handle indexing operations on various data structures such as arrays, dictionaries, and strings.
+The `evalIndex` function evaluates an index expression within the context of quantum programming. It accepts an `IndexExpr` object as its parameter and returns a `QuantumValue`.
 
-## Parameters
+## What It Does
 
-- **`IndexExpr &e`**: A reference to the `IndexExpr` object that contains the expression to be evaluated. An `IndexExpr` typically consists of two parts: the object being indexed (`object`) and the index itself (`index`).
+The function's main role is to resolve and retrieve a value at a specified index from various data structures such as arrays, dictionaries, and strings. This operation is fundamental in many quantum algorithms where accessing elements at specific positions is necessary.
 
-## Return Value
+## Why It Works This Way
 
-- **`QuantumValue`**: The result of evaluating the index expression. Depending on the type of the object being indexed, this can be a value from the array, dictionary, or string at the specified index.
+The implementation of `evalIndex` handles different types of data structures separately but follows a common principle: it unwraps pointers to their underlying objects and then performs the indexing operation based on the type of the object. For arrays and dictionaries, it directly accesses the element using the provided index. For strings, it treats the string as an array of characters and allows access through numerical indices, including negative indices which wrap around the string size.
 
-## How It Works
+This approach ensures that the function can handle complex nested data structures and perform accurate indexing operations regardless of the underlying data type.
 
-The `evalIndex` function performs the following steps:
+## Parameters/Return Value
 
-1. **Evaluate Object**: 
-   - The function first evaluates the `object` part of the `IndexExpr`. This is done using the `evaluate` method, which recursively evaluates expressions within the object.
+- **Parameters**:
+  - `e`: An `IndexExpr` object representing the index expression to be evaluated.
 
-2. **Evaluate Index**:
-   - Similarly, the function evaluates the `index` part of the `IndexExpr`. Again, this is done using the `evaluate` method.
-
-3. **Check Object Type**:
-   - After evaluation, the function checks the type of the resulting `object`.
-   
-4. **Handle Array Indexing**:
-   - If the `object` is an array, the function converts the `index` to an integer. If the `index` is negative, it adjusts the index to be relative to the end of the array (similar to Python's negative indexing).
-   - It then checks if the adjusted index is within the bounds of the array. If it is, the function returns the value at that index. Otherwise, it returns a default `QuantumValue`.
-
-5. **Handle Dictionary Indexing**:
-   - If the `object` is a dictionary, the function converts the `index` to a string and attempts to find it in the dictionary.
-   - If the key exists, the function returns the corresponding value. If not, it returns a default `QuantumValue`.
-
-6. **Handle String Indexing**:
-   - If the `object` is a string, the function converts the `index` to an integer. If the `index` is negative, it adjusts the index similarly to arrays.
-   - The function checks if the adjusted index is within the bounds of the string. If it is, the function returns the character at that index. If not, it throws an `IndexError`.
-
-7. **Pointer-to-Array Indexing**:
-   - If the `object` is a pointer, the function first unwraps the pointer to check if it points to an array cell.
-   - If it does, the function treats the pointer like an array and proceeds with the same logic as array indexing.
-   - If the pointer is null or does not point to an array cell, the function handles pointer arithmetic. Specifically, if the `index` is zero and the pointer is not null, it returns the value pointed to by the pointer. Otherwise, it throws a `TypeError`.
+- **Return Value**:
+  - A `QuantumValue` containing the result of the indexing operation. If the index is out of bounds or the data structure is not suitable for indexing, it returns an empty `QuantumValue`.
 
 ## Edge Cases
 
-- **Negative Indexes**: For arrays and strings, negative indexes are treated as relative to the end of the structure. For example, `-1` refers to the last element.
-- **Out-of-Bounds Access**: Accessing an index that is out of bounds for an array or string results in returning a default `QuantumValue` (for arrays and strings, this corresponds to `undefined` or `\0`, respectively).
-- **Non-Numeric Indexes**: When indexing arrays or dictionaries, non-numeric indexes are converted to numeric types. If conversion fails, a `TypeError` is thrown.
-- **Null Pointers**: When dealing with pointers, accessing a null pointer or a pointer that does not point to an array cell results in a `TypeError`.
+1. **Negative Indexing**: For arrays and strings, negative indices are allowed and wrap around the size of the data structure. For example, accessing the element at index `-1` in a string will return the last character.
+
+2. **Null Pointers**: When dealing with pointers, if the pointer is null, the function throws a `TypeError` unless the offset is zero, in which case it returns the value of the pointer's cell.
+
+3. **Non-Integer Indices**: For arrays and strings, non-integer indices are not allowed and will result in a `TypeError`. However, for dictionaries, any hashable value can be used as an index.
+
+4. **Empty Data Structures**: Accessing an index in an empty array or dictionary results in an empty `QuantumValue`, mimicking JavaScript behavior where `arr[outOfBounds]` returns `undefined`.
+
+5. **Invalid Types**: Attempting to index a non-pointer, non-array, non-dictionary, or non-string object will result in a `TypeError`.
 
 ## Interactions With Other Components
 
-The `evalIndex` function interacts with several other components within the Quantum Language compiler:
+- **Evaluation Engine**: `evalIndex` interacts with the evaluation engine to compute the values of the object and index expressions. The `evaluate` function is called recursively to resolve these expressions into `QuantumValue` objects.
 
-- **`evaluate` Method**: This method is used to recursively evaluate expressions within the `object` and `index` parts of the `IndexExpr`. It ensures that both parts are properly resolved before proceeding with the indexing operation.
-  
-- **Data Structures**: The function operates on different data structures including arrays, dictionaries, and strings. These data structures are represented by custom classes (`ArrayCell`, `DictionaryCell`, etc.) that provide methods for accessing their elements.
+- **Data Structure Handling**: Depending on whether the object is a pointer, array, dictionary, or string, `evalIndex` uses different methods to access the indexed value. These methods include dereferencing pointers, accessing elements in arrays, retrieving items from dictionaries, and treating strings as character arrays.
 
-- **Error Handling**: The function includes robust error handling mechanisms to manage situations where the index is out of bounds or when the index cannot be converted to a numeric type. These errors are propagated up the call stack as exceptions, allowing higher-level code to handle them appropriately.
+- **Error Handling**: The function includes robust error handling to manage invalid index types, out-of-bounds errors, and null pointer exceptions. Errors are thrown as `TypeError` or `IndexError` objects, providing clear feedback about the nature of the issue.
 
-In summary, the `evalIndex` function is a crucial component for handling indexing operations in the Quantum Language compiler. It ensures that the correct value is retrieved based on the provided index, while also managing potential errors and edge cases gracefully.
+Overall, `evalIndex` plays a crucial role in enabling flexible and powerful indexing operations within the quantum language compiler, ensuring compatibility with various data structures and robust error management.
