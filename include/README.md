@@ -1,93 +1,44 @@
-# QuantumLanguage Compiler - Parser.h
+# QuantumLanguage Compiler - Token.h
 
 ## Overview
 
-The `include/Parser.h` header file is a critical component of the QuantumLanguage compiler, focusing on the parsing phase of the compilation process. This file defines the `Parser` class, which takes a vector of `Token`s as input and constructs an Abstract Syntax Tree (AST) representing the syntactic structure of the source code. The parser employs a Pratt parser algorithm to manage operator precedence and associativity, ensuring that complex expressions are correctly interpreted.
+The `include/Token.h` header file plays a pivotal role in the QuantumLanguage compiler by defining and managing tokens, which are the basic units of the language's syntax. This file ensures that the compiler can accurately parse and interpret the source code into meaningful structures.
 
-## Role in Compiler Pipeline
+### Key Design Decisions
 
-The `Parser` class operates during the lexical analysis phase of the compiler, following the tokenization step. It converts the sequence of tokens into a structured representation (AST) that can be further analyzed and transformed into machine code or bytecode. The parser is essential for accurately interpreting the source code's syntax, facilitating subsequent stages such as semantic analysis and code generation.
+1. **TokenType Enum**: The `TokenType` enum class categorizes all possible token types in QuantumLanguage. This includes literals like numbers and strings, identifiers and keywords, operators, delimiters, special symbols, and more. Each token type is represented by a unique identifier, making it easier to identify and process tokens during compilation.
 
-## Key Design Decisions and Why
+2. **Token Structure**: The `Token` struct encapsulates essential information about each token, including its type, value, line number, and column position. This design allows the compiler to maintain context-specific details for each token, facilitating error reporting and debugging.
 
-### Pratt Parser Algorithm
+3. **Efficient String Handling**: By using `std::string` for storing token values, the compiler leverages C++'s powerful string handling capabilities. Additionally, the use of `std::move` in the constructor helps optimize memory management, reducing unnecessary copies.
 
-The parser uses the Pratt parser algorithm, which allows for flexible handling of operator precedence and associativity. This approach avoids the need for recursive descent parsers to explicitly manage operator precedence rules, simplifying the implementation and reducing potential errors.
+4. **Flexibility with Special Tokens**: The inclusion of special tokens such as `INDENT`, `DEDENT`, and `EOF_TOKEN` supports features like Python-style indentation blocks and end-of-file markers, enhancing the flexibility and robustness of the compiler.
 
-### Error Handling
+## Role in the Compiler Pipeline
 
-A custom `ParseError` exception class is defined to handle parsing errors. This exception includes line and column information, making it easier to pinpoint the exact location of errors within the source code. The use of exceptions for error handling ensures that the parser can gracefully report errors and terminate without proceeding with invalid syntax.
-
-### Flexibility in Parsing Declarations
-
-The parser supports various declarations including variable, function, and class declarations. Each declaration type has its own parsing method (`parseVarDecl`, `parseFunctionDecl`, etc.), allowing for clear separation of concerns and easy maintenance. Additionally, the parser handles both mutable and constant variable declarations, enhancing flexibility and readability.
+In the QuantumLanguage compiler pipeline, `Token.h` serves as a fundamental building block. It is used by the lexer (also known as the scanner or tokenizer) to convert the raw input text into individual tokens. These tokens are then passed to the parser, which constructs an abstract syntax tree (AST) based on the token sequence. Finally, the AST is utilized by the interpreter or compiler backend to generate executable code or perform other processing tasks.
 
 ## Major Classes/Functions Overview
 
-### Parser Class
+- **TokenType Enum Class**:
+  - Defines various token types such as literals, identifiers, keywords, operators, delimiters, and special symbols.
+  - Each token type has a corresponding unique identifier, ensuring clear differentiation between different tokens.
 
-- **Constructor**: Initializes the parser with a vector of tokens.
-- **parse() Method**: Main entry point for parsing the entire source code, returning an ASTNodePtr representing the root of the parsed AST.
-
-### Token Helpers
-
-- **current()**: Retrieves the current token being processed.
-- **peek(int offset)**: Looks ahead at a token relative to the current position.
-- **consume()**: Advances to the next token and returns it.
-- **expect(TokenType t, const std::string &msg)**: Consumes the expected token, throwing a `ParseError` if the token does not match.
-- **check(TokenType t)**: Checks if the next token matches the specified type.
-- **match(TokenType t)**: Consumes the next token if it matches the specified type.
-- **atEnd()**: Determines if the end of the token stream has been reached.
-- **skipNewlines()**: Skips over any newline characters encountered during parsing.
-
-### Parsing Methods
-
-- **parseStatement()**: Parses a single statement from the token stream.
-- **parseBlock()**: Parses a block of statements enclosed in curly braces.
-- **parseBodyOrStatement()**: Parses either a block or a single statement, depending on whether curly braces are present.
-- **parseVarDecl(bool isConst)**: Parses a variable declaration, optionally marking it as constant.
-- **parseFunctionDecl()**: Parses a function declaration, including parameter lists and return types.
-- **parseClassDecl()**: Parses a class declaration, including member variables and methods.
-- **parseIfStmt()**, **parseWhileStmt()**, **parseForStmt()**: Parses conditional and loop statements.
-- **parseReturnStmt()**: Parses a return statement, extracting the returned expression.
-- **parsePrintStmt()** and **parseInputStmt()**: Parses print and input statements respectively.
-- **parseCoutStmt()** and **parseCinStmt()**: Parses formatted output and input statements using `cout` and `cin`.
-- **parseImportStmt(bool isFrom)**: Parses import statements, supporting both standard imports and imports from specific modules.
-- **parseExprStmt()**: Parses an expression followed by a semicolon.
-- **parseCTypeVarDecl(const std::string &typeHint)**: Parses variable declarations with explicit type hints, supporting pointer types.
-- **isCTypeKeyword(TokenType t)**: Checks if a token represents a C-like type keyword.
-
-### Expression Parsing
-
-The parser includes multiple methods for parsing different types of expressions, adhering to the Pratt parser style:
-
-- **parseExpr()**
-- **parseAssignment()**
-- **parseOr(), parseAnd()**
-- **parseBitwise()**
-- **parseEquality(), parseComparison()**
-- **parseShift()**
-- **parseAddSub()**
-- **parseMulDiv()**
-- **parsePower()**
-- **parseUnary()**
-- **parsePostfix()**
-- **parsePrimary()**
-
-Additionally, specialized methods for parsing array literals, dictionary literals, lambdas, and arrow functions are provided.
+- **Token Struct**:
+  - Represents a single token in the source code.
+  - Contains the following members:
+    - `type`: Indicates the type of the token.
+    - `value`: Stores the actual value of the token as a string.
+    - `line`: Specifies the line number where the token appears in the source code.
+    - `col`: Specifies the column position where the token appears in the source code.
+  - Provides a constructor to initialize these members and a `toString()` method for easy representation and debugging.
 
 ## Tradeoffs
 
-### Complexity vs. Simplicity
+- **Memory Efficiency**: Using `std::string` for token values can lead to increased memory usage due to dynamic allocation. However, the benefits of flexible string handling and ease of use outweigh this drawback for most applications.
+  
+- **Performance**: The overhead associated with string manipulation and copying can impact performance, especially when dealing with large amounts of source code. Optimizations such as using move semantics help mitigate this issue.
 
-Using the Pratt parser algorithm simplifies the implementation of operator precedence handling but may increase complexity compared to recursive descent parsers. However, this trade-off is justified by the reduced likelihood of errors and improved maintainability.
+- **Complexity**: Introducing special tokens like `INDENT` and `DEDENT` adds complexity to the lexer and parser. While this complexity is necessary for supporting certain language features, it also requires additional logic to correctly handle indentation levels and dedentation events.
 
-### Error Reporting
-
-The use of exceptions for error reporting provides a powerful mechanism for pinpointing errors but can also lead to increased overhead due to exception handling. Balancing comprehensive error reporting with performance considerations is a key challenge addressed by the design.
-
-### Flexibility vs. Consistency
-
-Supporting various declaration types and providing flexibility in parsing expressions enhances the language's usability but may introduce inconsistencies in how similar structures are handled. Ensuring consistency while maintaining flexibility requires careful consideration of the parser's design.
-
-In summary, the `Parser.h` header file plays a pivotal role in the QuantumLanguage compiler by converting tokenized source code into a structured AST. Its use of the Pratt parser algorithm, combined with robust error handling and support for various declar
+Overall, the `include/Token.h` header file is a critical component of the QuantumLanguage compiler, providing a robust and efficient framework for managing tokens and their properties throughout the parsing and interpretation phases. Its design choices balance functionality, flexibility, and performance, ensuring that the compiler can effectively handle a wide range of source code inputs.
