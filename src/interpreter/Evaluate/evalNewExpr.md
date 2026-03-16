@@ -2,87 +2,43 @@
 
 ## Function Overview
 
-The `evalNewExpr` function is responsible for evaluating expressions that involve dynamic memory allocation in the Quantum Language compiler's interpreter. It handles two primary scenarios:
-
+The `evalNewExpr` function evaluates expressions involving dynamic memory allocation within the Quantum Language compiler's interpreter. It primarily handles two scenarios:
 1. Allocating arrays of a specified size.
-2. Allocating single instances of a class or primitive type with given arguments.
+2. Allocating single instances of a type.
 
-This function ensures proper initialization and management of dynamically allocated memory within the quantum programming environment.
+This function ensures proper memory management and initialization of variables or objects dynamically allocated during the execution of quantum programs.
 
 ## Parameters
 
-- **`e`**: A reference to an `Expression` object representing the new expression to be evaluated. This object contains information about the type being instantiated (`typeName`) and any arguments passed to the constructor (`args`). Additionally, it includes details on whether the expression is an array allocation (`isArray`) and the size expression (`sizeExpr`).
+- `e`: An expression object containing details about the memory allocation operation. The expression can either be an array allocation (`isArray` set to true) or a single-instance allocation (`isArray` set to false).
 
 ## Return Value
 
-The function returns a `QuantumValue` object containing either a pointer to the newly allocated array or an instance of the class/primitive type. If the expression involves an array allocation, the returned value is a `QuantumPointer` pointing to an `Array` object. For class or primitive allocations, it returns a `QuantumValue` directly.
+- Returns a `QuantumValue` representing the pointer to the newly allocated memory. If the allocation involves an array, the returned pointer points to an `Array` object; otherwise, it points to a single `QuantumValue`.
 
 ## Edge Cases
 
-- **Negative Array Size**: If the size expression evaluates to a negative number, the function sets the allocation size to 0. However, to prevent immediate errors, it ensures that at least one element is allocated.
-  
-- **Empty Arguments for Primitives**: When creating instances of primitive types without any arguments, the function initializes them with default values:
-  - `int`, `long`, `short`, `unsigned`: Default to 0.
-  - `float`, `double`: Default to 0.0.
-  - `char`: Default to an empty string.
-  - `bool`: Default to false.
+1. **Negative Array Size**: If the size of the array specified in the expression is negative, the function sets the allocation size to 0 to prevent invalid memory allocations.
+   
+2. **Empty Array Allocation**: To avoid crashing due to an invalid index error when accessing an empty array, the function allocates at least one element. This ensures that the array has a valid starting point even if its size is initially set to 0.
 
-- **Class Type Allocation**: The function currently supports only primitive types. For class types, further implementation is required to handle constructors and member initializations.
+3. **Single Instance Allocation with No Arguments**: For single-instance allocations where no arguments are provided, the function initializes the variable with a default value of `0.0`. This covers cases where the programmer might forget to provide initial values.
+
+4. **Type Conversion Errors**: When allocating primitive types like `int`, `long`, `short`, `unsigned`, `float`, `double`, `char`, and `bool`, the function attempts to convert any provided arguments to the appropriate type. If the conversion fails, it uses a default value:
+   - For numeric types (`int`, `long`, `short`, `unsigned`), it converts the argument to a double.
+   - For `char`, it converts the numeric argument to a character string.
+   - For `bool`, it converts the argument to a truthy/falsy boolean value.
+
+5. **Class Type Allocation**: For class types, the function constructs a new instance using the provided arguments. The exact behavior depends on how the class constructor is defined in the Quantum Language.
 
 ## Interactions with Other Components
 
-- **Memory Management**: `evalNewExpr` interacts with the memory management system of the Quantum Language compiler to allocate and initialize memory for new objects.
+- **Memory Management**: `evalNewExpr` interacts with the memory management system of the Quantum Language compiler to allocate and manage memory for dynamically created variables or objects.
   
-- **Evaluation Engine**: It utilizes the evaluation engine to compute the values of arguments passed to the constructor.
+- **Expression Evaluation**: The function calls `evaluate()` on sub-expressions (like the size expression for array allocations) to obtain their values before performing the actual allocation.
 
-- **Type System**: The function checks against a predefined set of primitive types to determine how to handle the instantiation. This interaction with the type system ensures that only valid types can be instantiated.
+- **Type Checking**: Before attempting to allocate memory, `evalNewExpr` checks whether the specified type is a primitive type or a class type. This distinction determines how the memory should be allocated and initialized.
 
-- **Error Handling**: The function includes basic error handling for invalid array sizes and missing arguments for primitives, ensuring robustness in the interpreter.
+- **Error Handling**: The function includes basic error handling to ensure that invalid sizes or conversions do not lead to crashes. For example, it clamps negative array sizes to 0 and provides default values for uninitialized variables.
 
-## Code Explanation
-
-### Array Allocation
-
-If the expression is marked as an array allocation (`e.isArray`):
-
-1. **Size Calculation**:
-   - The function first attempts to evaluate the size expression (`e.sizeExpr`).
-   - If successful, it converts the result to an integer. If not, it defaults to 0.
-   - Negative sizes are clamped to 0 to avoid errors.
-
-2. **Allocation**:
-   - The function calculates the actual allocation size (`allocN`) to ensure at least one element is allocated.
-   - An `Array` object is created using `std::make_shared`.
-   - The array is resized to `allocN` elements, all initialized to `0.0`.
-
-3. **Pointer Creation**:
-   - A `QuantumPointer` object is created to hold the array.
-   - The `QuantumPointer`'s `cell` member points to the shared `QuantumValue` containing the array.
-   - The `varName` member is set to indicate the type of the array.
-
-4. **Return Value**:
-   - The function returns a `QuantumValue` containing the `QuantumPointer`.
-
-### Single Instance Allocation
-
-For non-array allocations:
-
-1. **Argument Evaluation**:
-   - The function iterates over each argument in `e.args`, evaluates it using the `evaluate` function, and stores the results in a vector called `args`.
-
-2. **Primitive Type Handling**:
-   - If the type name corresponds to a primitive type (checked using the `primitives` set), the function processes the arguments accordingly:
-     - For numeric types (`int`, `long`, `short`, `unsigned`), it casts the input to a double.
-     - For `char`, it converts the input to a string of length 1.
-     - For `bool`, it determines truthiness based on the input value.
-   - If no arguments are provided, it initializes the value with the default for the respective type.
-
-3. **Class Type Handling**:
-   - Currently, the function does not support class types. Further development is needed to implement constructors and member initializations.
-
-4. **Return Value**:
-   - The function returns a `QuantumValue` containing the instantiated primitive or class object.
-
-## Conclusion
-
-The `evalNewExpr` function is crucial for managing dynamic memory allocation in the Quantum Language compiler. By correctly interpreting array and class instantiations, it ensures that resources are allocated and initialized appropriately, contributing to the stability and functionality of the quantum programming environment.
+By handling both array and single-instance allocations, `evalNewExpr` plays a crucial role in supporting dynamic memory operations within the Quantum Language compiler, ensuring that quantum programs can effectively manage and manipulate data structures during runtime.
