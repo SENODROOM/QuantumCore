@@ -1,35 +1,31 @@
 # evalUnary Function Explanation
 
-The `evalUnary` function is responsible for evaluating unary expressions in the Quantum Language compiler. Unary expressions consist of an operator and a single operand, such as `-x`, `!y`, or `~z`. This function processes these operators and returns the appropriate result based on the type of operand and the operation specified.
+The `evalUnary` function is responsible for evaluating unary expressions in the Quantum Language compiler. Unary expressions consist of an operator and a single operand, such as `-x`, `!y`, or `~z`. This function processes these operators and returns the appropriate result based on the type of operator encountered.
 
 ## Parameters
-
-- `UnaryExpr &e`: A reference to the unary expression node that needs to be evaluated. This node contains the operator (`op`) and the operand (`operand`).
+- `e`: A reference to a `UnaryExpression` object representing the unary expression to be evaluated. It contains information about the operator (`op`) and the operand.
 
 ## Return Value
-
-- `QuantumValue`: The result of evaluating the unary expression. The type of `QuantumValue` can vary depending on the operand and the operation.
+- Returns a `QuantumValue` object representing the result of the unary operation.
 
 ## How It Works
+The function evaluates the unary expression by first calling the `evaluate` function on the operand to get its value. Depending on the operator specified in the `UnaryExpression` object, the function performs different operations:
 
-1. **Operand Evaluation**: The function first evaluates the operand using the `evaluate` method. This ensures that the operand is in its simplest form before applying the unary operator.
+- **Operator `-`**: Negates the numeric value of the operand. If the operand is not a number, an error is thrown.
+- **Operators `not` and `!`**: Checks if the operand is truthy. If the operand is falsy, it returns `true`; otherwise, it returns `false`.
+- **Operator `~`**: Applies bitwise NOT to the integer value of the operand. If the operand is not an integer, an error is thrown.
+- **Spread Operator `...`**: Directly returns the value of the operand without any modification. This operator is typically used in contexts where array elements need to be expanded.
 
-2. **Operator Handling**:
-   - **Negation (`-`)**: If the operator is `-`, the function negates the numeric value of the operand using the `toNum` method. The `toNum` method is used to convert the operand to a number, ensuring that the negation is performed correctly.
-   - **Logical Not (`!` or `not`)**: If the operator is either `!` or `not`, the function checks whether the operand is truthy or falsy using the `isTruthy` method. It then returns the logical negation of this truthiness.
-   - **Bitwise Not (`~`)**: If the operator is `~`, the function performs a bitwise not operation on the integer value of the operand using the `toInt` method. The result is converted back to a double since `QuantumValue` typically handles numeric values as doubles.
-   - **Spread Operator (`...`)**: If the operator is `...`, the function simply returns the operand's value without performing any additional operations. This is useful for handling array spread syntax in quantum programs.
-
-3. **Error Handling**: If an unknown unary operator is encountered, the function throws a `RuntimeError` indicating the unrecognized operator.
+For any unknown unary operator, the function throws a `RuntimeError`.
 
 ## Edge Cases
-
-- **Numeric Overflow**: When performing bitwise operations, there is a risk of numeric overflow. However, the current implementation assumes that the operands are within the range of typical integer types.
-- **Type Mismatch**: The `toNum` and `toInt` methods ensure that the operand is converted to the correct type for the operation. If the conversion fails due to a type mismatch, the behavior is undefined and may lead to runtime errors.
+- **Non-Numeric Operand with `-` Operator**: If the operand is not a number, attempting to negate it will result in a runtime error.
+- **Non-Boolean Operand with `not` and `!` Operators**: These operators expect boolean values. If the operand is not boolean, they may behave unpredictably or throw errors depending on the implementation.
+- **Non-Integer Operand with `~` Operator**: Applying bitwise NOT to non-integer types will lead to undefined behavior or errors.
 
 ## Interactions with Other Components
+- **Evaluation Engine**: The `evalUnary` function relies on the `evaluate` function to compute the value of the operand before applying the unary operator.
+- **Type Checking**: For certain operators like `-` and `~`, the function ensures that the operand is of the correct type (numeric or integer respectively). This interaction helps maintain type safety within the compiler.
+- **Error Handling**: When encountering an unknown or invalid unary operator, the function throws a `RuntimeError`. This error handling mechanism is crucial for debugging and ensuring the robustness of the compiler.
 
-- **Evaluation Context**: The `evalUnary` function operates within the context of the interpreter, which manages the evaluation of expressions and maintains the state of the program.
-- **Expression Tree**: The unary expression node (`UnaryExpr`) is part of the expression tree structure used by the parser to represent the abstract syntax tree of the quantum program. The `evalUnary` function interacts with this tree to retrieve the operand and apply the unary operator.
-
-In summary, the `evalUnary` function is crucial for processing unary expressions in the Quantum Language compiler. It ensures that the operand is properly evaluated and that the unary operator is applied correctly, returning the expected result. The function also includes error handling for unknown operators and type mismatches, maintaining robustness in the interpreter.
+Overall, the `evalUnary` function plays a vital role in processing unary expressions, ensuring that the correct operations are applied and that the resulting values are returned accurately. Its interactions with other components, particularly the evaluation engine and type checking mechanisms, highlight its importance in maintaining the integrity and functionality of the Quantum Language compiler.
