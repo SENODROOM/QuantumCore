@@ -1,74 +1,48 @@
 # Lexer Component - Quantum Language Compiler
 
-The Lexer component is a crucial part of the Quantum Language compiler responsible for breaking down the source code into tokens that can be processed by the parser. This README provides an overview of the Lexer's functionality, its components, and the overall flow of tokenization.
+The Lexer component is a fundamental module in the Quantum Language compiler, tasked with converting the source code into a series of tokens. These tokens serve as the building blocks for further parsing and semantic analysis within the compiler. This README offers a comprehensive guide on the Lexer's role, its constituent parts, and the overarching process of tokenization.
 
-## Overview
+## Key Features
 
-The Lexer reads through the input source code character by character, identifying patterns that match specific token types such as keywords, identifiers, numbers, strings, and operators. These tokens form the basis of the syntactic analysis performed by the parser.
+- **Tokenization**: The primary function of the Lexer is to break down the source code into meaningful tokens.
+- **Character Handling**: It processes individual characters from the input stream, identifying keywords, identifiers, literals, and operators.
+- **State Management**: The Lexer maintains a state machine to handle different types of tokens efficiently.
+- **Error Handling**: It gracefully handles syntax errors and reports them to the user.
 
 ## Components
 
-### Lexer Class
+### current()
+Returns the current character being processed without advancing the position.
 
-- **Constructor**: Initializes the Lexer with the input source code.
-- **current()**: Returns the current token being processed.
-- **peek()**: Returns the next token without advancing the lexer.
-- **advance()**: Advances the lexer to the next token.
-- **skipWhitespace()**: Skips over any whitespace characters in the input.
-- **skipComment()**: Skips over single-line comments starting with `//`.
-- **skipBlockComment()**: Skips over multi-line comments enclosed within `/* */`.
-- **readNumber()**: Reads a sequence of digits to form a number token.
-- **readString()**: Reads a sequence of characters enclosed within quotes to form a string token.
+### peek()
+Looks ahead at the next character in the input stream without consuming it.
 
-### TokenType Enum
+### advance()
+Moves to the next character in the input stream and returns it.
 
-Defines various token types used in the quantum language, including:
+### skipWhitespace()
+Skips over any whitespace characters encountered in the input stream.
 
-- `IDENTIFIER`: Represents variable or function names.
-- `NUMBER`: Represents numeric literals.
-- `STRING`: Represents string literals.
-- `KEYWORD`: Represents reserved words like `let`, `const`, `fn`, etc.
-- `OPERATOR`: Represents arithmetic, logical, and other operators.
-- `PUNCTUATION`: Represents punctuation marks like commas, semicolons, etc.
-- `EOF`: Represents the end of the file.
+### skipComment()
+Ignores single-line comments starting with `//` until the end of the line.
 
-### Error Handling
+### skipBlockComment()
+Handles multi-line comments enclosed between `/*` and `*/`.
 
-The Lexer includes error handling mechanisms to manage unexpected characters or malformed tokens. It throws exceptions when encountering errors, which are then caught and handled by the compiler.
+### readNumber()
+Reads and constructs a numeric literal token from the input stream.
+
+### readString()
+Constructs a string literal token by reading characters until a closing quote is found.
 
 ## Overall Flow
 
-1. **Initialization**: The Lexer is initialized with the input source code.
-2. **Tokenization Loop**: The lexer enters a loop where it repeatedly calls `advance()` to process each token.
-3. **Skip Whitespace and Comments**: During processing, the lexer skips over whitespace and comments using `skipWhitespace()`, `skipComment()`, and `skipBlockComment()`.
-4. **Read Tokens**: The lexer identifies and reads different types of tokens such as numbers, strings, and keywords using `readNumber()`, `readString()`, and pattern matching.
-5. **Error Handling**: If an unexpected character or malformed token is encountered, the lexer throws an exception, which is then handled by the compiler.
-6. **End of File**: When the end of the file is reached, the lexer returns a `TokenType::EOF` token to indicate the completion of tokenization.
+1. **Initialization**: The Lexer starts by initializing itself with the input source code.
+2. **Character Processing**: It iterates through each character in the input stream using the `advance()` method.
+3. **State Transition**: Based on the current character, the Lexer transitions between states to identify token types such as keywords, identifiers, literals, and operators.
+4. **Token Construction**: When a complete token is identified, it constructs the corresponding token object using helper methods like `readNumber()` and `readString()`.
+5. **Skip Mechanisms**: To ignore unnecessary characters like whitespace and comments, the Lexer uses methods like `skipWhitespace()`, `skipComment()`, and `skipBlockComment()`.
+6. **Error Detection**: If a syntax error is encountered, the Lexer detects it and reports it appropriately.
+7. **Output**: Finally, the Lexer outputs the list of tokens to the parser for further processing.
 
-## Usage Example
-
-```cpp
-#include "Lexer.h"
-
-int main() {
-    std::string sourceCode = "let x = 42; // This is a comment";
-    Lexer lexer(sourceCode);
-
-    while (lexer.current().type != TokenType::EOF) {
-        Token token = lexer.advance();
-        std::cout << "Type: " << token.type << ", Value: " << token.value << std::endl;
-    }
-
-    return 0;
-}
-```
-
-In this example, the Lexer processes the input source code and prints out each token type and value.
-
-## Documentation
-
-For detailed documentation on each function and class, refer to the individual header files located in the `../include` directory.
-
----
-
-This README provides a comprehensive overview of the Lexer component, its functionality, and the overall flow of tokenization in the Quantum Language compiler. For more detailed information, please consult the individual header files and documentation.
+By following this structured approach, the Lexer ensures efficient and accurate tokenization, laying the groundwork for successful compilation of the Quantum Language source code.
