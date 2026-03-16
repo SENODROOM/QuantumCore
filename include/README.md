@@ -1,49 +1,60 @@
-# QuantumLanguage Compiler - Value.h
+# QuantumLanguage Compiler - AST.h
 
 ## Overview
 
-The `include/Value.h` header file is a crucial component of the QuantumLanguage compiler, responsible for defining and managing various data types and values within the language. This file provides the foundational structure necessary for the interpreter to handle expressions, statements, and function calls efficiently. By utilizing C++'s type system and features such as `std::variant`, it enables the representation of multiple value types in a single unified class, enhancing code readability and maintainability.
+The `include/AST.h` header file is an essential part of the QuantumLanguage compiler, focusing on defining and managing Abstract Syntax Trees (ASTs). This file serves as the backbone for representing the syntactic structure of the source code, enabling efficient parsing, semantic analysis, and code generation. The use of C++'s type system allows for a flexible and robust representation of various AST nodes, facilitating the handling of complex expressions, statements, and function calls.
 
 ## Role in Compiler Pipeline
 
-In the QuantumLanguage compiler pipeline, `Value.h` plays a pivotal role during the evaluation phase. The interpreter uses these definitions to represent and manipulate values at runtime. It ensures that all operations performed on variables or literals are correctly handled based on their data type, providing robust error checking and type safety.
+### Parsing Phase
+In the parsing phase, the `AST.h` file is instrumental in converting the input source code into a structured AST. Each token generated during lexical analysis corresponds to a specific AST node, which is then constructed using the structures defined in this file.
+
+### Semantic Analysis Phase
+During semantic analysis, the AST is traversed to validate the syntax and semantics of the code. The `AST.h` file facilitates this process by providing mechanisms to check variable types, function signatures, and other language-specific rules.
+
+### Code Generation Phase
+Finally, the AST is used to generate machine code or intermediate representations like LLVM IR. The `AST.h` file ensures that all necessary information is available at each stage of the compilation process, allowing for accurate and efficient code generation.
 
 ## Key Design Decisions and Why
 
-1. **Use of `std::variant`**: The primary design decision in `Value.h` is the use of `std::variant` to encapsulate different value types within a single `QuantumValue` struct. This choice simplifies the management of multiple types without requiring complex type casting or inheritance hierarchies. It also enhances performance by avoiding unnecessary memory allocations and copies.
+1. **Use of Variants**: The `std::variant` type is employed extensively to represent different kinds of AST nodes. This choice simplifies the management of heterogeneous data structures and enhances type safety without sacrificing flexibility.
 
-2. **Shared Ownership with `std::shared_ptr`**: To manage memory effectively and ensure that values can be shared across different parts of the program, `Value.h` leverages `std::shared_ptr`. This allows for automatic memory management, preventing memory leaks and dangling pointers, which are common issues in languages with manual memory handling.
+2. **Smart Pointers**: All AST nodes are managed using `std::unique_ptr`, ensuring automatic memory management and preventing memory leaks. This approach aligns with modern C++ practices and promotes cleaner code.
 
-3. **Separate Structures for Complex Types**: For more complex data structures like functions, native functions, instances, and classes, separate structs (`QuantumFunction`, `QuantumNative`, `QuantumInstance`, `QuantumClass`) are defined. These structs provide additional metadata and functionality specific to each type, enabling the interpreter to execute them appropriately.
+3. **Forward Declarations**: Forward declarations are utilized where possible to reduce compilation times and avoid circular dependencies. This design decision helps maintain a modular architecture and improves overall build efficiency.
 
-4. **Error Handling with Exceptions**: The inclusion of exception handling mechanisms, such as `throw std::runtime_error`, ensures that errors related to invalid operations or null references are caught and handled gracefully. This improves the reliability and user experience of the interpreter.
+4. **Extensibility**: The AST structures are designed with extensibility in mind, allowing for easy addition of new expression and statement types as the language evolves. This flexibility is crucial for maintaining a dynamic and evolving compiler.
 
 ## Major Classes/Functions Overview
 
-### QuantumValue
+### Expression Types
 
-The central class in `Value.h` is `QuantumValue`, which represents any value in the QuantumLanguage. It contains a `std::variant` named `data` that can hold one of several predefined types, including basic types (`bool`, `double`, `std::string`), collections (`Array`, `Dict`), and more complex entities (`QuantumFunction`, `QuantumNative`, `QuantumInstance`, `QuantumClass`, `QuantumPointer`). Each constructor initializes the variant with the corresponding type, ensuring type safety.
+- **NumberLiteral, StringLiteral, BoolLiteral, NilLiteral**: Represent literal values of numbers, strings, booleans, and nil respectively.
+- **Identifier**: Represents variable names.
+- **BinaryExpr, UnaryExpr, AssignExpr**: Handle binary operations, unary operations, and assignments, including compound assignment operators.
+- **CallExpr, IndexExpr, SliceExpr, MemberExpr**: Manage function calls, array indexing, slicing, and member access.
+- **ArrayLiteral, DictLiteral**: Represent arrays and dictionaries using their respective literal forms.
+- **LambdaExpr**: Defines anonymous functions with parameters, return types, and bodies.
+- **TernaryExpr**: Handles conditional expressions (`condition ? then : else`).
+- **SuperExpr**: Represents calls to parent class constructors or methods.
 
-### QuantumPointer
+### C++ Pointer Expression Types
 
-This struct represents a pointer to a value in the QuantumLanguage. It holds a `std::shared_ptr` to the actual value, allowing for dynamic memory management and sharing. The `isNull()` method checks if the pointer is null, while the `deref()` method safely dereferences the pointer, throwing an exception if the pointer is null to prevent undefined behavior.
+- **AddressOfExpr, DerefExpr, ArrowExpr**: Manage pointer arithmetic and member access through pointers.
 
-### QuantumFunction
+### Statement Types
 
-This struct defines a function in the QuantumLanguage. It includes the function's name, parameters, whether each parameter is passed by reference, default arguments, the body of the function (as an AST node), and a closure that captures the environment in which the function was defined. This structure facilitates the execution of functions and the preservation of their state.
-
-### QuantumNative
-
-This struct represents a native function, which is a function implemented in C++ rather than QuantumLanguage itself. It includes the function's name and a callable object (`QuantumNativeFunc`) that performs the actual computation. Native functions are used for performance-critical operations or when interfacing with external systems.
+- **VarDecl**: Declares variables, including support for constant declarations and type hints.
+- **FunctionDecl**: Defines functions, including parameter types, return types, and default arguments.
+- **ReturnStmt**: Represents return statements, optionally containing a return value.
+- **IfStmt**: Manages conditional statements, supporting multiple `elif` branches.
 
 ## Tradeoffs
 
-While the design choices in `Value.h` offer significant advantages in terms of simplicity, performance, and type safety, they also introduce some tradeoffs:
+1. **Memory Overhead**: Using smart pointers adds some overhead compared to raw pointers, but it significantly reduces the risk of memory leaks and makes the code safer and more maintainable.
 
-1. **Performance Overhead**: Using `std::variant` and `std::shared_ptr` adds overhead compared to simpler types. However, this tradeoff is often outweighed by the benefits of flexibility and robustness.
+2. **Type Safety vs. Flexibility**: While `std::variant` enhances type safety, it can introduce complexity in handling large and diverse sets of AST nodes. However, the benefits in terms of error prevention and code clarity outweigh this potential drawback.
 
-2. **Complexity**: The introduction of multiple structs and variants increases the complexity of the codebase. While this might lead to longer compile times, it results in a more modular and easier-to-maintain system.
+3. **Performance vs. Simplicity**: The use of forward declarations can improve compile time performance, but it might add cognitive load when reading and understanding the codebase. Balancing simplicity and performance is a continuous challenge in software development.
 
-3. **Memory Usage**: Dynamic memory allocation with `std::shared_ptr` means higher memory usage compared to static memory allocation. However, this is generally managed well through smart pointers and garbage collection.
-
-Overall, the design of `Value.h` strikes a balance between simplicity, performance, and robustness, making it a vital part of the QuantumLanguage compiler's architecture.
+Overall, the `AST.h` file plays a pivotal role in the QuantumLanguage compiler's architecture, providing a solid foundation for representing and manipulating the syntactic structure of the source code. Its design decisions reflect a balance between safety, flexibility, and performance, making it a critical component of the compiler's ecosystem.
