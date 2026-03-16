@@ -1,55 +1,35 @@
 # `visit` Function
 
-The `visit` function in the Quantum Language compiler is designed to handle different types of statements or declarations encountered during the interpretation process. This function acts as a dispatcher that routes each statement or declaration to its corresponding execution handler based on its type.
+The `visit` function in the Quantum Language compiler is designed to handle different types of statements or declarations encountered during the interpretation process. This function acts as a dispatcher that routes each statement or declaration to its corresponding execution handler based on the type of the node passed to it.
 
 ## What It Does
 
-The `visit` function takes an AST (Abstract Syntax Tree) node (`n`) and an environment (`env`). Depending on the type of the node, it calls the appropriate execution handler to process the node. The function uses template metaprogramming and `if constexpr` to determine the type at compile time, ensuring efficient branching without runtime overhead.
+The primary role of the `visit` function is to interpret and execute various quantum language constructs such as blocks, variable declarations, functions, classes, conditional statements, loops, returns, prints, inputs, imports, expressions, breaks, continues, and raises exceptions. Each construct is handled by a dedicated function, which performs the necessary operations to execute the code correctly.
 
 ## Why It Works This Way
 
-This design allows for a clear separation of concerns between different types of nodes and their respective execution logic. By using `if constexpr`, the compiler can optimize away unused branches, resulting in more efficient code. Additionally, this approach ensures type safety and eliminates the need for dynamic casting, which can be costly and error-prone.
+This design pattern, often referred to as the Visitor Pattern, allows for easy extension of the interpreter to support new constructs without modifying existing code. By defining separate functions for each type of construct, the `visit` function can efficiently dispatch control to the appropriate handler, making the code cleaner and more maintainable.
 
 ## Parameters/Return Value
 
 - **Parameters**:
-  - `n`: An AST node representing the current statement or declaration being processed.
-  - `env`: A reference to the current environment, which contains variables and other state information.
+  - `n`: A reference to the current node being interpreted. The type of `n` determines which handler will be invoked.
+  - `env`: An environment object that holds the current state of variables and their values. Some handlers may modify this environment.
 
-- **Return Value**: None. The function executes the appropriate handler for the given node and may modify the environment or throw exceptions.
+- **Return Value**: None. The `visit` function executes the corresponding handler and does not return any value directly. Handlers may modify the environment or perform other side effects.
 
 ## Edge Cases
 
-1. **Empty Nodes**: If the node is empty or not recognized, the function should gracefully handle it without causing errors.
-2. **Break and Continue Statements**: These statements do not return values but rather control the flow of execution. They throw special signals (`BreakSignal` and `ContinueSignal`) to indicate the need for control flow changes.
-3. **Raise Statement**: When a raise statement is encountered, the function evaluates the exception expression and constructs a `QuantumError` with the appropriate kind and message. If the exception expression evaluates to `nil`, it defaults to the kind of the exception.
+1. **Empty Statements**: If an empty statement is encountered, the `visit` function should simply ignore it without causing any errors.
+2. **Invalid Constructs**: If an invalid or unrecognized construct is passed to the `visit` function, it should raise an exception indicating that the construct is not supported.
+3. **Break and Continue**: The `visit` function throws `BreakSignal` and `ContinueSignal` exceptions when encountering break and continue statements, respectively. These signals are caught and handled by the loop structures where they occur.
+4. **Raises Exceptions**: When a raise statement is encountered, the `visit` function evaluates the expression associated with the raise statement and constructs a `QuantumError` with the appropriate kind and message. If no message is provided, it defaults to the kind of error.
 
 ## Interactions With Other Components
 
-- **Environment Management**: The `visit` function interacts with the environment to manage variable bindings and scope. Different handlers update the environment accordingly.
-- **Execution Handlers**: Each branch of the `if constexpr` statement corresponds to a specific execution handler function (`execBlock`, `execVarDecl`, etc.). These functions encapsulate the logic for executing different types of nodes.
-- **Evaluation Engine**: The `evaluate` function is used within the `RaiseStmt` branch to evaluate the exception expression. This interaction with the evaluation engine is crucial for determining the exact kind and message of the exception.
-- **Control Flow Signals**: The `BreakSignal` and `ContinueSignal` thrown by the `BreakStmt` and `ContinueStmt` branches are caught by higher-level control structures (e.g., loops) to adjust their behavior accordingly.
+- **Environment Management**: The `visit` function interacts closely with the environment management component. Variable declarations update the environment, while expressions within statements access and potentially modify the environment.
+- **Expression Evaluation**: For nodes that contain expressions (e.g., `ExprStmt`, `RaiseStmt`), the `visit` function calls the `evaluate` function to compute the value of the expression before passing it to the appropriate handler.
+- **Control Flow**: The `visit` function handles control flow constructs (`IfStmt`, `WhileStmt`, `ForStmt`) by invoking the corresponding handlers. These handlers may throw `BreakSignal` or `ContinueSignal` exceptions, which are then caught and handled appropriately.
+- **Error Handling**: The `visit` function plays a crucial role in error handling. When a raise statement is encountered, it constructs a `QuantumError` and throws it, allowing the error handling mechanism to catch and respond to the exception.
 
-## Example Usage
-
-Here’s a simplified example demonstrating how the `visit` function might be used:
-
-```cpp
-// Create an AST node for a variable declaration
-auto varDeclNode = std::make_shared<VarDecl>("x", std::make_shared<IntegerLiteral>(42));
-
-// Create an environment
-Environment env;
-
-// Dispatch the node to the appropriate handler
-try {
-    visit(varDeclNode, env);
-} catch (const QuantumError& e) {
-    std::cerr << "Caught quantum error: " << e.what() << std::endl;
-}
-```
-
-In this example, the `visit` function would dispatch the `varDeclNode` to the `execVarDecl` handler, which would then execute the variable declaration and update the environment.
-
-This function is a fundamental part of the interpreter, enabling it to process various types of statements and declarations efficiently and correctly.
+Overall, the `visit` function serves as a central hub for interpreting and executing quantum language constructs, ensuring that each type of construct is handled appropriately and efficiently.
