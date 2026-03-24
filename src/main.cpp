@@ -1,23 +1,10 @@
 /*
  * Quantum Language v2.0.0 — Bytecode VM
  *
- * This is the unified entry point.  It replaces both main.cpp (v1 tree-walk)
- * and main_vm.cpp (early VM draft).  The binary is named "quantum" — the same
- * name as before — so every existing script, batch file, and CI job continues
- * to work without modification.
- *
- * All v1 flags are preserved:
- *   quantum <file.sa>          run a script
- *   quantum                    REPL
- *   quantum --check  <file>    parse + type-check only
- *   quantum --test   [dir]     batch-test all .sa files
- *   quantum --aura             show achievement panel
- *   quantum --version          version info
- *   quantum --help             usage
- *
- * New VM-only flags:
- *   quantum --debug  <file>    dump bytecode then run
- *   quantum --dis    <file>    dump bytecode, no execution
+ * Build defines (set by CMakeLists.txt):
+ *   QUANTUM_MODE_COMPILER  → quantum.exe  (compiles .sa → .exe, then runs it)
+ *   QRUN_MODE              → qrun.exe     (always interprets, never bundles)
+ *   neither                → standalone bundled exe (hello.exe etc.)
  */
 
 #include "Lexer.h"
@@ -38,7 +25,7 @@
 #include <filesystem>
 #include <cstring>
 
-#ifdef _WIN32
+// Windows-only — bundling and launching use Win32 API
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -46,138 +33,104 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
-#endif
 
 namespace fs = std::filesystem;
 
-// ─── Global test-mode flag (keeps input() from blocking in --test runs) ───────
+// Shared with Vm.cpp
 bool g_testMode = false;
 
-// ─── Embedded Executable Loaders ──────────────────────────────────────────────
+// ─── Executable path ──────────────────────────────────────────────────────────
 
-static std::string getExecutablePath(const char *argv0)
+static std::string getExecutablePath()
 {
-#ifdef _WIN32
     char buffer[MAX_PATH];
     GetModuleFileNameA(NULL, buffer, MAX_PATH);
     return std::string(buffer);
-#else
-    return std::string(argv0);
-#endif
 }
+
+// ─── Embedded bytecode ────────────────────────────────────────────────────────
+// Format (appended after the PE image):
+//   [payload bytes ...] [payloadSize: uint32_t LE] [magic: "QNTM_VM!" 8 bytes]
 
 static std::shared_ptr<Chunk> loadEmbeddedBytecode(const std::string &exePath)
 {
     std::ifstream file(exePath, std::ios::binary | std::ios::ate);
-    if (!file)
-        return nullptr;
+    if (!file) return nullptr;
 
-    std::streamsize size = file.tellg();
-    if (size < 12)
-        return nullptr;
+    auto size = (uint64_t)file.tellg();
+    if (size < 12) return nullptr;
 
-    file.seekg(size - 8, std::ios::beg);
+    // Check magic at the very end
+    file.seekg(-(std::streamoff)8, std::ios::end);
     char magic[8];
     file.read(magic, 8);
-    if (std::memcmp(magic, "QNTM_VM!", 8) != 0)
-        return nullptr;
+    if (std::memcmp(magic, "QNTM_VM!", 8) != 0) return nullptr;
 
-    file.seekg(size - 12, std::ios::beg);
+    // Read payload size
+    file.seekg(-(std::streamoff)12, std::ios::end);
     uint32_t payloadSize = 0;
     file.read(reinterpret_cast<char *>(&payloadSize), 4);
 
-    if (payloadSize == 0 || size < payloadSize + 12)
-        return nullptr;
+    // Sanity: payload must fit in file and be non-zero, non-absurd
+    if (payloadSize == 0 || payloadSize > 64u * 1024 * 1024) return nullptr;
+    if ((uint64_t)(payloadSize + 12) > size) return nullptr;
 
-    file.seekg(size - 12 - payloadSize, std::ios::beg);
+    // Read payload
+    file.seekg(-(std::streamoff)(payloadSize + 12), std::ios::end);
     std::vector<uint8_t> payload(payloadSize);
     file.read(reinterpret_cast<char *>(payload.data()), payloadSize);
+    if (!file) return nullptr;
 
-    try
-    {
-        return Serializer::deserialize(payload);
-    }
-    catch (...)
-    {
-        return nullptr;
-    }
+    try   { return Serializer::deserialize(payload); }
+    catch (...) { return nullptr; }
 }
 
 // ─── Banner ───────────────────────────────────────────────────────────────────
 
 static void printBanner()
 {
-    std::cout << Colors::CYAN << Colors::BOLD
-              << "\n"
-              << "  ██████╗ ██╗   ██╗ █████╗ ███╗   ██╗████████╗██╗   ██╗███╗   ███╗\n"
-              << " ██╔═══██╗██║   ██║██╔══██╗████╗  ██║╚══██╔══╝██║   ██║████╗ ████║\n"
-              << " ██║   ██║██║   ██║███████║██╔██╗ ██║   ██║   ██║   ██║██╔████╔██║\n"
-              << " ██║▄▄ ██║██║   ██║██╔══██║██║╚██╗██║   ██║   ██║   ██║██║╚██╔╝██║\n"
-              << " ╚██████╔╝╚██████╔╝██║  ██║██║ ╚████║   ██║   ╚██████╔╝██║ ╚═╝ ██║\n"
-              << "  ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝\n"
-              << Colors::RESET
-              << Colors::YELLOW
-              << "  Quantum Language v2.0.0 | Bytecode VM Edition\n"
-              << Colors::RESET << "\n";
+    std::cout
+        << Colors::CYAN << Colors::BOLD
+        << "\n"
+        << "  ██████╗ ██╗   ██╗ █████╗ ███╗   ██╗████████╗██╗   ██╗███╗   ███╗\n"
+        << " ██╔═══██╗██║   ██║██╔══██╗████╗  ██║╚══██╔══╝██║   ██║████╗ ████║\n"
+        << " ██║   ██║██║   ██║███████║██╔██╗ ██║   ██║   ██║   ██║██╔████╔██║\n"
+        << " ██║▄▄ ██║██║   ██║██╔══██║██║╚██╗██║   ██║   ██║   ██║██║╚██╔╝██║\n"
+        << " ╚██████╔╝╚██████╔╝██║  ██║██║ ╚████║   ██║   ╚██████╔╝██║ ╚═╝ ██║\n"
+        << "  ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝\n"
+        << Colors::RESET
+        << Colors::YELLOW << "  Quantum Language v2.0.0 | Bytecode VM Edition\n"
+        << Colors::RESET << "\n";
 }
 
 static void printAura()
 {
-    std::cout << Colors::CYAN << Colors::BOLD
-              << "\n╔══════════════════════════════════════════════════════════════════╗\n"
-              << "║" << Colors::YELLOW << "                🌟 QUANTUM LANGUAGE ACHIEVEMENTS 🌟" << Colors::CYAN << "               ║\n"
-              << "╠══════════════════════════════════════════════════════════════════╣\n"
-              << "║" << Colors::GREEN << "  ✅ Complete C++17 Compiler Implementation" << Colors::CYAN << "                       ║\n"
-              << "║" << Colors::GREEN << "  ✅ Bytecode VM Engine (v2.0)" << Colors::CYAN << "                                    ║\n"
-              << "║" << Colors::GREEN << "  ✅ Single-Pass Bytecode Compiler" << Colors::CYAN << "                                ║\n"
-              << "║" << Colors::GREEN << "  ✅ Lexical Closures via Upvalue Cells" << Colors::CYAN << "                           ║\n"
-              << "║" << Colors::GREEN << "  ✅ Lexical Analysis & Tokenization" << Colors::CYAN << "                              ║\n"
-              << "║" << Colors::GREEN << "  ✅ Recursive Descent Parser" << Colors::CYAN << "                                     ║\n"
-              << "║" << Colors::GREEN << "  ✅ Abstract Syntax Tree (AST)" << Colors::CYAN << "                                   ║\n"
-              << "║" << Colors::GREEN << "  ✅ Dynamic Type System" << Colors::CYAN << "                                          ║\n"
-              << "║" << Colors::GREEN << "  ✅ REPL Interactive Mode" << Colors::CYAN << "                                        ║\n"
-              << "║" << Colors::GREEN << "  ✅ Cross-Platform Build System" << Colors::CYAN << "                                  ║\n"
-              << "║" << Colors::GREEN << "  ✅ VS Code Language Support" << Colors::CYAN << "                                     ║\n"
-              << "║" << Colors::GREEN << "  ✅ Comprehensive Documentation" << Colors::CYAN << "                                  ║\n"
-              << "╠══════════════════════════════════════════════════════════════════╣\n"
-              << "║" << Colors::MAGENTA << "                    📊 PROJECT STATISTICS 📊" << Colors::CYAN << "                      ║\n"
-              << "╠══════════════════════════════════════════════════════════════════╣\n"
-              << "║" << Colors::WHITE << "  📁 Source Files: " << Colors::YELLOW << "11 core modules" << Colors::CYAN << "                                ║\n"
-              << "║" << Colors::WHITE << "  📝 Language Version: " << Colors::YELLOW << "v2.0.0" << Colors::CYAN << "                                     ║\n"
-              << "║" << Colors::WHITE << "  🔧 Build System: " << Colors::YELLOW << "CMake + MSVC/GCC/Clang" << Colors::CYAN << "                         ║\n"
-              << "║" << Colors::WHITE << "  🎯 Language Standard: " << Colors::YELLOW << "C++17" << Colors::CYAN << "                                     ║\n"
-              << "║" << Colors::WHITE << "  🚀 Performance: " << Colors::YELLOW << "Bytecode VM — ~3× faster than v1" << Colors::CYAN << "               ║\n"
-              << "╠══════════════════════════════════════════════════════════════════╣\n"
-              << "║" << Colors::BLUE << "                    🛡️  CYBERSECURITY FEATURES 🛡️" << Colors::CYAN << "                   ║\n"
-              << "╠══════════════════════════════════════════════════════════════════╣\n"
-              << "║" << Colors::BLUE << "  🔍 scan()      - Network scanning capabilities" << Colors::CYAN << "                  ║\n"
-              << "║" << Colors::BLUE << "  💣 payload()   - Exploit payload creation" << Colors::CYAN << "                       ║\n"
-              << "║" << Colors::BLUE << "  🔐 encrypt()   - Cryptographic operations" << Colors::CYAN << "                       ║\n"
-              << "║" << Colors::BLUE << "  🔓 decrypt()   - Decryption functions" << Colors::CYAN << "                           ║\n"
-              << "║" << Colors::BLUE << "  🗝️  hash()     - Hashing algorithms" << Colors::CYAN << "                              ║\n"
-              << "╚══════════════════════════════════════════════════════════════════╝\n"
-              << Colors::RESET;
+    std::cout
+        << Colors::CYAN << Colors::BOLD
+        << "\n╔══════════════════════════════════════════════════════════════════╗\n"
+        << "║" << Colors::YELLOW << "                🌟 QUANTUM LANGUAGE ACHIEVEMENTS 🌟" << Colors::CYAN << "               ║\n"
+        << "╠══════════════════════════════════════════════════════════════════╣\n"
+        << "║" << Colors::GREEN  << "  ✅ Complete C++17 Compiler + Bytecode VM"   << Colors::CYAN << "                        ║\n"
+        << "║" << Colors::GREEN  << "  ✅ Multi-Syntax: Python + JavaScript + C/C++" << Colors::CYAN << "                    ║\n"
+        << "║" << Colors::GREEN  << "  ✅ Closures, Classes, Exceptions, Pointers" << Colors::CYAN << "                      ║\n"
+        << "║" << Colors::GREEN  << "  ✅ Self-bundling standalone .exe generation" << Colors::CYAN << "                     ║\n"
+        << "╚══════════════════════════════════════════════════════════════════╝\n"
+        << Colors::RESET;
 }
 
-// ─── Compile + optional disassemble helper ────────────────────────────────────
+// ─── Compile source → Chunk ───────────────────────────────────────────────────
 
 static std::shared_ptr<Chunk> compileSource(const std::string &source,
                                             const std::string &sourcePath = "<input>",
                                             bool debug = false)
 {
-    Lexer lexer(source);
-    auto tokens = lexer.tokenize();
+    Lexer   lexer(source);
+    auto    tokens = lexer.tokenize();
+    Parser  parser(std::move(tokens));
+    auto    ast = parser.parse();
 
-    Parser parser(std::move(tokens));
-    auto ast = parser.parse();
-
-    try
-    {
-        TypeChecker checker;
-        checker.check(ast);
-    }
-    catch (const StaticTypeError &e)
-    {
+    try { TypeChecker tc; tc.check(ast); }
+    catch (const StaticTypeError &e) {
         std::cerr << Colors::YELLOW << "[TypeWarning] " << Colors::RESET
                   << e.what() << " (line " << e.line << ")\n";
     }
@@ -185,113 +138,41 @@ static std::shared_ptr<Chunk> compileSource(const std::string &source,
     Compiler compiler;
     auto chunk = compiler.compile(*ast);
 
-    if (debug)
-    {
-        std::cerr << Colors::CYAN << "[DEBUG] Bytecode — " << sourcePath << "\n"
-                  << Colors::RESET;
+    if (debug) {
+        std::cerr << Colors::CYAN << "[DEBUG] Bytecode — " << sourcePath << "\n" << Colors::RESET;
         disassembleChunk(*chunk, std::cerr);
     }
-
     return chunk;
 }
 
-// ─── REPL ─────────────────────────────────────────────────────────────────────
-
-static void runREPL(bool debug = false)
-{
-    printBanner();
-    std::cout << Colors::GREEN
-              << "  REPL Mode — Bytecode VM\n"
-              << "  Type 'exit' or Ctrl+D to quit\n"
-              << Colors::RESET << "\n";
-
-    VM vm;
-    int lineNum = 1;
-    std::string line;
-
-    while (true)
-    {
-        std::cout << Colors::CYAN << "quantum[" << lineNum++ << "]> " << Colors::RESET;
-        if (!std::getline(std::cin, line))
-            break;
-        if (line == "exit" || line == "quit")
-            break;
-        if (line.empty())
-            continue;
-
-        try
-        {
-            auto chunk = compileSource(line, "<repl>", debug);
-            vm.run(chunk);
-        }
-        catch (const ParseError &e)
-        {
-            std::cerr << Colors::RED << "[ParseError] " << Colors::RESET
-                      << e.what() << " (line " << e.line << ")\n";
-        }
-        catch (const QuantumError &e)
-        {
-            std::cerr << Colors::RED << "[" << e.kind << "] " << Colors::RESET
-                      << e.what();
-            if (e.line > 0)
-                std::cerr << " (line " << e.line << ")";
-            std::cerr << "\n";
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << Colors::RED << "[Error] " << Colors::RESET << e.what() << "\n";
-        }
-    }
-
-    std::cout << Colors::YELLOW << "\n  Goodbye! 👋\n"
-              << Colors::RESET;
-}
-
-// ─── runFile ──────────────────────────────────────────────────────────────────
+// ─── runFile — interpret a .sa file in-place (no exe created) ─────────────────
 
 static void runFile(const std::string &path, bool debug = false)
 {
     std::ifstream file(path);
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         std::cerr << Colors::RED << "[Error] " << Colors::RESET
                   << "Cannot open file: " << path << "\n";
         std::exit(1);
     }
+    std::ostringstream ss; ss << file.rdbuf();
 
-    if (path.size() < 3 || path.substr(path.size() - 3) != ".sa")
-        std::cerr << Colors::YELLOW << "[Warning] " << Colors::RESET
-                  << "File does not have .sa extension\n";
-
-    std::ostringstream ss;
-    ss << file.rdbuf();
-    std::string source = ss.str();
-
-    try
-    {
-        auto chunk = compileSource(source, path, debug);
+    try {
         VM vm;
-        vm.run(chunk);
-    }
-    catch (const ParseError &e)
-    {
+        vm.run(compileSource(ss.str(), path, debug));
+    } catch (const ParseError &e) {
         std::cerr << Colors::RED << Colors::BOLD
                   << "\n  X ParseError" << Colors::RESET
-                  << " in " << path << " at line " << e.line << ":" << e.col << "\n"
-                  << "    " << e.what() << "\n\n";
+                  << " in " << path << " at line " << e.line << ":" << e.col
+                  << "\n    " << e.what() << "\n\n";
         std::exit(1);
-    }
-    catch (const QuantumError &e)
-    {
+    } catch (const QuantumError &e) {
         std::cerr << Colors::RED << Colors::BOLD
                   << "\n  X " << e.kind << Colors::RESET;
-        if (e.line > 0)
-            std::cerr << " at line " << e.line;
+        if (e.line > 0) std::cerr << " at line " << e.line;
         std::cerr << "\n    " << e.what() << "\n\n";
         std::exit(1);
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception &e) {
         std::cerr << Colors::RED << "[Fatal] " << Colors::RESET << e.what() << "\n";
         std::exit(1);
     }
@@ -302,621 +183,308 @@ static void runFile(const std::string &path, bool debug = false)
 static int checkFile(const std::string &path)
 {
     std::ifstream file(path);
-    if (!file.is_open())
-    {
-        std::cerr << path << ":1:1: error: Cannot open file\n";
-        return 1;
-    }
-
-    std::ostringstream ss;
-    ss << file.rdbuf();
-    std::string source = ss.str();
-
-    try
-    {
-        Lexer lexer(source);
-        auto tokens = lexer.tokenize();
-        Parser parser(std::move(tokens));
-        auto ast = parser.parse();
-
-        try
-        {
-            TypeChecker checker;
-            checker.check(ast);
-        }
-        catch (const StaticTypeError &e)
-        {
+    if (!file.is_open()) { std::cerr << path << ":1:1: error: Cannot open\n"; return 1; }
+    std::ostringstream ss; ss << file.rdbuf();
+    try {
+        Lexer l(ss.str()); auto tok = l.tokenize();
+        Parser p(std::move(tok)); auto ast = p.parse();
+        try { TypeChecker tc; tc.check(ast); }
+        catch (const StaticTypeError &e) {
             std::cerr << path << ":" << e.line << ":1: warning: " << e.what() << "\n";
         }
-
         return 0;
-    }
-    catch (const ParseError &e)
-    {
+    } catch (const ParseError &e) {
         std::cerr << path << ":" << e.line << ":" << e.col << ": error: " << e.what() << "\n";
         return 1;
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception &e) {
         std::cerr << path << ":1:1: error: " << e.what() << "\n";
         return 1;
     }
 }
 
-// ─── Batch test helpers ───────────────────────────────────────────────────────
+// ─── Batch test ───────────────────────────────────────────────────────────────
 
-struct TestResult
-{
-    std::string path;
-    std::string source;
-    std::string error;
-    int line = 0;
-    int col = 0;
+struct TestResult { std::string path, source, error; int line = 0, col = 0; };
+
+static void redirectStdinToNull() { FILE *n=nullptr; freopen_s(&n,"NUL","r",stdin); }
+
+struct StreamGuard {
+    std::streambuf *oc, *oe;
+    StreamGuard(std::streambuf *a, std::streambuf *b) : oc(a), oe(b) {}
+    ~StreamGuard() { std::cout.rdbuf(oc); std::cerr.rdbuf(oe); }
 };
 
-static void redirectStdinToNull()
+static bool isInputDriven(const std::string &m)
 {
-#ifdef _WIN32
-    FILE *nul = nullptr;
-    freopen_s(&nul, "NUL", "r", stdin);
-#else
-    freopen("/dev/null", "r", stdin);
-#endif
+    return m.find("got string") != m.npos || m.find("got nil") != m.npos ||
+           m.find("Cannot convert ''") != m.npos;
 }
 
-struct StreamGuard
-{
-    std::streambuf *oldCout;
-    std::streambuf *oldCerr;
-    StreamGuard(std::streambuf *oc, std::streambuf *oe) : oldCout(oc), oldCerr(oe) {}
-    ~StreamGuard()
-    {
-        std::cout.rdbuf(oldCout);
-        std::cerr.rdbuf(oldCerr);
-    }
-};
-
-static bool isInputDrivenError(const std::string &msg)
-{
-    if (msg.find("got string") != std::string::npos)
-        return true;
-    if (msg.find("got nil") != std::string::npos)
-        return true;
-    if (msg.find("Cannot convert ''") != std::string::npos)
-        return true;
-    if (msg.find("int() cannot convert ''") != std::string::npos)
-        return true;
-    if (msg.find("float() cannot convert ''") != std::string::npos)
-        return true;
-    return false;
-}
-
-static std::string getSourceLine(const std::string &source, int lineNum)
-{
-    if (lineNum <= 0)
-        return "";
-    int cur = 1;
-    size_t i = 0;
-    while (i < source.size())
-    {
-        size_t end = source.find('\n', i);
-        if (end == std::string::npos)
-            end = source.size();
-        if (cur == lineNum)
-            return source.substr(i, end - i);
-        ++cur;
-        i = end + 1;
-    }
-    return "";
-}
-
-// Run one .sa file non-fatally through the bytecode VM.
-// Phase 1: parse-only — catches syntax errors.
-// Phase 2: compile + execute — catches runtime errors; treats
-//          input()-driven failures as passes.
 static TestResult testFile(const std::string &path)
 {
-    TestResult res;
-    res.path = path;
-
-    std::ifstream file(path);
-    if (!file.is_open())
-    {
-        res.error = "Cannot open file";
-        return res;
+    TestResult res; res.path = path;
+    std::ifstream f(path);
+    if (!f.is_open()) { res.error = "Cannot open"; return res; }
+    std::ostringstream ss; ss << f.rdbuf(); res.source = ss.str();
+    try {
+        Lexer l(res.source); auto tok=l.tokenize();
+        Parser p(std::move(tok)); auto ast=p.parse(); (void)ast;
+    } catch (const ParseError &e) {
+        res.error="ParseError: "+std::string(e.what()); res.line=e.line; res.col=e.col; return res;
+    } catch (const std::exception &e) {
+        res.error="LexError: "+std::string(e.what()); res.line=1; return res;
     }
-
-    std::ostringstream ss;
-    ss << file.rdbuf();
-    res.source = ss.str();
-    const std::string &source = res.source;
-
-    // ── Phase 1: parse only ───────────────────────────────────────────────
-    try
-    {
-        Lexer lexer(source);
-        auto tokens = lexer.tokenize();
-        Parser parser(std::move(tokens));
-        auto ast = parser.parse();
-        (void)ast;
-    }
-    catch (const ParseError &e)
-    {
-        res.error = std::string("ParseError: ") + e.what();
-        res.line = e.line;
-        res.col = e.col;
-        return res;
-    }
-    catch (const std::exception &e)
-    {
-        res.error = std::string("LexError: ") + e.what();
-        res.line = 1;
-        return res;
-    }
-
-    // ── Phase 2: compile + execute with output swallowed ─────────────────
     std::ostringstream sink;
-    StreamGuard guard(
-        std::cout.rdbuf(sink.rdbuf()),
-        std::cerr.rdbuf(sink.rdbuf()));
-
-    auto setErr = [&](const std::string &kind, const std::string &msg, int ln)
-    {
-        if (isInputDrivenError(msg))
-            return;
-        res.error = kind + ": " + msg;
-        res.line = ln;
-    };
-
-    try
-    {
-        auto chunk = compileSource(source, path, false);
-        VM vm;
-        vm.run(chunk);
-    }
-    catch (const ParseError &e)
-    {
-        setErr("ParseError", e.what(), e.line);
-    }
-    catch (const QuantumError &e)
-    {
-        setErr(e.kind, e.what(), e.line);
-    }
-    catch (const std::exception &e)
-    {
-        std::string msg = e.what();
-        if (!isInputDrivenError(msg))
-            res.error = "Fatal: " + msg;
-    }
-    catch (...)
-    {
-        res.error = "Fatal: unknown exception";
-    }
-
+    StreamGuard g(std::cout.rdbuf(sink.rdbuf()), std::cerr.rdbuf(sink.rdbuf()));
+    try { VM vm; vm.run(compileSource(res.source,path,false)); }
+    catch (const ParseError &e)  { if(!isInputDriven(e.what())) {res.error="ParseError: "+std::string(e.what());res.line=e.line;} }
+    catch (const QuantumError &e){ if(!isInputDriven(e.what())) {res.error=e.kind+": "+e.what();res.line=e.line;} }
+    catch (const std::exception &e){ if(!isInputDriven(e.what())) res.error="Fatal: "+std::string(e.what()); }
+    catch (...) { res.error="Fatal: unknown"; }
     return res;
 }
 
 static void collectSaFiles(const fs::path &dir, std::vector<fs::path> &out)
 {
-    if (!fs::exists(dir) || !fs::is_directory(dir))
-        return;
-    for (auto &entry : fs::recursive_directory_iterator(
-             dir, fs::directory_options::skip_permission_denied))
-    {
-        if (entry.is_regular_file() && entry.path().extension() == ".sa")
-            out.push_back(entry.path());
-    }
+    if (!fs::exists(dir)||!fs::is_directory(dir)) return;
+    for (auto &e:fs::recursive_directory_iterator(dir,fs::directory_options::skip_permission_denied))
+        if (e.is_regular_file()&&e.path().extension()==".sa") out.push_back(e.path());
 }
 
-// ─── runTestExamples ──────────────────────────────────────────────────────────
-
-static int runTestExamples(const std::string &examplesDir)
+static int runTestExamples(const std::string &dir)
 {
-    fs::path dir(examplesDir);
-    if (!fs::exists(dir) || !fs::is_directory(dir))
-    {
-        std::cerr << Colors::RED << "[Error] " << Colors::RESET
-                  << "Examples directory not found: " << dir.string() << "\n";
-        return 1;
-    }
-
-    redirectStdinToNull();
-    g_testMode = true;
-
-    std::vector<fs::path> files;
-    collectSaFiles(dir, files);
-
-    if (files.empty())
-    {
-        std::cout << Colors::YELLOW << "[Warning] " << Colors::RESET
-                  << "No .sa files found under: " << dir.string() << "\n";
-        return 0;
-    }
-
-    std::sort(files.begin(), files.end());
-
-    std::cout << Colors::CYAN << Colors::BOLD
-              << "\n══════════════════════════════════════════════════\n"
-              << "  Quantum Test Runner — Bytecode VM\n"
-              << "══════════════════════════════════════════════════\n"
-              << Colors::RESET
-              << "  Directory  : " << Colors::YELLOW << fs::absolute(dir).string() << Colors::RESET << "\n"
-              << "  Files found: " << Colors::YELLOW << files.size() << Colors::RESET << "\n\n";
-
-    std::vector<TestResult> failures;
-    int passed = 0;
-
-    for (const auto &filePath : files)
-    {
-        std::string pathStr = filePath.string();
-        std::string displayPath = pathStr;
-        try
-        {
-            displayPath = fs::relative(filePath).string();
-        }
-        catch (...)
-        {
-        }
-
-        TestResult tr = testFile(pathStr);
-        tr.path = displayPath;
-
-        if (tr.error.empty())
-        {
-            std::cout << Colors::GREEN << "  ✓ " << Colors::RESET << displayPath << "\n";
-            ++passed;
-        }
-        else
-        {
-            std::cout << Colors::RED << "  ✗ " << Colors::RESET << displayPath << "\n";
-
-            if (tr.line > 0)
-            {
-                std::cout << "      " << Colors::YELLOW << "Line " << tr.line;
-                if (tr.col > 0)
-                    std::cout << ":" << tr.col;
-                std::cout << Colors::RESET << "  " << Colors::RED << tr.error << Colors::RESET << "\n";
-            }
-            else
-            {
-                std::cout << "      " << Colors::RED << tr.error << Colors::RESET << "\n";
-            }
-
-            if (tr.line > 0)
-            {
-                std::string srcLine = getSourceLine(tr.source, tr.line);
-                if (!srcLine.empty())
-                {
-                    size_t indent = 0;
-                    while (indent < srcLine.size() &&
-                           (srcLine[indent] == ' ' || srcLine[indent] == '\t'))
-                        ++indent;
-                    std::string trimmed = srcLine.substr(indent);
-                    std::cout << "      " << Colors::WHITE << "| " << trimmed << Colors::RESET << "\n";
-                    if (tr.col > 0 && tr.col > (int)indent)
-                    {
-                        int caretPos = tr.col - (int)indent - 1;
-                        if (caretPos < 0)
-                            caretPos = 0;
-                        std::cout << "      " << Colors::RED << "| "
-                                  << std::string(caretPos, ' ') << "^"
-                                  << Colors::RESET << "\n";
-                    }
-                }
-            }
-
+    fs::path d(dir);
+    if (!fs::exists(d)||!fs::is_directory(d)) {
+        std::cerr<<Colors::RED<<"[Error] "<<Colors::RESET<<"Not found: "<<dir<<"\n"; return 1; }
+    redirectStdinToNull(); g_testMode=true;
+    std::vector<fs::path> files; collectSaFiles(d,files);
+    if (files.empty()) { std::cout<<"No .sa files found.\n"; return 0; }
+    std::sort(files.begin(),files.end());
+    std::cout<<Colors::CYAN<<Colors::BOLD
+             <<"\n═══════════════ Quantum Test Runner ═══════════════\n"
+             <<Colors::RESET<<"  Files: "<<files.size()<<"\n\n";
+    int passed=0; std::vector<TestResult> failures;
+    for (auto &fp:files) {
+        std::string ps=fp.string(), disp=ps;
+        try{disp=fs::relative(fp).string();}catch(...){}
+        auto tr=testFile(ps); tr.path=disp;
+        if (tr.error.empty()) { std::cout<<Colors::GREEN<<"  ✓ "<<Colors::RESET<<disp<<"\n"; ++passed; }
+        else {
+            std::cout<<Colors::RED<<"  ✗ "<<Colors::RESET<<disp<<"\n";
+            if (tr.line>0) std::cout<<"    Line "<<tr.line<<": ";
+            std::cout<<Colors::RED<<tr.error<<Colors::RESET<<"\n";
             failures.push_back(tr);
         }
     }
+    int total=(int)files.size(),failed=(int)failures.size();
+    if (failed==0) std::cout<<Colors::GREEN<<"  ✓ All "<<total<<" passed!\n"<<Colors::RESET;
+    else           std::cout<<Colors::RED  <<"  ✗ "<<failed<<"/"<<total<<" failed\n"<<Colors::RESET;
+    return failed>0?1:0;
+}
 
-    int total = static_cast<int>(files.size());
-    int failed = static_cast<int>(failures.size());
+// ─── REPL ─────────────────────────────────────────────────────────────────────
 
-    std::cout << Colors::CYAN << Colors::BOLD
-              << "\n══════════════════════════════════════════════════\n"
-              << Colors::RESET;
-
-    if (failed == 0)
-        std::cout << Colors::GREEN << Colors::BOLD
-                  << "  ✓ All " << total << " file(s) passed!\n"
-                  << Colors::RESET;
-    else
-        std::cout << Colors::GREEN << "  Passed : " << passed << " / " << total << "\n"
-                  << Colors::RESET
-                  << Colors::RED << "  Failed : " << failed << " / " << total << "\n"
-                  << Colors::RESET;
-
-    std::cout << Colors::CYAN << Colors::BOLD
-              << "══════════════════════════════════════════════════\n\n"
-              << Colors::RESET;
-
-    // ── Write test_results.txt ────────────────────────────────────────────
-    const std::string reportPath = "test_results.txt";
-    std::ofstream report(reportPath);
-
-    if (!report.is_open())
-    {
-        std::cerr << Colors::RED << "[Error] " << Colors::RESET
-                  << "Could not write report to: " << reportPath << "\n";
-        return failed > 0 ? 1 : 0;
+static void runREPL(bool debug=false)
+{
+    printBanner();
+    std::cout<<Colors::GREEN<<"  REPL — type 'exit' to quit\n"<<Colors::RESET<<"\n";
+    VM vm; int n=1; std::string line;
+    while (true) {
+        std::cout<<Colors::CYAN<<"quantum["<<n++<<"]> "<<Colors::RESET;
+        if (!std::getline(std::cin,line)) break;
+        if (line=="exit"||line=="quit") break;
+        if (line.empty()) continue;
+        try { vm.run(compileSource(line,"<repl>",debug)); }
+        catch (const ParseError &e){ std::cerr<<Colors::RED<<"[ParseError] "<<Colors::RESET<<e.what()<<"\n"; }
+        catch (const QuantumError &e){ std::cerr<<Colors::RED<<"["<<e.kind<<"] "<<Colors::RESET<<e.what()<<"\n"; }
+        catch (const std::exception &e){ std::cerr<<Colors::RED<<"[Error] "<<Colors::RESET<<e.what()<<"\n"; }
     }
-
-    report << "================================================================================\n";
-    report << "  Quantum Language — Test Results  (Bytecode VM)\n";
-    report << "================================================================================\n";
-    report << "  Directory : " << fs::absolute(dir).string() << "\n";
-    report << "  Total     : " << total << "\n";
-    report << "  Passed    : " << passed << "\n";
-    report << "  Failed    : " << failed << "\n";
-    report << "================================================================================\n\n";
-
-    if (failures.empty())
-    {
-        report << "All files passed — no errors found.\n";
-    }
-    else
-    {
-        for (size_t i = 0; i < failures.size(); ++i)
-        {
-            const auto &f = failures[i];
-            report << "################################################################################\n";
-            report << "  FAILED FILE #" << (i + 1) << "\n";
-            report << "################################################################################\n";
-            report << "  Path  : " << f.path << "\n";
-            report << "  Error : " << f.error << "\n";
-            if (f.line > 0)
-            {
-                report << "  Line  : " << f.line;
-                if (f.col > 0)
-                    report << ":" << f.col;
-                report << "\n";
-                std::string srcLine = getSourceLine(f.source, f.line);
-                if (!srcLine.empty())
-                {
-                    report << "  Code  : " << srcLine << "\n";
-                    if (f.col > 0)
-                    {
-                        int lead = 0;
-                        while (lead < (int)srcLine.size() &&
-                               (srcLine[lead] == ' ' || srcLine[lead] == '\t'))
-                            ++lead;
-                        int caretPos = 10 + f.col - 1;
-                        report << std::string(caretPos, ' ') << "^\n";
-                    }
-                }
-            }
-            report << "--------------------------------------------------------------------------------\n";
-            report << "  Source Code:\n";
-            report << "--------------------------------------------------------------------------------\n";
-            report << f.source << "\n";
-            report << "################################################################################\n\n";
-        }
-    }
-
-    report.close();
-    std::cout << Colors::CYAN << "  Report saved to: "
-              << Colors::YELLOW << reportPath << Colors::RESET << "\n\n";
-
-    return failed > 0 ? 1 : 0;
+    std::cout<<Colors::YELLOW<<"\n  Goodbye! 👋\n"<<Colors::RESET;
 }
 
 // ─── printHelp ────────────────────────────────────────────────────────────────
 
 static void printHelp(const char *prog)
 {
-    std::cout << Colors::BOLD << "Usage:\n"
-              << Colors::RESET
-              << "  " << prog << " <file.sa>              Run a Quantum script\n"
-              << "  " << prog << "                         Start interactive REPL\n"
-              << "  " << prog << " --help                  Show this help\n"
-              << "  " << prog << " --version               Show version info\n"
-              << "  " << prog << " --aura                  Show achievements panel\n"
-              << "  " << prog << " --check  <file.sa>      Parse + type-check only\n"
-              << "  " << prog << " --test   [dir]          Batch-test all .sa files\n"
-              << "  " << prog << " --debug  <file.sa>      Dump bytecode then run\n"
-              << "  " << prog << " --dis    <file.sa>      Dump bytecode, no execution\n"
-              << "  " << prog << " --run    <file.sa>      Run script directly (no .exe created)\n\n"
-              << Colors::BOLD << "File extension:\n"
-              << Colors::RESET
-              << "  Quantum scripts use the .sa extension\n\n"
-              << Colors::BOLD << "Examples:\n"
-              << Colors::RESET
-              << "  quantum hello.sa\n"
-              << "  quantum script.sa\n"
-              << "  quantum --test examples\n"
-              << "  quantum --debug hello.sa\n"
-              << "  quantum --dis   hello.sa\n\n"
-              << Colors::BOLD << "Runtime:\n"
-              << Colors::RESET
-              << "  Bytecode VM — ~3× faster than v1 tree-walk interpreter\n"
-              << "  Pipeline: Source → Lexer → Parser → AST → Compiler → Chunk → VM\n";
+    std::cout<<Colors::BOLD<<"Usage:\n"<<Colors::RESET
+             <<"  "<<prog<<" <file.sa>          Compile → <file>.exe then run it\n"
+             <<"  "<<prog<<" --run <file.sa>    Interpret directly (no .exe)\n"
+             <<"  "<<prog<<" --check <file.sa>  Parse + type-check only\n"
+             <<"  "<<prog<<" --debug <file.sa>  Dump bytecode then run\n"
+             <<"  "<<prog<<" --dis   <file.sa>  Dump bytecode only\n"
+             <<"  "<<prog<<" --test  [dir]      Batch-test all .sa files\n"
+             <<"  qrun <file.sa>              Interpret directly (no .exe)\n\n"
+             <<"  quantum hello.sa            → hello.exe created and run\n"
+             <<"  qrun    hello.sa            → interpreted directly\n";
 }
 
-int main(int argc, char *argv[])
+// ─── bundleAndRun ─────────────────────────────────────────────────────────────
+// Compile .sa → bytecode → append to copy of quantum.exe → run the result
+
+static int bundleAndRun(const std::string &path, const std::string &exePath)
 {
-#ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-#endif
-
-    // ── Pre-check for embedded bytecode execution ─────────────────────────
-    std::string exePath = getExecutablePath(argv[0]);
-    auto embeddedChunk = loadEmbeddedBytecode(exePath);
-    if (embeddedChunk)
-    {
-        try
-        {
-            VM vm;
-            vm.run(embeddedChunk);
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << Colors::RED << "[Fatal] " << Colors::RESET << e.what() << "\n";
-            return 1;
-        }
-        return 0;
-    }
-
-    if (argc == 1)
-    {
-        runREPL();
-        return 0;
-    }
-
-    std::string arg = argv[1];
-
-    // ── Flags that need no file argument ──────────────────────────────────
-    if (arg == "--help" || arg == "-h")
-    {
-        printBanner();
-        printHelp(argv[0]);
-        return 0;
-    }
-
-    if (arg == "--aura")
-    {
-        printBanner();
-        printAura();
-        return 0;
-    }
-
-    if (arg == "--version" || arg == "-v")
-    {
-        std::cout << "Quantum Language v2.0.0\n"
-                  << "Runtime: Bytecode VM (stack-based, ~3x faster than v1)\n"
-                  << "Built By Muhammad Saad Amin\n";
-        return 0;
-    }
-
-    // ── Flags that take a file/dir argument ───────────────────────────────
-    if (arg == "--check" && argc >= 3)
-        return checkFile(argv[2]);
-
-    if (arg == "--test")
-    {
-        std::string targetDir = "examples";
-        if (argc >= 3)
-            targetDir = argv[2];
-        return runTestExamples(targetDir);
-    }
-
-    if (arg == "--debug" && argc >= 3)
-    {
-        runFile(argv[2], true);
-        return 0;
-    }
-
-    if (arg == "--dis" && argc >= 3)
-    {
-        std::ifstream f(argv[2]);
-        if (!f.is_open())
-        {
-            std::cerr << Colors::RED << "[Error] " << Colors::RESET
-                      << "Cannot open: " << argv[2] << "\n";
-            return 1;
-        }
-        std::ostringstream ss;
-        ss << f.rdbuf();
-        try
-        {
-            auto chunk = compileSource(ss.str(), argv[2], false);
-            disassembleChunk(*chunk, std::cout);
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << Colors::RED << "[Error] " << Colors::RESET << e.what() << "\n";
-            return 1;
-        }
-        return 0;
-    }
-
-    if (arg == "--run" && argc >= 3)
-    {
-        // Directly interpret and execute the script (no .exe generated)
-        runFile(argv[2]);
-        return 0;
-    }
-
-    // ── Executable Generator or Direct Runner (qrun vs quantum) ────────────
-    //
-    // QRUN_MODE is defined at compile-time when building the `qrun` target.
-    // The `quantum` target never defines it, so it always goes to the bundler.
-    // This is more reliable than detecting the exe name at runtime.
-#ifdef QRUN_MODE
-    runFile(arg);
-    return 0;
-#endif
-
-    // Default: compile the script and bundle it into a standalone .exe
-    std::string path = arg;
-    std::ifstream file(path);
-    if (!file.is_open())
-    {
-        std::cerr << Colors::RED << "[Error] " << Colors::RESET
-                  << "Cannot open file: " << path << "\n";
+    // 1. Read source
+    std::ifstream src(path);
+    if (!src.is_open()) {
+        std::cerr<<Colors::RED<<"[Error] "<<Colors::RESET<<"Cannot open: "<<path<<"\n";
         return 1;
     }
+    std::ostringstream ss; ss<<src.rdbuf();
 
-    std::ostringstream ss;
-    ss << file.rdbuf();
-    std::string source = ss.str();
-
+    // 2. Compile
     std::shared_ptr<Chunk> chunk;
-    try
-    {
-        chunk = compileSource(source, path, false);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << Colors::RED << "[Compile Error] " << Colors::RESET << e.what() << "\n";
+    try { chunk = compileSource(ss.str(), path, false); }
+    catch (const ParseError &e) {
+        std::cerr<<Colors::RED<<Colors::BOLD<<"\n  X ParseError"<<Colors::RESET
+                 <<" in "<<path<<" at line "<<e.line<<":"<<e.col
+                 <<"\n    "<<e.what()<<"\n\n";
+        return 1;
+    } catch (const std::exception &e) {
+        std::cerr<<Colors::RED<<"[Compile Error] "<<Colors::RESET<<e.what()<<"\n";
         return 1;
     }
 
-    std::vector<uint8_t> payload = Serializer::serialize(chunk);
-    uint32_t payloadSize = static_cast<uint32_t>(payload.size());
+    // 3. Serialize
+    auto payload = Serializer::serialize(chunk);
+    uint32_t payloadSize = (uint32_t)payload.size();
 
-    // The bundled .exe must be a copy of quantum.exe (the compiler binary),
-    // NOT qrun.exe. We locate quantum.exe next to whichever binary is running.
-    fs::path selfDir = fs::path(exePath).parent_path();
-    std::string quantumStub = (selfDir / "quantum.exe").string();
-    // Fallback: if quantum.exe is not found beside us, use ourselves
-    if (!fs::exists(quantumStub))
-        quantumStub = exePath;
+    // 4. Stub = quantum.exe itself (the file that is currently running)
+    //    We use exePath directly — no need to search.
+    std::string stub = exePath;
 
+    // 5. Output path: hello.sa → hello.exe (in the same directory as the .sa)
     fs::path srcPath(path);
     std::string outName = (srcPath.parent_path() / srcPath.stem()).string() + ".exe";
 
-    // Safety: never let the bundled output overwrite a "quantum" binary itself
+    // Safety: never overwrite quantum.exe or qrun.exe
     {
-        std::string outBase = fs::path(outName).stem().string();
-        std::transform(outBase.begin(), outBase.end(), outBase.begin(), ::tolower);
-        if (outBase == "quantum")
-            outName = (srcPath.parent_path() / (srcPath.stem().string() + "_bundled")).string() + ".exe";
+        std::string base = fs::path(outName).stem().string();
+        std::transform(base.begin(), base.end(), base.begin(), ::tolower);
+        if (base == "quantum" || base == "qrun")
+            outName = (srcPath.parent_path() /
+                       (srcPath.stem().string() + "_out")).string() + ".exe";
     }
 
-    try
-    {
-        fs::copy_file(quantumStub, outName, fs::copy_options::overwrite_existing);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << Colors::RED << "[Error] " << Colors::RESET << "Failed to generate executable: " << e.what() << "\n";
+    // 6. Copy stub → output
+    try { fs::copy_file(stub, outName, fs::copy_options::overwrite_existing); }
+    catch (const std::exception &e) {
+        std::cerr<<Colors::RED<<"[Error] "<<Colors::RESET
+                 <<"Cannot create "<<outName<<": "<<e.what()<<"\n";
         return 1;
     }
 
-    // Append payload to new executable
-    std::ofstream outFile(outName, std::ios::binary | std::ios::app);
-    if (!outFile)
+    // 7. Append payload + size + magic
     {
-        std::cerr << Colors::RED << "[Error] " << Colors::RESET << "Failed to open generated executable for appending.\n";
-        return 1;
+        std::ofstream out(outName, std::ios::binary | std::ios::app);
+        if (!out) {
+            std::cerr<<Colors::RED<<"[Error] "<<Colors::RESET
+                     <<"Cannot open "<<outName<<" for appending\n";
+            return 1;
+        }
+        out.write(reinterpret_cast<const char*>(payload.data()), payloadSize);
+        out.write(reinterpret_cast<const char*>(&payloadSize), 4);
+        out.write("QNTM_VM!", 8);
     }
 
-    outFile.write(reinterpret_cast<const char *>(payload.data()), payloadSize);
-    outFile.write(reinterpret_cast<const char *>(&payloadSize), 4);
-    outFile.write("QNTM_VM!", 8);
-    outFile.close();
+    std::cout<<Colors::GREEN<<"[Compiled] "<<Colors::RESET
+             <<path<<" -> "<<outName<<" ("<<payloadSize<<" bytes)\n";
 
-    std::cout << Colors::GREEN << "[Success] " << Colors::RESET << "Compiled " << path << " -> " << outName << " (" << payloadSize << " bytes appended)\n";
+    // 8. Launch the generated exe and wait for it
+    std::cout<<Colors::CYAN<<"[Running]  "<<Colors::RESET<<outName<<"\n\n";
+
+    STARTUPINFOA si{}; si.cb = sizeof(si);
+    PROCESS_INFORMATION pi{};
+    std::string cmd = "\"" + outName + "\"";
+
+    if (!CreateProcessA(NULL, const_cast<char*>(cmd.c_str()),
+                        NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
+        std::cerr<<Colors::RED<<"[Error] "<<Colors::RESET
+                 <<"Failed to launch "<<outName<<" (GetLastError="<<GetLastError()<<")\n";
+        return 1;
+    }
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    DWORD ec = 0; GetExitCodeProcess(pi.hProcess, &ec);
+    CloseHandle(pi.hProcess); CloseHandle(pi.hThread);
+    return (int)ec;
+}
+
+// ─── main ─────────────────────────────────────────────────────────────────────
+
+int main(int argc, char *argv[])
+{
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
+    std::string exePath = getExecutablePath();
+
+    // ══════════════════════════════════════════════════════════════
+    //  STANDALONE BUNDLED EXE  (hello.exe, foo.exe …)
+    //  These are copies of quantum.exe with bytecode appended.
+    //  They define neither QRUN_MODE nor QUANTUM_MODE_COMPILER.
+    // ══════════════════════════════════════════════════════════════
+#if !defined(QRUN_MODE) && !defined(QUANTUM_MODE_COMPILER)
+    {
+        auto embedded = loadEmbeddedBytecode(exePath);
+        if (embedded) {
+            try { VM vm; vm.run(embedded); return 0; }
+            catch (const QuantumError &e) {
+                std::cerr<<Colors::RED<<"["<<e.kind<<"] "<<Colors::RESET<<e.what()<<"\n";
+                return 1;
+            } catch (const std::exception &e) {
+                std::cerr<<Colors::RED<<"[Fatal] "<<Colors::RESET<<e.what()<<"\n";
+                return 1;
+            }
+        }
+        // No valid embedded payload — fall through to compiler mode below
+    }
+#endif
+
+    // ══════════════════════════════════════════════════════════════
+    //  QRUN MODE  (qrun.exe) — always interpret, never bundle
+    // ══════════════════════════════════════════════════════════════
+#ifdef QRUN_MODE
+    if (argc == 1) { runREPL(); return 0; }
+    std::string a1 = argv[1];
+    if (a1=="--help"  ||a1=="-h"              ) { printBanner(); printHelp(argv[0]); return 0; }
+    if (a1=="--version"||a1=="-v"             ) { std::cout<<"Quantum Language v2.0.0\n"; return 0; }
+    if (a1=="--check" && argc>=3              ) return checkFile(argv[2]);
+    if (a1=="--debug" && argc>=3              ) { runFile(argv[2],true); return 0; }
+    if (a1=="--dis"   && argc>=3              ) {
+        std::ifstream f(argv[2]); std::ostringstream ss; ss<<f.rdbuf();
+        disassembleChunk(*compileSource(ss.str(),argv[2],false),std::cout); return 0; }
+    if (a1=="--test"                          ) return runTestExamples(argc>=3?argv[2]:"examples");
+    // Any other argument: treat as a .sa file to interpret
+    runFile(a1);
     return 0;
+#endif
+
+    // ══════════════════════════════════════════════════════════════
+    //  QUANTUM COMPILER MODE  (quantum.exe)
+    //  quantum <file.sa>  →  compile + bundle + run
+    // ══════════════════════════════════════════════════════════════
+    if (argc == 1) { runREPL(); return 0; }
+
+    std::string arg = argv[1];
+
+    if (arg=="--help"   ||arg=="-h"  ) { printBanner(); printHelp(argv[0]); return 0; }
+    if (arg=="--aura"                ) { printBanner(); printAura();         return 0; }
+    if (arg=="--version"||arg=="-v"  ) {
+        std::cout<<"Quantum Language v2.0.0\nRuntime: Bytecode VM\nBy Muhammad Saad Amin\n";
+        return 0;
+    }
+    if (arg=="--check" && argc>=3   ) return checkFile(argv[2]);
+    if (arg=="--test"               ) return runTestExamples(argc>=3?argv[2]:"examples");
+    if (arg=="--debug" && argc>=3   ) { runFile(argv[2],true);  return 0; }
+    if (arg=="--run"   && argc>=3   ) { runFile(argv[2]);        return 0; }
+    if (arg=="--dis"   && argc>=3   ) {
+        std::ifstream f(argv[2]);
+        if (!f.is_open()) { std::cerr<<Colors::RED<<"[Error] Cannot open: "<<argv[2]<<"\n"; return 1; }
+        std::ostringstream ss; ss<<f.rdbuf();
+        try { disassembleChunk(*compileSource(ss.str(),argv[2],false),std::cout); }
+        catch (const std::exception &e) { std::cerr<<Colors::RED<<"[Error] "<<e.what()<<"\n"; return 1; }
+        return 0;
+    }
+
+    // Default: compile .sa → .exe → run
+    return bundleAndRun(arg, exePath);
 }
