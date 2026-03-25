@@ -1,74 +1,63 @@
-# QuantumLanguage Compiler - TypeChecker.h
+# QuantumLanguage Compiler - Value.h
 
 ## Overview
 
-The `include/TypeChecker.h` header file is a critical component of the QuantumLanguage compiler, dedicated to the type checking phase. This phase ensures that the code adheres to its declared types, preventing runtime errors due to type mismatches. The `TypeChecker` class, along with supporting structures like `StaticTypeError` and `TypeEnv`, forms the backbone of this functionality.
+The `include/Value.h` header file is a fundamental component of the QuantumLanguage compiler, responsible for defining the data types and structures used within the virtual machine (VM). This file includes various value types such as nil, booleans, numbers, strings, arrays, dictionaries, closures, native functions, instances, classes, and bound methods. Additionally, it introduces a `QuantumPointer` structure to manage references to variable storage efficiently.
 
-### Role in Compiler Pipeline
-
-1. **Syntax Analysis**: After parsing the source code into an Abstract Syntax Tree (AST), the next step is type checking.
-2. **Semantic Validation**: Ensures that all variables, functions, and expressions are used correctly according to their declared types.
-3. **Error Detection**: Identifies static type errors such as mismatched argument types or undeclared variables.
+This header file plays a critical role in the compiler's pipeline by providing a rich set of data types that can be manipulated during the execution phase. By encapsulating these data types within a single variant, the compiler ensures type safety while allowing dynamic typing at runtime.
 
 ## Key Design Decisions and Why
 
-### 1. Exception Handling with `StaticTypeError`
+1. **Variadic Data Types**: Using `std::variant` allows for a flexible representation of multiple data types within a single `QuantumValue`. This decision simplifies the implementation of operations that need to handle different types without resorting to complex type-checking mechanisms.
 
-- **Why**: To provide clear and specific error messages indicating where and why a type error occurred during compilation.
-- **Implementation**: Inherits from `std::runtime_error` and includes an additional `line` attribute to specify the error's location in the source code.
+2. **Smart Pointers**: The use of smart pointers (`std::shared_ptr`) in `QuantumPointer` and other value types ensures automatic memory management. This helps prevent memory leaks and dangling pointers, which are common issues in manual memory management.
 
-### 2. Type Environment (`TypeEnv`)
+3. **Dynamic Typing**: Allowing dynamic typing through the `QuantumValue` variant enables the VM to handle a wide range of operations and expressions without prior knowledge of their types. This flexibility is crucial for interpreting and executing dynamically typed languages like QuantumLanguage.
 
-- **Why**: To manage variable scoping and type resolution efficiently.
-- **Design**:
-  - Uses a hierarchical map structure where each scope can override or extend the parent scope.
-  - `define` method adds new variables to the current scope.
-  - `resolve` method searches for a variable starting from the current scope and moving up to the global scope, returning `"any"` if not found.
-
-### 3. Global Type Environment
-
-- **Why**: To maintain a consistent state of defined types across different parts of the program.
-- **Implementation**: A shared pointer to a `TypeEnv` instance that serves as the root of the type environment hierarchy.
+4. **Efficient Memory Management**: Smart pointers provide efficient memory management by automatically deallocating memory when it is no longer needed. This reduces the risk of memory leaks and improves overall performance.
 
 ## Major Classes/Functions Overview
 
-### `TypeChecker`
+### QuantumValue
 
-- **Purpose**: Manages the overall type checking process.
-- **Public Methods**:
-  - `check(const std::vector<ASTNodePtr>& nodes)`: Checks a list of AST nodes.
-  - `check(const ASTNodePtr& node)`: Checks a single AST node.
-  - `checkNode(const ASTNodePtr& node, std::shared_ptr<TypeEnv> env)`: Recursively checks a node within a given type environment.
+- **Purpose**: Represents a value in the QuantumLanguage virtual machine.
+- **Data Members**:
+  - `Data data`: A variant containing one of several possible value types.
+- **Constructors**:
+  - Various constructors allow creating `QuantumValue` objects with specific data types.
+- **Type Checks**:
+  - Methods like `isNil`, `isBool`, `isNumber`, etc., check the underlying data type of the `QuantumValue`.
 
-### `StaticTypeError`
+### QuantumPointer
 
-- **Purpose**: Custom exception class for reporting static type errors.
-- **Attributes**:
-  - `int line`: Line number where the error occurred.
-- **Constructor**: Takes a message and a line number, initializing the base `std::runtime_error`.
-
-### `TypeEnv`
-
-- **Purpose**: Represents the type environment, which tracks variable declarations and their types.
-- **Attributes**:
-  - `std::map<std::string, std::string> vars`: Map of variable names to their types.
-  - `std::shared_ptr<TypeEnv> parent`: Pointer to the parent type environment.
+- **Purpose**: Manages references to variable storage within the VM.
+- **Data Members**:
+  - `std::shared_ptr<QuantumValue> cell`: A shared pointer to the actual value stored.
+  - `std::string varName`: The name of the variable for display purposes.
+  - `int offset`: An offset for pointer arithmetic.
 - **Methods**:
-  - `void define(const std::string& name, const std::string& type)`: Adds a variable declaration.
-  - `std::string resolve(const std::string& name)`: Resolves the type of a variable, searching through the scope hierarchy.
+  - `bool isNull() const`: Checks if the pointer is null.
+  - `QuantumValue &deref() const`: Dereferences the pointer and returns the value. Throws an exception if the pointer is null.
+
+### QuantumNativeFunc
+
+- **Purpose**: Represents a native function in the QuantumLanguage virtual machine.
+- **Data Members**:
+  - `std::function<QuantumValue(std::vector<QuantumValue>)> fn`: A callable object representing the native function.
+
+### QuantumNative
+
+- **Purpose**: Encapsulates information about a native function.
+- **Data Members**:
+  - `std::string name`: The name of the native function.
+  - `QuantumNativeFunc fn`: The callable object representing the native function.
 
 ## Tradeoffs
 
-### Memory Management
+1. **Performance Overhead**: Using `std::variant` and smart pointers incurs some performance overhead compared to simpler data types or raw pointers. However, this is generally outweighed by the benefits of type safety and automatic memory management.
 
-- **Tradeoff**: Using shared pointers for `TypeEnv` allows efficient management of memory, especially in large programs with many nested scopes. However, it also introduces overhead associated with reference counting.
+2. **Complexity**: The introduction of variadic data types and smart pointers adds complexity to the codebase. Developers must be aware of these features to avoid potential bugs related to type handling and memory management.
 
-### Error Reporting
+3. **Memory Usage**: While smart pointers help reduce memory leaks, they also increase memory usage due to the overhead of managing reference counts. In scenarios where memory efficiency is critical, this could be a drawback.
 
-- **Tradeoff**: Providing detailed error messages with line numbers enhances debugging but requires more complex exception handling mechanisms.
-
-### Performance
-
-- **Tradeoff**: Recursive type resolution in `checkNode` can be computationally expensive, particularly in deeply nested programs. Optimizing these recursive calls might involve caching results or using memoization techniques.
-
-Overall, the `TypeChecker.h` file plays a vital role in ensuring the correctness and reliability of the compiled code by performing comprehensive type validation. Its design choices balance functionality, performance, and memory usage, making it a robust and efficient part of the QuantumLanguage compiler.
+Overall, the design choices in `Value.h` enhance the robustness and maintainability of the QuantumLanguage compiler, making it better suited for handling dynamically typed languages and ensuring efficient memory management.
