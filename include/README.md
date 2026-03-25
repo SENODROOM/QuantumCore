@@ -1,60 +1,70 @@
-# QuantumLanguage Compiler - Error.h
+# QuantumLanguage Compiler - Lexer.h
 
 ## Overview
 
-The `include/Error.h` header file is a critical component of the QuantumLanguage compiler, dedicated to defining error handling mechanisms. This file includes various exception classes derived from `std::runtime_error`, each tailored to specific types of errors encountered during compilation or execution. Additionally, it provides a namespace for color codes used in error messages for better visibility and user experience.
-
-### Role in Compiler Pipeline
-
-- **Compilation Errors**: Captures issues related to syntax, type mismatches, and undefined names before the code reaches the virtual machine.
-- **Execution Errors**: Handles runtime exceptions such as index out of bounds, type errors, and name resolution failures within the virtual machine.
+The `include/Lexer.h` header file is a critical component of the QuantumLanguage compiler, primarily responsible for converting source code into a sequence of tokens. This process is fundamental to the compilation pipeline as it lays the groundwork for subsequent stages such as parsing and semantic analysis. The lexer class, `Lexer`, encapsulates the logic necessary to accurately identify and categorize each token in the source code, ensuring that the compiler can correctly interpret the program's structure and intent.
 
 ### Key Design Decisions and Why
 
-1. **Custom Exception Classes**: By deriving from `std::runtime_error`, custom exception classes (`QuantumError`, `RuntimeError`, `TypeError`, etc.) provide more context-specific error information, making debugging easier.
-   
-2. **Line Number Information**: Each error class includes a line number attribute, allowing developers to pinpoint the exact location of the error in their source code quickly.
+1. **State Machine Approach**: The lexer uses a state machine to handle different types of characters and transitions between states based on the encountered input. This approach allows for efficient and straightforward tokenization without complex nested loops or recursive functions, making the implementation both readable and maintainable.
 
-3. **Color Coding**: The `Colors` namespace offers a set of ANSI escape codes to style error messages differently based on their severity or category. This enhances readability and makes it easier to distinguish between different types of errors.
+2. **Support for F-Strings**: To accommodate Python-like formatted string literals, the lexer includes support for f-strings. This feature involves using a separate data structure (`pendingTokens_`) to temporarily store tokens during the expansion of f-strings, which are then combined back into a single token stream. This ensures that f-strings are handled seamlessly and correctly within the compiler.
 
-### Major Classes/Functions Overview
+3. **C Preprocessor Support**: The lexer also supports C preprocessor directives, specifically `#define`. These macros are stored in a hash map (`defines_`), where each macro name maps to its corresponding replacement token list. This allows the lexer to expand macros before further processing, ensuring that all preprocessed content is correctly interpreted.
 
-#### QuantumError Class
+4. **Error Handling**: While not explicitly shown in the provided code snippet, the lexer should have robust error handling mechanisms to manage unexpected characters, syntax errors, and other issues that may arise during tokenization. This helps in providing clear and actionable error messages to the developer, facilitating easier debugging and maintenance.
 
-- **Purpose**: Acts as a base class for all quantum-related errors, providing common attributes like `line` and `kind`.
-- **Constructor**: Takes a message string, an optional line number, and a kind string indicating the type of error.
+## Major Classes/Functions Overview
 
-#### RuntimeError Class
+### Lexer Class
 
-- **Purpose**: Derived from `QuantumError`, specifically for runtime exceptions.
-- **Constructor**: Simplifies the creation of runtime error instances with just a message and an optional line number.
+- **Constructor**: `explicit Lexer(const std::string &source);`
+  - Initializes the lexer with the source code to be tokenized.
 
-#### TypeError Class
+- **tokenize Method**: `std::vector<Token> tokenize();`
+  - Converts the entire source code into a vector of tokens.
 
-- **Purpose**: Derived from `QuantumError`, designed for type-related errors.
-- **Constructor**: Facilitates the creation of type error instances using a message and an optional line number.
+### Private Methods
 
-#### NameError Class
+- **current Method**: `char current() const;`
+  - Returns the character at the current position in the source code.
 
-- **Purpose**: Derived from `QuantumError`, intended for errors related to undefined names.
-- **Constructor**: Provides a straightforward way to create name error instances with a message and an optional line number.
+- **peek Method**: `char peek(int offset = 1) const;`
+  - Returns the character at the specified offset from the current position.
 
-#### IndexError Class
+- **advance Method**: `char advance();`
+  - Advances the current position in the source code and returns the new character.
 
-- **Purpose**: Derived from `QuantumError`, used for index out of bounds errors.
-- **Constructor**: Simplifies the creation of index error instances by accepting a message and an optional line number.
+- **skipWhitespace Method**: `void skipWhitespace();`
+  - Skips over any whitespace characters in the source code.
 
-#### Colors Namespace
+- **skipComment Method**: `void skipComment();`
+  - Skips over a single-line comment starting with `//`.
 
-- **Purpose**: Offers a collection of ANSI escape codes for styling console output.
-- **Contents**: Includes constants for red, yellow, white, cyan, green, blue, bold, reset, and magenta colors.
+- **skipBlockComment Method**: `void skipBlockComment();`
+  - Skips over a multi-line comment enclosed between `/*` and `*/`.
 
-### Tradeoffs
+- **readNumber Method**: `Token readNumber();`
+  - Reads a numeric literal from the source code and returns it as a `Token`.
 
-- **Performance**: Using custom exception classes might introduce slight performance overhead compared to standard exceptions, but this is generally negligible in most applications.
-  
-- **Complexity**: Adding color coding increases the complexity of error handling but improves usability significantly, especially in large projects where multiple types of errors need to be distinguished easily.
+- **readString Method**: `Token readString(char quote);`
+  - Reads a string literal enclosed by the specified quote character and returns it as a `Token`.
 
-- **Readability**: Custom exception classes enhance readability by clearly categorizing errors, while color coding aids visual identification of error types.
+- **readTemplateLiteral Method**: `void readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol);`
+  - Handles the expansion of template literals (f-strings) and appends the resulting tokens to the output vector.
 
-By leveraging these components, the QuantumLanguage compiler ensures robust error management throughout its pipeline, from initial compilation to runtime execution, thereby improving both developer productivity and code quality.
+- **readIdentifierOrKeyword Method**: `Token readIdentifierOrKeyword();`
+  - Reads an identifier or keyword from the source code and returns it as a `Token`.
+
+- **readOperator Method**: `Token readOperator();`
+  - Reads an operator or punctuation mark from the source code and returns it as a `Token`.
+
+## Tradeoffs
+
+- **Complexity vs. Efficiency**: By using a state machine, the lexer achieves a balance between simplicity and efficiency. However, more advanced features like f-string expansion and C preprocessor support add complexity to the implementation.
+
+- **Readability vs. Performance**: The use of separate data structures for f-string expansion and macro definitions might slightly impact performance, but it significantly improves the readability and maintainability of the code.
+
+- **Flexibility vs. Simplicity**: Supporting both f-strings and C preprocessor directives increases the flexibility of the lexer, but it also adds additional layers of complexity to the codebase.
+
+Overall, the `Lexer.h` file is a well-designed and essential part of the QuantumLanguage compiler, enabling accurate and efficient tokenization of source code. Its ability to handle advanced features like f-strings and C preprocessor directives makes it a versatile tool for developers working with the QuantumLanguage platform.
