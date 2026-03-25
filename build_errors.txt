@@ -5,6 +5,9 @@ C:\Programming\Quantum Language\src\Vm.cpp:1927:15: warning: suggest explicit br
 C:\Programming\Quantum Language\src\Vm.cpp:1937:15: warning: suggest explicit braces to avoid ambiguous 'else' [-Wdangling-else]
  1937 |             if(step>0) for(int i=start;i<stop;i+=step) if(i<len) r->push_back(arr[i]);
       |               ^
+C:\Programming\Quantum Language\src\main.cpp:59:31: warning: 'std::shared_ptr<Chunk> loadEmbeddedBytecode(const std::string&)' defined but not used [-Wunused-function]
+   59 | static std::shared_ptr<Chunk> loadEmbeddedBytecode(const std::string &exePath)
+      |                               ^~~~~~~~~~~~~~~~~~~~
 C:\Programming\Quantum Language\src\Vm.cpp: In lambda function:
 C:\Programming\Quantum Language\src\Vm.cpp:1927:15: warning: suggest explicit braces to avoid ambiguous 'else' [-Wdangling-else]
  1927 |             if(step>0) for(int i=start;i<stop;i+=step) if(i<len) r+=s[i];
@@ -12,6 +15,9 @@ C:\Programming\Quantum Language\src\Vm.cpp:1927:15: warning: suggest explicit br
 C:\Programming\Quantum Language\src\Vm.cpp:1937:15: warning: suggest explicit braces to avoid ambiguous 'else' [-Wdangling-else]
  1937 |             if(step>0) for(int i=start;i<stop;i+=step) if(i<len) r->push_back(arr[i]);
       |               ^
+C:\Programming\Quantum Language\src\main.cpp:59:31: warning: 'std::shared_ptr<Chunk> loadEmbeddedBytecode(const std::string&)' defined but not used [-Wunused-function]
+   59 | static std::shared_ptr<Chunk> loadEmbeddedBytecode(const std::string &exePath)
+      |                               ^~~~~~~~~~~~~~~~~~~~
 C:\Programming\Quantum Language\src\Vm.cpp: In lambda function:
 C:\Programming\Quantum Language\src\Vm.cpp:1927:15: warning: suggest explicit braces to avoid ambiguous 'else' [-Wdangling-else]
  1927 |             if(step>0) for(int i=start;i<stop;i+=step) if(i<len) r+=s[i];

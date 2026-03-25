@@ -69,7 +69,7 @@ private:
     std::vector<std::shared_ptr<Upvalue>> openUpvalues_;
 
     long long stepCount_ = 0;
-    static constexpr long long MAX_STEPS = 10'000'000;
+    static constexpr long long MAX_STEPS = 50'000'000;
     std::vector<std::pair<QuantumValue, size_t>> pendingInstances_;
 
     // ── Native registration ───────────────────────────────────────────────────
