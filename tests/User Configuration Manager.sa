@@ -51,3 +51,7 @@ def view_settings(settings):
         result.append(f"{key.capitalize()}: {value}")
 
     return "\n".join(result) + "\n"
+
+
+
+    
