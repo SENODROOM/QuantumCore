@@ -578,10 +578,12 @@ void VM::runFrame(size_t stopDepth)
             }
             catch (NameError &)
             {
-                // Implicit self: if slot 0 of this frame is an instance,
-                // try to read the field from it (C++ class bare-name access)
+                // Implicit self: only inside a method (params[0] == "self"),
+                // fall back to reading the field from the instance at slot 0.
                 bool found = false;
-                if (frame.stackBase < stack_.size())
+                auto &params = frame.closure->chunk->params;
+                if (!params.empty() && params[0] == "self" &&
+                    frame.stackBase < stack_.size())
                 {
                     QuantumValue &slot0 = stack_[frame.stackBase];
                     if (slot0.isInstance())
@@ -595,7 +597,7 @@ void VM::runFrame(size_t stopDepth)
                         }
                         else
                         {
-                            // Check class methods/static fields
+                            // Check class methods in hierarchy
                             auto *k = inst->klass.get();
                             while (k && !found)
                             {
@@ -631,14 +633,14 @@ void VM::runFrame(size_t stopDepth)
         case Op::STORE_GLOBAL:
         {
             const std::string &name = consts[instr.operand].asString();
-            // Implicit self: if slot 0 of this frame is an instance and
-            // the name is not a known global, store as an instance field
-            if (!globals->has(name) &&
-                frame.stackBase < stack_.size() &&
-                stack_[frame.stackBase].isInstance())
-            {
+            // Implicit self: only inside a method (params[0] == "self"),
+            // and only when the name is not already a known global.
+            auto &params = frame.closure->chunk->params;
+            bool inMethod = !params.empty() && params[0] == "self" &&
+                            frame.stackBase < stack_.size() &&
+                            stack_[frame.stackBase].isInstance();
+            if (inMethod && !globals->has(name))
                 stack_[frame.stackBase].asInstance()->setField(name, peek(0));
-            }
             else if (globals->has(name))
                 globals->set(name, peek(0));
             else
@@ -1506,7 +1508,15 @@ void VM::registerNatives()
     reg("ceil", [](std::vector<QuantumValue> a) -> QuantumValue
         { return QuantumValue(std::ceil(toNum2(a[0], "ceil"))); });
     reg("round", [](std::vector<QuantumValue> a) -> QuantumValue
-        { return QuantumValue(std::round(toNum2(a[0], "round"))); });
+        {
+        if (a.empty()) throw RuntimeError("round() requires at least 1 argument");
+        double v = toNum2(a[0], "round");
+        if (a.size() >= 2) {
+            int places = (int)toNum2(a[1], "round");
+            double factor = std::pow(10.0, places);
+            return QuantumValue(std::round(v * factor) / factor);
+        }
+        return QuantumValue(std::round(v)); });
     reg("pow", [](std::vector<QuantumValue> a) -> QuantumValue
         { return QuantumValue(std::pow(toNum2(a[0], "pow"), toNum2(a[1], "pow"))); });
     reg("log", [](std::vector<QuantumValue> a) -> QuantumValue
@@ -1824,6 +1834,25 @@ void VM::registerNatives()
         if(args[0].isInstance()) return QuantumValue(args[0].asInstance()->klass->name);
         if(args[0].isClass())    return QuantumValue(args[0].asClass()->name);
         return QuantumValue(args[0].typeName()); });
+
+    // ── Exception type constructors (ValueError, TypeError, etc.) ─────────
+    // These return a string-like value so raise/except/print work naturally.
+    auto makeExceptionCtor = [](const std::string &typeName)
+    {
+        return [typeName](std::vector<QuantumValue> args) -> QuantumValue
+        {
+            std::string msg = args.empty() ? typeName : args[0].toString();
+            return QuantumValue(typeName + ": " + msg);
+        };
+    };
+    for (const char *eName : {"ValueError", "TypeError", "RuntimeError", "KeyError",
+                              "IndexError", "NameError", "AttributeError",
+                              "ZeroDivisionError", "OverflowError", "StopIteration",
+                              "Exception", "Error", "IOError", "OSError",
+                              "NotImplementedError", "AssertionError"})
+    {
+        reg(std::string(eName), makeExceptionCtor(std::string(eName)));
+    }
 
     // ── Number theory ─────────────────────────────────────────────────────
     reg("is_prime", [](std::vector<QuantumValue> args) -> QuantumValue
@@ -2790,6 +2819,169 @@ void VM::registerNatives()
             std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         }
         return QuantumValue(); });
+
+    // ── Networking utilities ──────────────────────────────────────────────
+    reg("ip_to_int", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.empty()) throw RuntimeError("ip_to_int() requires 1 argument");
+        std::string ip = args[0].toString();
+        unsigned long result = 0;
+        int shift = 24;
+        std::string part;
+        for (char c : ip + ".") {
+            if (c == '.') {
+                result |= (std::stoul(part) & 0xFF) << shift;
+                shift -= 8;
+                part.clear();
+            } else part += c;
+        }
+        return QuantumValue((double)result); });
+
+    reg("ip_in_cidr", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.size() < 2) throw RuntimeError("ip_in_cidr() requires 2 arguments");
+        auto ipToInt = [](const std::string &ip) -> unsigned long {
+            unsigned long r = 0; int sh = 24; std::string p;
+            for (char c : ip + ".") {
+                if (c == '.') { r |= (std::stoul(p) & 0xFF) << sh; sh -= 8; p.clear(); }
+                else p += c;
+            }
+            return r;
+        };
+        std::string cidr = args[1].toString();
+        size_t slash = cidr.find('/');
+        if (slash == std::string::npos) return QuantumValue(false);
+        std::string network = cidr.substr(0, slash);
+        int prefix = std::stoi(cidr.substr(slash + 1));
+        unsigned long mask = prefix == 0 ? 0 : (0xFFFFFFFFUL << (32 - prefix));
+        return QuantumValue((ipToInt(args[0].toString()) & mask) == (ipToInt(network) & mask)); });
+
+    reg("cidr_hosts", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.empty()) throw RuntimeError("cidr_hosts() requires 1 argument");
+        std::string cidr = args[0].toString();
+        size_t slash = cidr.find('/');
+        if (slash == std::string::npos) return QuantumValue(std::make_shared<Array>());
+        auto ipToInt = [](const std::string &ip) -> unsigned long {
+            unsigned long r = 0; int sh = 24; std::string p;
+            for (char c : ip + ".") {
+                if (c == '.') { r |= (std::stoul(p) & 0xFF) << sh; sh -= 8; p.clear(); }
+                else p += c;
+            }
+            return r;
+        };
+        auto intToIp = [](unsigned long ip) -> std::string {
+            return std::to_string((ip>>24)&0xFF)+"."+std::to_string((ip>>16)&0xFF)+
+                   "."+std::to_string((ip>>8)&0xFF)+"."+std::to_string(ip&0xFF);
+        };
+        std::string network = cidr.substr(0, slash);
+        int prefix = std::stoi(cidr.substr(slash + 1));
+        unsigned long mask = prefix == 0 ? 0 : (0xFFFFFFFFUL << (32 - prefix));
+        unsigned long net = ipToInt(network) & mask;
+        unsigned long broadcast = net | (~mask & 0xFFFFFFFFUL);
+        auto arr = std::make_shared<Array>();
+        for (unsigned long ip = net + 1; ip < broadcast; ip++)
+            arr->push_back(QuantumValue(intToIp(ip)));
+        return QuantumValue(arr); });
+
+    reg("parse_http_request", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.empty()) throw RuntimeError("parse_http_request() requires 1 argument");
+        std::string raw = args[0].toString();
+        auto result = std::make_shared<Dict>();
+        auto headers = std::make_shared<Dict>();
+        std::istringstream ss(raw);
+        std::string line;
+        bool firstLine = true;
+        while (std::getline(ss, line)) {
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+            if (line.empty()) break;
+            if (firstLine) {
+                std::istringstream ls(line);
+                std::string method, path, version;
+                ls >> method >> path >> version;
+                (*result)["method"] = QuantumValue(method);
+                (*result)["path"]   = QuantumValue(path);
+                (*result)["version"]= QuantumValue(version);
+                firstLine = false;
+            } else {
+                size_t colon = line.find(':');
+                if (colon != std::string::npos) {
+                    std::string key = line.substr(0, colon);
+                    std::string val = line.substr(colon + 1);
+                    while (!val.empty() && val[0] == ' ') val = val.substr(1);
+                    (*headers)[key] = QuantumValue(val);
+                }
+            }
+        }
+        (*result)["headers"] = QuantumValue(headers);
+        return QuantumValue(result); });
+
+    // ── Forensics / string analysis ───────────────────────────────────────
+    reg("hamming_distance", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.size() < 2) throw RuntimeError("hamming_distance() requires 2 arguments");
+        std::string a = args[0].toString(), b = args[1].toString();
+        size_t len = std::min(a.size(), b.size());
+        int dist = (int)std::abs((long long)a.size() - (long long)b.size());
+        for (size_t i = 0; i < len; i++) if (a[i] != b[i]) dist++;
+        return QuantumValue((double)dist); });
+
+    reg("edit_distance", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.size() < 2) throw RuntimeError("edit_distance() requires 2 arguments");
+        std::string a = args[0].toString(), b = args[1].toString();
+        size_t m = a.size(), n = b.size();
+        std::vector<std::vector<int>> dp(m+1, std::vector<int>(n+1, 0));
+        for (size_t i = 0; i <= m; i++) dp[i][0] = (int)i;
+        for (size_t j = 0; j <= n; j++) dp[0][j] = (int)j;
+        for (size_t i = 1; i <= m; i++)
+            for (size_t j = 1; j <= n; j++) {
+                int cost = (a[i-1] == b[j-1]) ? 0 : 1;
+                dp[i][j] = std::min({dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost});
+            }
+        return QuantumValue((double)dp[m][n]); });
+
+    // ── Encoding / obfuscation ────────────────────────────────────────────
+    reg("url_encode", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.empty()) throw RuntimeError("url_encode() requires 1 argument");
+        std::string s = args[0].toString(), out;
+        for (unsigned char c : s) {
+            if (std::isalnum(c) || c=='-'||c=='_'||c=='.'||c=='~') out += c;
+            else { out += '%'; out += "0123456789ABCDEF"[c>>4]; out += "0123456789ABCDEF"[c&0xF]; }
+        }
+        return QuantumValue(out); });
+
+    reg("url_decode", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.empty()) throw RuntimeError("url_decode() requires 1 argument");
+        std::string s = args[0].toString(), out;
+        for (size_t i = 0; i < s.size(); i++) {
+            if (s[i]=='%' && i+2<s.size()) {
+                auto hexVal = [](char c)->int{
+                    if(c>='0'&&c<='9') return c-'0';
+                    if(c>='A'&&c<='F') return c-'A'+10;
+                    if(c>='a'&&c<='f') return c-'a'+10;
+                    return 0;
+                };
+                out += (char)((hexVal(s[i+1])<<4)|hexVal(s[i+2]));
+                i += 2;
+            } else if (s[i]=='+') out += ' ';
+            else out += s[i];
+        }
+        return QuantumValue(out); });
+
+    reg("str_to_hex_escape", [](std::vector<QuantumValue> args) -> QuantumValue
+        {
+        if (args.empty()) throw RuntimeError("str_to_hex_escape() requires 1 argument");
+        std::string s = args[0].toString(), out;
+        for (unsigned char c : s) {
+            out += "\\x";
+            out += "0123456789abcdef"[c>>4];
+            out += "0123456789abcdef"[c&0xF];
+        }
+        return QuantumValue(out); });
 }
 
 // ─── Array methods ────────────────────────────────────────────────────────────
