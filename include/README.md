@@ -1,35 +1,60 @@
-# QuantumLanguage Compiler - Disassembler.h
+# QuantumLanguage Compiler - Error.h
 
 ## Overview
 
-The `include/Disassembler.h` header file is an integral component of the QuantumLanguage compiler, dedicated to the disassembly process. This file primarily focuses on converting bytecode into human-readable assembly language, aiding in debugging and understanding the intermediate representation produced by the compiler.
+The `include/Error.h` header file is a critical component of the QuantumLanguage compiler, dedicated to defining error handling mechanisms. This file includes various exception classes derived from `std::runtime_error`, each tailored to specific types of errors encountered during compilation or execution. Additionally, it provides a namespace for color codes used in error messages for better visibility and user experience.
 
 ### Role in Compiler Pipeline
 
-The Disassembler operates at the end of the compiler pipeline, taking the final bytecode output and transforming it back into a readable format. This allows developers to inspect and verify the correctness of the generated code before deployment or further optimization.
+- **Compilation Errors**: Captures issues related to syntax, type mismatches, and undefined names before the code reaches the virtual machine.
+- **Execution Errors**: Handles runtime exceptions such as index out of bounds, type errors, and name resolution failures within the virtual machine.
 
 ### Key Design Decisions and Why
 
-#### Single Instruction Pretty-Printing
+1. **Custom Exception Classes**: By deriving from `std::runtime_error`, custom exception classes (`QuantumError`, `RuntimeError`, `TypeError`, etc.) provide more context-specific error information, making debugging easier.
+   
+2. **Line Number Information**: Each error class includes a line number attribute, allowing developers to pinpoint the exact location of the error in their source code quickly.
 
-The function `disassembleInstruction` is designed to pretty-print a single instruction from a bytecode chunk. Given that each instruction in QuantumLanguage's bytecode is represented by a single byte (`Opcode`), this function simplifies the disassembly process by always consuming one byte per instruction. This decision ensures consistency and ease of implementation.
-
-#### Entire Chunk Dumping
-
-The function `disassembleChunk` extends the functionality of `disassembleInstruction` by providing a comprehensive view of an entire bytecode chunk. By iterating through each instruction in the chunk, this function aggregates and outputs them as a continuous stream of assembly instructions. This approach facilitates a holistic examination of the compiled code.
+3. **Color Coding**: The `Colors` namespace offers a set of ANSI escape codes to style error messages differently based on their severity or category. This enhances readability and makes it easier to distinguish between different types of errors.
 
 ### Major Classes/Functions Overview
 
-- **disassembleInstruction**: Accepts a `Chunk` object and an index `idx`, representing the position of the instruction within the chunk. It outputs the instruction in a human-readable format to the specified `std::ostream`. The function guarantees that it consumes exactly one byte of data per call, making it suitable for sequential processing of the bytecode.
+#### QuantumError Class
 
-- **disassembleChunk**: Takes a `Chunk` object and an `std::ostream` as parameters. It iterates over all instructions in the chunk, using `disassembleInstruction` to convert each one into its assembly form. The resulting assembly code is then written to the provided stream, offering a complete disassembly of the bytecode.
+- **Purpose**: Acts as a base class for all quantum-related errors, providing common attributes like `line` and `kind`.
+- **Constructor**: Takes a message string, an optional line number, and a kind string indicating the type of error.
+
+#### RuntimeError Class
+
+- **Purpose**: Derived from `QuantumError`, specifically for runtime exceptions.
+- **Constructor**: Simplifies the creation of runtime error instances with just a message and an optional line number.
+
+#### TypeError Class
+
+- **Purpose**: Derived from `QuantumError`, designed for type-related errors.
+- **Constructor**: Facilitates the creation of type error instances using a message and an optional line number.
+
+#### NameError Class
+
+- **Purpose**: Derived from `QuantumError`, intended for errors related to undefined names.
+- **Constructor**: Provides a straightforward way to create name error instances with a message and an optional line number.
+
+#### IndexError Class
+
+- **Purpose**: Derived from `QuantumError`, used for index out of bounds errors.
+- **Constructor**: Simplifies the creation of index error instances by accepting a message and an optional line number.
+
+#### Colors Namespace
+
+- **Purpose**: Offers a collection of ANSI escape codes for styling console output.
+- **Contents**: Includes constants for red, yellow, white, cyan, green, blue, bold, reset, and magenta colors.
 
 ### Tradeoffs
 
-While the current design provides a straightforward and efficient way to disassemble bytecode, there are some potential tradeoffs:
+- **Performance**: Using custom exception classes might introduce slight performance overhead compared to standard exceptions, but this is generally negligible in most applications.
+  
+- **Complexity**: Adding color coding increases the complexity of error handling but improves usability significantly, especially in large projects where multiple types of errors need to be distinguished easily.
 
-- **Performance vs. Readability**: The focus on simplicity and performance might result in less detailed or more cryptic assembly representations compared to more complex disassemblers. However, this balance is necessary given the compact nature of QuantumLanguage's bytecode.
+- **Readability**: Custom exception classes enhance readability by clearly categorizing errors, while color coding aids visual identification of error types.
 
-- **Memory Usage**: Storing and processing the entire bytecode chunk simultaneously can be memory-intensive. Future optimizations could explore incremental disassembly techniques to reduce memory usage.
-
-By addressing these considerations, the `Disassembler.h` header file aims to provide a robust yet user-friendly tool for analyzing QuantumLanguage's compiled code, enhancing both development and maintenance processes.
+By leveraging these components, the QuantumLanguage compiler ensures robust error management throughout its pipeline, from initial compilation to runtime execution, thereby improving both developer productivity and code quality.
