@@ -1,70 +1,40 @@
-# QuantumLanguage Compiler - Lexer.h
+# QuantumLanguage Compiler - Opcode.h
 
 ## Overview
 
-The `include/Lexer.h` header file is a critical component of the QuantumLanguage compiler, primarily responsible for converting source code into a sequence of tokens. This process is fundamental to the compilation pipeline as it lays the groundwork for subsequent stages such as parsing and semantic analysis. The lexer class, `Lexer`, encapsulates the logic necessary to accurately identify and categorize each token in the source code, ensuring that the compiler can correctly interpret the program's structure and intent.
+The `include/Opcode.h` header file is a critical component of the QuantumLanguage compiler, defining the instruction set (opcodes) used by the virtual machine (VM). These opcodes represent fundamental operations such as stack manipulation, variable handling, arithmetic, comparison, logical operations, control flow, function calls, collection management, member/index access, iteration, class definitions, exceptions, and miscellaneous operations. This file serves as the foundation for the VM's ability to execute quantum language programs efficiently and correctly.
 
-### Key Design Decisions and Why
+## Role in Compiler Pipeline
 
-1. **State Machine Approach**: The lexer uses a state machine to handle different types of characters and transitions between states based on the encountered input. This approach allows for efficient and straightforward tokenization without complex nested loops or recursive functions, making the implementation both readable and maintainable.
+1. **Compilation**: During the compilation phase, the QuantumLanguage compiler translates high-level source code into bytecode using these opcodes.
+2. **Execution**: The VM interprets and executes the bytecode generated during compilation.
+3. **Optimization**: Some optimizations can be applied at runtime based on opcode sequences, improving performance without altering the original program.
 
-2. **Support for F-Strings**: To accommodate Python-like formatted string literals, the lexer includes support for f-strings. This feature involves using a separate data structure (`pendingTokens_`) to temporarily store tokens during the expansion of f-strings, which are then combined back into a single token stream. This ensures that f-strings are handled seamlessly and correctly within the compiler.
+## Key Design Decisions and Why
 
-3. **C Preprocessor Support**: The lexer also supports C preprocessor directives, specifically `#define`. These macros are stored in a hash map (`defines_`), where each macro name maps to its corresponding replacement token list. This allows the lexer to expand macros before further processing, ensuring that all preprocessed content is correctly interpreted.
-
-4. **Error Handling**: While not explicitly shown in the provided code snippet, the lexer should have robust error handling mechanisms to manage unexpected characters, syntax errors, and other issues that may arise during tokenization. This helps in providing clear and actionable error messages to the developer, facilitating easier debugging and maintenance.
+- **Efficiency**: By using a compact representation (e.g., `uint8_t`), the opcodes minimize memory usage and improve execution speed.
+- **Flexibility**: The inclusion of various types of operations (stack manipulation, arithmetic, logical, etc.) allows the VM to handle complex quantum language constructs.
+- **Safety**: Exception handling mechanisms (e.g., `PUSH_HANDLER`, `POP_HANDLER`, `RAISE`, `RERAISE`) ensure robust error management during program execution.
+- **Extensibility**: The file supports C++ extensions like pointer operations (`ADDRESS_OF`, `DEREF`, `ARROW`), making it versatile for future enhancements and integrations.
 
 ## Major Classes/Functions Overview
 
-### Lexer Class
+### Enum Class `Op`
+This enumeration defines all the available opcodes. Each opcode corresponds to a specific operation that the VM can perform. For example:
+- `LOAD_CONST`: Pushes a constant onto the stack.
+- `CALL`: Calls a function with a specified number of arguments.
+- `JUMP`: Unconditionally jumps to a specified instruction pointer (IP).
 
-- **Constructor**: `explicit Lexer(const std::string &source);`
-  - Initializes the lexer with the source code to be tokenized.
-
-- **tokenize Method**: `std::vector<Token> tokenize();`
-  - Converts the entire source code into a vector of tokens.
-
-### Private Methods
-
-- **current Method**: `char current() const;`
-  - Returns the character at the current position in the source code.
-
-- **peek Method**: `char peek(int offset = 1) const;`
-  - Returns the character at the specified offset from the current position.
-
-- **advance Method**: `char advance();`
-  - Advances the current position in the source code and returns the new character.
-
-- **skipWhitespace Method**: `void skipWhitespace();`
-  - Skips over any whitespace characters in the source code.
-
-- **skipComment Method**: `void skipComment();`
-  - Skips over a single-line comment starting with `//`.
-
-- **skipBlockComment Method**: `void skipBlockComment();`
-  - Skips over a multi-line comment enclosed between `/*` and `*/`.
-
-- **readNumber Method**: `Token readNumber();`
-  - Reads a numeric literal from the source code and returns it as a `Token`.
-
-- **readString Method**: `Token readString(char quote);`
-  - Reads a string literal enclosed by the specified quote character and returns it as a `Token`.
-
-- **readTemplateLiteral Method**: `void readTemplateLiteral(std::vector<Token> &out, int startLine, int startCol);`
-  - Handles the expansion of template literals (f-strings) and appends the resulting tokens to the output vector.
-
-- **readIdentifierOrKeyword Method**: `Token readIdentifierOrKeyword();`
-  - Reads an identifier or keyword from the source code and returns it as a `Token`.
-
-- **readOperator Method**: `Token readOperator();`
-  - Reads an operator or punctuation mark from the source code and returns it as a `Token`.
+### Functions
+- **`execute()`**: Main function to execute the VM. It processes each opcode in sequence and updates the stack and IP accordingly.
+- **`interpret()`**: Entry point for interpreting bytecode. Initializes the VM context and starts the execution loop.
+- **`handleException()`**: Manages exception handling by pushing and popping handlers and raising/rethrowing exceptions.
 
 ## Tradeoffs
 
-- **Complexity vs. Efficiency**: By using a state machine, the lexer achieves a balance between simplicity and efficiency. However, more advanced features like f-string expansion and C preprocessor support add complexity to the implementation.
+- **Memory Usage**: Using compact data types like `uint8_t` reduces memory footprint but may increase complexity in opcode decoding.
+- **Performance**: Efficient opcode processing is crucial for fast execution. However, overly complex opcodes might lead to increased parsing time.
+- **Readability**: While compactness improves efficiency, it can reduce readability for developers unfamiliar with the opcode system.
+- **Maintainability**: Extending the opcode set requires careful consideration to maintain backward compatibility and avoid conflicts.
 
-- **Readability vs. Performance**: The use of separate data structures for f-string expansion and macro definitions might slightly impact performance, but it significantly improves the readability and maintainability of the code.
-
-- **Flexibility vs. Simplicity**: Supporting both f-strings and C preprocessor directives increases the flexibility of the lexer, but it also adds additional layers of complexity to the codebase.
-
-Overall, the `Lexer.h` file is a well-designed and essential part of the QuantumLanguage compiler, enabling accurate and efficient tokenization of source code. Its ability to handle advanced features like f-strings and C preprocessor directives makes it a versatile tool for developers working with the QuantumLanguage platform.
+In summary, the `Opcode.h` file is vital for defining the instruction set and behavior of the QuantumLanguage VM. Its comprehensive design ensures efficient, flexible, safe, and extensible execution of quantum language programs.
