@@ -1,0 +1,24 @@
+[submodule "Website"]
+	path = Website
+	url = https://github.com/SENODROOM/QuantumLanguage-Website.git
+	branch = main
+[submodule "Library"]
+	path = examples/library
+	url = https://github.com/SENODROOM/Quantum-Library.git
+	branch = main
+[submodule "code-explaination"]
+	path = docs/code-explanation
+	url = https://github.com/SENODROOM/QuantumLangCodeExplaination.git
+	branch = main
+[submodule "demo"]
+	path = examples/demo
+	url = https://github.com/SENODROOM/QuantumCodeDemo.git
+	branch = main
+[submodule "extensions"]
+	path = extensions
+	url = https://github.com/SENODROOM/QLang-DesginDocs.git
+	branch = main
+[submodule "design"]
+	path = docs/design
+	url = https://github.com/SENODROOM/QLang-DesginDocs.git
+	branch = main
