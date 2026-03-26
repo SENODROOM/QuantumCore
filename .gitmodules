@@ -2,10 +2,6 @@
 	path = Website
 	url = https://github.com/SENODROOM/QuantumLanguage-Website.git
 	branch = main
-[submodule "code-explaination"]
-	path = docs/code-explanation
-	url = https://github.com/SENODROOM/QuantumLangCodeExplaination.git
-	branch = main
 [submodule "demo"]
 	path = examples/demo
 	url = https://github.com/SENODROOM/QuantumCodeDemo.git
