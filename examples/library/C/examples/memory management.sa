@@ -1,0 +1,540 @@
+# memory_management.sa - Memory Management Examples
+# C-style memory management implementation in Quantum Language
+
+print("=== Memory Management Examples ===");
+
+# Memory allocation simulation
+print("\n--- Memory Allocation Simulation ---");
+
+class MemoryBlock {
+    constructor(address, size, allocated) {
+        this.address = address;
+        this.size = size;
+        this.allocated = allocated;
+        this.data = null;
+    }
+    
+    allocate(data) {
+        if (this.allocated && this.data == null) {
+            this.data = data;
+            return true;
+        }
+        return false;
+    }
+    
+    deallocate() {
+        this.data = null;
+        this.allocated = false;
+    }
+    
+    get_info() {
+        return {
+            "address": this.address,
+            "size": this.size,
+            "allocated": this.allocated,
+            "has_data": this.data != null
+        };
+    }
+}
+
+class MemoryManager {
+    constructor(total_size) {
+        this.total_size = total_size;
+        this.blocks = [];
+        this.next_address = 1000;  # Starting address
+        this.allocated_count = 0;
+        this.allocated_size = 0;
+    }
+    
+    malloc(size) {
+        # Find a free block or create new one
+        for (let i = 0; i < len(this.blocks); i++) {
+            if (!this.blocks[i].allocated && this.blocks[i].size >= size) {
+                this.blocks[i].allocated = true;
+                this.allocated_count++;
+                this.allocated_size += size;
+                print("Allocated", size, "bytes at address", this.blocks[i].address);
+                return this.blocks[i].address;
+            }
+        }
+        
+        # Create new block
+        if (this.allocated_size + size <= this.total_size) {
+            let block = MemoryBlock(this.next_address, size, true);
+            this.blocks.push(block);
+            this.next_address += size;
+            this.allocated_count++;
+            this.allocated_size += size;
+            print("Allocated", size, "bytes at address", block.address);
+            return block.address;
+        }
+        
+        print("Failed to allocate", size, "bytes - insufficient memory");
+        return -1;
+    }
+    
+    free(address) {
+        for (let i = 0; i < len(this.blocks); i++) {
+            if (this.blocks[i].address == address && this.blocks[i].allocated) {
+                let size = this.blocks[i].size;
+                this.blocks[i].deallocate();
+                this.allocated_count--;
+                this.allocated_size -= size;
+                print("Freed", size, "bytes at address", address);
+                return true;
+            }
+        }
+        
+        print("Failed to free address", address, "- not found or already freed");
+        return false;
+    }
+    
+    realloc(address, new_size) {
+        for (let i = 0; i < len(this.blocks); i++) {
+            if (this.blocks[i].address == address && this.blocks[i].allocated) {
+                let old_size = this.blocks[i].size;
+                
+                if (new_size <= old_size) {
+                    # Shrink block
+                    this.blocks[i].size = new_size;
+                    this.allocated_size -= (old_size - new_size);
+                    print("Reallocated address", address, "from", old_size, "to", new_size, "bytes (shrunk)");
+                    return address;
+                } else {
+                    # Need new block
+                    let new_address = this.malloc(new_size);
+                    if (new_address != -1) {
+                        # Copy data (simulated)
+                        print("Copied data from", address, "to", new_address);
+                        this.free(address);
+                        print("Reallocated address", address, "to", new_address, "bytes");
+                        return new_address;
+                    }
+                }
+                break;
+            }
+        }
+        
+        print("Failed to reallocate address", address);
+        return -1;
+    }
+    
+    get_memory_info() {
+        return {
+            "total_size": this.total_size,
+            "allocated_size": this.allocated_size,
+            "free_size": this.total_size - this.allocated_size,
+            "allocated_count": this.allocated_count,
+            "utilization": (this.allocated_size / this.total_size * 100).toFixed(2) + "%"
+        };
+    }
+    
+    display_memory_map() {
+        print("Memory Map:");
+        for (let i = 0; i < len(this.blocks); i++) {
+            let block = this.blocks[i];
+            let status = block.allocated ? "ALLOCATED" : "FREE";
+            print("  Address:", block.address, "Size:", block.size, "Status:", status);
+        }
+    }
+    
+    defragment() {
+        print("Defragmenting memory...");
+        let allocated_blocks = [];
+        let free_blocks = [];
+        
+        # Separate allocated and free blocks
+        for (let i = 0; i < len(this.blocks); i++) {
+            if (this.blocks[i].allocated) {
+                allocated_blocks.push(this.blocks[i]);
+            } else {
+                free_blocks.push(this.blocks[i]);
+            }
+        }
+        
+        # Reorganize allocated blocks contiguously
+        let current_address = 1000;
+        for (let i = 0; i < len(allocated_blocks); i++) {
+            if (allocated_blocks[i].address != current_address) {
+                print("Moving block from", allocated_blocks[i].address, "to", current_address);
+                allocated_blocks[i].address = current_address;
+            }
+            current_address += allocated_blocks[i].size;
+        }
+        
+        # Update blocks list
+        this.blocks = allocated_blocks;
+        this.next_address = current_address;
+        print("Defragmentation complete");
+    }
+}
+
+# Test memory manager
+let mem_manager = MemoryManager(1024);  # 1KB total memory
+
+print("Initial memory state:");
+print(mem_manager.get_memory_info());
+
+# Allocate some memory
+let addr1 = mem_manager.malloc(100);
+let addr2 = mem_manager.malloc(200);
+let addr3 = mem_manager.malloc(150);
+
+print("\nAfter allocations:");
+print(mem_manager.get_memory_info());
+mem_manager.display_memory_map();
+
+# Free some memory
+print("\nFreeing memory...");
+mem_manager.free(addr2);
+
+print("\nAfter freeing:");
+print(mem_manager.get_memory_info());
+mem_manager.display_memory_map();
+
+# Reallocate memory
+print("\nReallocating memory...");
+let new_addr = mem_manager.realloc(addr1, 150);
+
+print("\nAfter reallocation:");
+print(mem_manager.get_memory_info());
+mem_manager.display_memory_map();
+
+# Defragment memory
+print("\nDefragmenting...");
+mem_manager.defragment();
+mem_manager.display_memory_map();
+
+# Memory leak detection
+print("\n=== Memory Leak Detection ===");
+
+class MemoryLeakDetector {
+    constructor() {
+        this.allocations = {};
+        this.leak_count = 0;
+        this.total_leaked = 0;
+    }
+    
+    track_allocation(address, size, tag) {
+        this.allocations[str(address)] = {
+            "size": size,
+            "tag": tag,
+            "timestamp": time()
+        };
+    }
+    
+    track_deallocation(address) {
+        let addr_str = str(address);
+        if (this.allocations[addr_str] != null) {
+            delete this.allocations[addr_str];
+        }
+    }
+    
+    detect_leaks() {
+        this.leak_count = 0;
+        this.total_leaked = 0;
+        
+        print("Memory Leak Detection Results:");
+        print("============================");
+        
+        for (let address in this.allocations) {
+            let alloc = this.allocations[address];
+            this.leak_count++;
+            this.total_leaked += alloc.size;
+            print("LEAK: Address", address, "Size:", alloc.size, "Tag:", alloc.tag);
+        }
+        
+        print("============================");
+        print("Total leaks detected:", this.leak_count);
+        print("Total memory leaked:", this.total_leaked, "bytes");
+        
+        return this.leak_count;
+    }
+    
+    generate_report() {
+        let report = "Memory Leak Report\n";
+        report += "==================\n";
+        report += "Total leaks: " + str(this.leak_count) + "\n";
+        report += "Total leaked memory: " + str(this.total_leaked) + " bytes\n\n";
+        
+        for (let address in this.allocations) {
+            let alloc = this.allocations[address];
+            report += "Leak at address " + address + ":\n";
+            report += "  Size: " + str(alloc.size) + " bytes\n";
+            report += "  Tag: " + alloc.tag + "\n";
+            report += "  Timestamp: " + str(alloc.timestamp) + "\n\n";
+        }
+        
+        return report;
+    }
+}
+
+# Test memory leak detection
+let leak_detector = MemoryLeakDetector();
+
+# Simulate some allocations with potential leaks
+leak_detector.track_allocation(1000, 64, "test_buffer");
+leak_detector.track_allocation(1064, 128, "user_data");
+leak_detector.track_allocation(1192, 256, "temp_buffer");
+
+# Simulate some deallocations (but forget one)
+leak_detector.track_deallocation(1064);  # This one is properly freed
+
+# Detect leaks
+leak_detector.detect_leaks();
+
+# Generate and save report
+let leak_report = leak_detector.generate_report();
+write_file("memory_leak_report.txt", leak_report);
+print("Leak report saved to memory_leak_report.txt");
+
+# Smart pointer simulation
+print("\n=== Smart Pointer Simulation ===");
+
+class SmartPointer {
+    constructor(data) {
+        this.data = data;
+        this.ref_count = 1;
+        this.address = randint(1000, 9999);
+        print("SmartPointer created at address", this.address, "with ref_count =", this.ref_count);
+    }
+    
+    add_ref() {
+        this.ref_count++;
+        print("SmartPointer at", this.address, "ref_count increased to", this.ref_count);
+        return this;
+    }
+    
+    release() {
+        this.ref_count--;
+        print("SmartPointer at", this.address, "ref_count decreased to", this.ref_count);
+        
+        if (this.ref_count <= 0) {
+            print("SmartPointer at", this.address, "being deleted");
+            this.data = null;
+            return true;  # Object should be deleted
+        }
+        return false;
+    }
+    
+    get() {
+        return this.data;
+    }
+    
+    reset(new_data) {
+        if (this.data != new_data) {
+            this.data = new_data;
+            print("SmartPointer at", this.address, "reset with new data");
+        }
+    }
+    
+    use_count() {
+        return this.ref_count;
+    }
+}
+
+# Test smart pointers
+print("Creating smart pointer...");
+let sp1 = SmartPointer("Hello World");
+
+print("Adding references...");
+let sp2 = sp1.add_ref();
+let sp3 = sp1.add_ref();
+
+print("Current ref_count:", sp1.use_count());
+
+print("Releasing references...");
+sp1.release();
+sp2.release();
+
+print("Current ref_count:", sp3.use_count());
+
+print("Final release...");
+sp3.release();
+
+# Pool allocator simulation
+print("\n=== Pool Allocator Simulation ===");
+
+class PoolAllocator {
+    constructor(block_size, num_blocks) {
+        this.block_size = block_size;
+        this.num_blocks = num_blocks;
+        this.pool = [];
+        this.free_blocks = [];
+        
+        # Initialize pool
+        for (let i = 0; i < num_blocks; i++) {
+            this.pool.push({"data": null, "in_use": false});
+            this.free_blocks.push(i);
+        }
+        
+        print("Pool allocator created:", num_blocks, "blocks of", block_size, "bytes each");
+    }
+    
+    allocate() {
+        if (len(this.free_blocks) == 0) {
+            print("Pool allocator: No free blocks available");
+            return -1;
+        }
+        
+        let block_index = this.free_blocks.pop();
+        this.pool[block_index].in_use = true;
+        print("Pool allocator: Allocated block", block_index);
+        return block_index;
+    }
+    
+    deallocate(block_index) {
+        if (block_index >= 0 && block_index < len(this.pool)) {
+            if (this.pool[block_index].in_use) {
+                this.pool[block_index].in_use = false;
+                this.pool[block_index].data = null;
+                this.free_blocks.push(block_index);
+                print("Pool allocator: Deallocated block", block_index);
+                return true;
+            }
+        }
+        
+        print("Pool allocator: Invalid block index", block_index);
+        return false;
+    }
+    
+    get_pool_info() {
+        let used = 0;
+        for (let i = 0; i < len(this.pool); i++) {
+            if (this.pool[i].in_use) {
+                used++;
+            }
+        }
+        
+        return {
+            "total_blocks": this.num_blocks,
+            "used_blocks": used,
+            "free_blocks": this.num_blocks - used,
+            "utilization": (used / this.num_blocks * 100).toFixed(2) + "%"
+        };
+    }
+    
+    display_pool_status() {
+        print("Pool Status:");
+        let status_line = "";
+        for (let i = 0; i < len(this.pool); i++) {
+            status_line += this.pool[i].in_use ? "█" : "░";
+        }
+        print("  ", status_line);
+        print("  █ = Used, ░ = Free");
+    }
+}
+
+# Test pool allocator
+let pool = PoolAllocator(64, 16);  # 16 blocks of 64 bytes each
+
+print("\nInitial pool status:");
+print(pool.get_pool_info());
+pool.display_pool_status();
+
+# Allocate some blocks
+print("\nAllocating blocks...");
+let allocated_blocks = [];
+for (let i = 0; i < 8; i++) {
+    let block = pool.allocate();
+    if (block != -1) {
+        allocated_blocks.push(block);
+    }
+}
+
+print("\nAfter allocations:");
+print(pool.get_pool_info());
+pool.display_pool_status();
+
+# Deallocate some blocks
+print("\nDeallocating some blocks...");
+for (let i = 0; i < 3; i++) {
+    if (len(allocated_blocks) > 0) {
+        let block = allocated_blocks.pop();
+        pool.deallocate(block);
+    }
+}
+
+print("\nAfter deallocations:");
+print(pool.get_pool_info());
+pool.display_pool_status();
+
+# Memory usage profiler
+print("\n=== Memory Usage Profiler ===");
+
+class MemoryProfiler {
+    constructor() {
+        this.snapshots = [];
+        this.start_time = time();
+    }
+    
+    take_snapshot(label, memory_info) {
+        let snapshot = {
+            "timestamp": time() - this.start_time,
+            "label": label,
+            "allocated": memory_info.allocated_size,
+            "free": memory_info.free_size,
+            "utilization": memory_info.utilization
+        };
+        this.snapshots.push(snapshot);
+        print("Memory snapshot taken:", label, "-", snapshot.utilization, "utilization");
+    }
+    
+    generate_report() {
+        let report = "Memory Usage Profile\n";
+        report += "===================\n\n";
+        
+        for (let i = 0; i < len(this.snapshots); i++) {
+            let snap = this.snapshots[i];
+            report += "Time: " + str(snap.timestamp) + "s\n";
+            report += "Label: " + snap.label + "\n";
+            report += "Allocated: " + str(snap.allocated) + " bytes\n";
+            report += "Free: " + str(snap.free) + " bytes\n";
+            report += "Utilization: " + snap.utilization + "\n";
+            report += "-------------------\n\n";
+        }
+        
+        return report;
+    }
+    
+    find_peak_usage() {
+        if (len(this.snapshots) == 0) {
+            return null;
+        }
+        
+        let peak = this.snapshots[0];
+        for (let i = 1; i < len(this.snapshots); i++) {
+            if (this.snapshots[i].allocated > peak.allocated) {
+                peak = this.snapshots[i];
+            }
+        }
+        
+        return peak;
+    }
+}
+
+# Test memory profiler
+let profiler = MemoryProfiler();
+
+# Take snapshots during memory operations
+profiler.take_snapshot("Initial", mem_manager.get_memory_info());
+
+let addr4 = mem_manager.malloc(300);
+profiler.take_snapshot("After malloc 300", mem_manager.get_memory_info());
+
+let addr5 = mem_manager.malloc(400);
+profiler.take_snapshot("After malloc 400", mem_manager.get_memory_info());
+
+mem_manager.free(addr3);
+profiler.take_snapshot("After free", mem_manager.get_memory_info());
+
+# Generate and save profile report
+let profile_report = profiler.generate_report();
+write_file("memory_profile.txt", profile_report);
+
+let peak = profiler.find_peak_usage();
+if (peak != null) {
+    print("Peak memory usage:", peak.allocated, "bytes at", peak.label);
+}
+
+print("\nMemory management examples completed!");

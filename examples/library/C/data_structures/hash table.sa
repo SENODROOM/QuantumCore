@@ -1,0 +1,522 @@
+# hash_table.sa - Hash Table Data Structure Implementation
+# C-style hash table implementation in Quantum Language
+
+# Hash Table Node class (for chaining)
+class HashNode {
+    constructor(key, value) {
+        this.key = key;
+        this.value = value;
+        this.next = null;
+    }
+}
+
+# Hash Table class
+class HashTable {
+    constructor(size) {
+        this.size = size;
+        this.table = [];
+        this.count = 0;
+        
+        # Initialize table with empty lists
+        for (let i = 0; i < size; i++) {
+            this.table.push(null);
+        }
+    }
+    
+    # Hash function (simple string hash)
+    hash(key) {
+        if (typeof(key) == "number") {
+            return key % this.size;
+        }
+        
+        # String hashing
+        let hash_value = 0;
+        for (let i = 0; i < len(key); i++) {
+            hash_value = (hash_value * 31 + key[i].charCodeAt()) % this.size;
+        }
+        return hash_value < 0 ? hash_value + this.size : hash_value;
+    }
+    
+    # Insert or update a key-value pair
+    insert(key, value) {
+        let index = this.hash(key);
+        let new_node = HashNode(key, value);
+        
+        if (this.table[index] == null) {
+            this.table[index] = new_node;
+        } else {
+            # Check if key already exists and update
+            let current = this.table[index];
+            while (current != null) {
+                if (current.key == key) {
+                    current.value = value;
+                    return true;
+                }
+                if (current.next == null) {
+                    break;
+                }
+                current = current.next;
+            }
+            # Add to end of chain
+            current.next = new_node;
+        }
+        
+        this.count++;
+        return true;
+    }
+    
+    # Get value by key
+    get(key) {
+        let index = this.hash(key);
+        let current = this.table[index];
+        
+        while (current != null) {
+            if (current.key == key) {
+                return current.value;
+            }
+            current = current.next;
+        }
+        
+        return null;  # Key not found
+    }
+    
+    # Remove a key-value pair
+    remove(key) {
+        let index = this.hash(key);
+        let current = this.table[index];
+        let prev = null;
+        
+        while (current != null) {
+            if (current.key == key) {
+                if (prev == null) {
+                    this.table[index] = current.next;
+                } else {
+                    prev.next = current.next;
+                }
+                this.count--;
+                return true;
+            }
+            prev = current;
+            current = current.next;
+        }
+        
+        return false;  # Key not found
+    }
+    
+    # Check if key exists
+    contains(key) {
+        return this.get(key) != null;
+    }
+    
+    # Get all keys
+    keys() {
+        let all_keys = [];
+        
+        for (let i = 0; i < this.size; i++) {
+            let current = this.table[i];
+            while (current != null) {
+                all_keys.push(current.key);
+                current = current.next;
+            }
+        }
+        
+        return all_keys;
+    }
+    
+    # Get all values
+    values() {
+        let all_values = [];
+        
+        for (let i = 0; i < this.size; i++) {
+            let current = this.table[i];
+            while (current != null) {
+                all_values.push(current.value);
+                current = current.next;
+            }
+        }
+        
+        return all_values;
+    }
+    
+    # Get current number of elements
+    get_count() {
+        return this.count;
+    }
+    
+    # Check if hash table is empty
+    is_empty() {
+        return this.count == 0;
+    }
+    
+    # Clear the hash table
+    clear() {
+        for (let i = 0; i < this.size; i++) {
+            this.table[i] = null;
+        }
+        this.count = 0;
+    }
+    
+    # Display hash table contents
+    display() {
+        if (this.is_empty()) {
+            print("Hash table is empty");
+            return;
+        }
+        
+        print("Hash Table Contents:");
+        for (let i = 0; i < this.size; i++) {
+            if (this.table[i] != null) {
+                print("Bucket", i, ":");
+                let current = this.table[i];
+                while (current != null) {
+                    print("  ", current.key, ":", current.value);
+                    current = current.next;
+                }
+            }
+        }
+    }
+    
+    # Get load factor
+    get_load_factor() {
+        return this.count / this.size;
+    }
+    
+    # Display bucket distribution
+    display_distribution() {
+        print("Bucket Distribution:");
+        let bucket_sizes = [];
+        
+        for (let i = 0; i < this.size; i++) {
+            let size = 0;
+            let current = this.table[i];
+            while (current != null) {
+                size++;
+                current = current.next;
+            }
+            bucket_sizes.push(size);
+        }
+        
+        for (let i = 0; i < this.size; i++) {
+            if (bucket_sizes[i] > 0) {
+                print("Bucket", i, ":", bucket_sizes[i], "elements");
+            }
+        }
+        
+        let max_bucket = max(bucket_sizes);
+        let avg_bucket = this.count / this.size;
+        print("Max bucket size:", max_bucket);
+        print("Average bucket size:", avg_bucket.toFixed(2));
+        print("Load factor:", this.get_load_factor().toFixed(2));
+    }
+}
+
+# Test Hash Table
+print("=== Hash Table Test ===");
+
+let ht = HashTable(10);
+
+# Test insert operations
+print("\n--- Testing Insert Operations ---");
+ht.insert("apple", 5);
+ht.insert("banana", 3);
+ht.insert("orange", 7);
+ht.insert("grape", 2);
+ht.insert("mango", 4);
+ht.insert("apple", 8);  # Update existing key
+
+print("After insertions:");
+ht.display();
+
+print("\nHash table properties:");
+print("Count:", ht.get_count());
+print("Load factor:", ht.get_load_factor().toFixed(2));
+
+# Test get operations
+print("\n--- Testing Get Operations ---");
+print("Get 'apple':", ht.get("apple"));
+print("Get 'banana':", ht.get("banana"));
+print("Get 'pear':", ht.get("pear"));
+
+# Test contains operation
+print("\n--- Testing Contains Operation ---");
+print("Contains 'orange':", ht.contains("orange"));
+print("Contains 'pear':", ht.contains("pear"));
+
+# Test remove operations
+print("\n--- Testing Remove Operations ---");
+print("Remove 'grape':", ht.remove("grape"));
+print("Remove 'pear':", ht.remove("pear"));
+
+print("\nAfter removals:");
+ht.display();
+print("Count:", ht.get_count());
+
+# Test keys and values
+print("\n--- Testing Keys and Values ---");
+print("All keys:", ht.keys());
+print("All values:", ht.values());
+
+# Test with numeric keys
+print("\n--- Testing with Numeric Keys ---");
+let numeric_ht = HashTable(8);
+
+for (let i = 0; i < 15; i++) {
+    let key = i * 3;
+    numeric_ht.insert(key, "value_" + key);
+}
+
+print("Numeric hash table:");
+numeric_ht.display();
+numeric_ht.display_distribution();
+
+# Hash Table application: Symbol Table
+print("\n=== Hash Table Application: Symbol Table ===");
+
+class SymbolTable {
+    constructor() {
+        this.symbols = HashTable(100);
+        this.scopes = [];
+        this.current_scope = 0;
+    }
+    
+    enter_scope(scope_name) {
+        this.current_scope++;
+        this.scopes.push({"name": scope_name, "symbols": []});
+        print("Entered scope:", scope_name, "(Level:", this.current_scope, ")");
+    }
+    
+    exit_scope() {
+        if (len(this.scopes) > 0) {
+            let scope = this.scopes.pop();
+            # Remove symbols from this scope
+            for (let symbol in scope.symbols) {
+                this.symbols.remove(symbol);
+            }
+            this.current_scope--;
+            print("Exited scope:", scope.name, "(Level:", this.current_scope, ")");
+        }
+    }
+    
+    declare(name, type, value) {
+        if (this.symbols.contains(name)) {
+            print("Error: Symbol", name, "already declared");
+            return false;
+        }
+        
+        let symbol_info = {
+            "name": name,
+            "type": type,
+            "value": value,
+            "scope": this.current_scope
+        };
+        
+        this.symbols.insert(name, symbol_info);
+        if (len(this.scopes) > 0) {
+            this.scopes[len(this.scopes) - 1].symbols.push(name);
+        }
+        
+        print("Declared", name, "as", type, "=", value);
+        return true;
+    }
+    
+    lookup(name) {
+        let symbol = this.symbols.get(name);
+        if (symbol != null) {
+            print("Found", name, ":", symbol.type, "=", symbol.value, "(Scope:", symbol.scope, ")");
+            return symbol;
+        } else {
+            print("Symbol", name, "not found");
+            return null;
+        }
+    }
+    
+    update(name, new_value) {
+        let symbol = this.symbols.get(name);
+        if (symbol != null) {
+            symbol.value = new_value;
+            this.symbols.insert(name, symbol);  # Update
+            print("Updated", name, "to", new_value);
+            return true;
+        } else {
+            print("Cannot update undefined symbol", name);
+            return false;
+        }
+    }
+    
+    display_symbols() {
+        print("Current symbols in scope", this.current_scope, ":");
+        let all_keys = this.symbols.keys();
+        for (let key in all_keys) {
+            let symbol = this.symbols.get(key);
+            if (symbol.scope == this.current_scope) {
+                print("  ", symbol.name, ":", symbol.type, "=", symbol.value);
+            }
+        }
+    }
+}
+
+# Test symbol table
+let sym_table = SymbolTable();
+sym_table.enter_scope("main");
+sym_table.declare("x", "int", 10);
+sym_table.declare("y", "int", 20);
+sym_table.declare("name", "string", "\"Hello\"");
+
+sym_table.display_symbols();
+sym_table.lookup("x");
+sym_table.lookup("name");
+
+sym_table.enter_scope("function");
+sym_table.declare("x", "int", 30);  # Shadowing
+sym_table.declare("result", "float", 3.14);
+
+sym_table.display_symbols();
+sym_table.lookup("x");
+
+sym_table.exit_scope();
+sym_table.lookup("x");
+
+# Hash Table application: Cache
+print("\n=== Hash Table Application: Cache ===");
+
+class LRUCache {
+    constructor(capacity) {
+        this.capacity = capacity;
+        this.cache = HashTable(capacity * 2);
+        this.access_order = [];
+    }
+    
+    get(key) {
+        if (this.cache.contains(key)) {
+            # Update access order
+            let index = -1;
+            for (let i = 0; i < len(this.access_order); i++) {
+                if (this.access_order[i] == key) {
+                    index = i;
+                    break;
+                }
+            }
+            
+            if (index != -1) {
+                this.access_order.splice(index, 1);
+                this.access_order.push(key);
+            }
+            
+            print("Cache HIT for key:", key);
+            return this.cache.get(key);
+        } else {
+            print("Cache MISS for key:", key);
+            return null;
+        }
+    }
+    
+    put(key, value) {
+        if (this.cache.contains(key)) {
+            # Update existing
+            this.cache.insert(key, value);
+            this._update_access_order(key);
+            print("Updated cache for key:", key);
+        } else {
+            # Add new
+            if (len(this.access_order) >= this.capacity) {
+                # Remove least recently used
+                let lru_key = this.access_order.shift();
+                this.cache.remove(lru_key);
+                print("Evicted LRU key:", lru_key);
+            }
+            
+            this.cache.insert(key, value);
+            this.access_order.push(key);
+            print("Added to cache:", key, ":", value);
+        }
+    }
+    
+    _update_access_order(key) {
+        let index = -1;
+        for (let i = 0; i < len(this.access_order); i++) {
+            if (this.access_order[i] == key) {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index != -1) {
+            this.access_order.splice(index, 1);
+            this.access_order.push(key);
+        }
+    }
+    
+    display() {
+        print("Cache Contents:");
+        for (let i = 0; i < len(this.access_order); i++) {
+            let key = this.access_order[i];
+            let value = this.cache.get(key);
+            print("  ", key, ":", value);
+        }
+    }
+}
+
+# Test LRU Cache
+let cache = LRUCache(3);
+
+cache.put("A", 1);
+cache.put("B", 2);
+cache.put("C", 3);
+cache.display();
+
+print("\nAccessing A:");
+cache.get("A");
+
+print("\nAdding D (should evict B):");
+cache.put("D", 4);
+cache.display();
+
+print("\nAccessing B (should miss):");
+cache.get("B");
+
+print("\nAccessing C then adding E:");
+cache.get("C");
+cache.put("E", 5);
+cache.display();
+
+# Performance test
+print("\n=== Performance Test ===");
+
+function performance_test() {
+    let ht = HashTable(1000);
+    let num_operations = 10000;
+    
+    # Test insert performance
+    let start_time = time();
+    for (let i = 0; i < num_operations; i++) {
+        let key = "key_" + i;
+        let value = "value_" + i;
+        ht.insert(key, value);
+    }
+    let insert_time = time() - start_time;
+    
+    # Test search performance
+    start_time = time();
+    for (let i = 0; i < num_operations; i++) {
+        let key = "key_" + randint(0, num_operations - 1);
+        ht.get(key);
+    }
+    let search_time = time() - start_time;
+    
+    # Test delete performance
+    start_time = time();
+    for (let i = 0; i < num_operations / 2; i++) {
+        let key = "key_" + i;
+        ht.remove(key);
+    }
+    let delete_time = time() - start_time;
+    
+    print("Hash Table Performance Test:");
+    print("Inserted", num_operations, "elements in", insert_time, "seconds");
+    print("Performed", num_operations, "searches in", search_time, "seconds");
+    print("Deleted", num_operations / 2, "elements in", delete_time, "seconds");
+    print("Final count:", ht.get_count());
+    print("Load factor:", ht.get_load_factor().toFixed(2));
+}
+
+performance_test();

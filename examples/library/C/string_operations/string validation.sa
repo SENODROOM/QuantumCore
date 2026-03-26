@@ -1,0 +1,704 @@
+# string_validation.sa - String Validation Examples
+# C-style string validation implementation in Quantum Language
+
+print("=== String Validation Examples ===");
+
+# Check if string is empty
+function is_empty(str) {
+    return len(str) == 0;
+}
+
+# Check if string contains only whitespace
+function is_whitespace(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    for (let i = 0; i < len(str); i++) {
+        let char = str[i];
+        if (char != ' ' && char != '\t' && char != '\n' && char != '\r') {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Check if string is numeric (digits only)
+function is_numeric(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    for (let i = 0; i < len(str); i++) {
+        let char = str[i];
+        if (char < '0' || char > '9') {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Check if string is alphabetic (letters only)
+function is_alpha(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    for (let i = 0; i < len(str); i++) {
+        let char = str[i];
+        if (!((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'))) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Check if string is alphanumeric (letters and digits)
+function is_alphanumeric(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    for (let i = 0; i < len(str); i++) {
+        let char = str[i];
+        if (!((char >= 'a' && char <= 'z') || 
+              (char >= 'A' && char <= 'Z') || 
+              (char >= '0' && char <= '9'))) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Check if string is a valid email address (basic validation)
+function is_email(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    # Basic email validation: local@domain
+    let at_count = 0;
+    let at_pos = -1;
+    
+    # Count @ symbols and find position
+    for (let i = 0; i < len(str); i++) {
+        if (str[i] == '@') {
+            at_count++;
+            at_pos = i;
+        }
+    }
+    
+    if (at_count != 1) {
+        return false;
+    }
+    
+    # Check local part (before @)
+    let local_part = str.slice(0, at_pos);
+    if (len(local_part) == 0) {
+        return false;
+    }
+    
+    # Check domain part (after @)
+    let domain_part = str.slice(at_pos + 1);
+    if (len(domain_part) == 0) {
+        return false;
+    }
+    
+    # Domain should contain at least one dot
+    if (!domain_part.contains('.')) {
+        return false;
+    }
+    
+    # Basic character checks
+    for (let i = 0; i < len(str); i++) {
+        let char = str[i];
+        if (char == ' ' || char == '\t' || char == '\n' || char == '\r') {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Check if string is a valid phone number (basic US format)
+function is_phone_number(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    # Remove common separators
+    let cleaned = "";
+    for (let i = 0; i < len(str); i++) {
+        let char = str[i];
+        if (char >= '0' && char <= '9') {
+            cleaned += char;
+        }
+    }
+    
+    # Check if we have exactly 10 digits
+    return len(cleaned) == 10;
+}
+
+# Check if string is a valid URL (basic validation)
+function is_url(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    # Must contain http:// or https://
+    if (!(str.slice(0, 7) == "http://" || str.slice(0, 8) == "https://")) {
+        return false;
+    }
+    
+    # Must contain at least one dot after protocol
+    let protocol_end = str.index("://") + 3;
+    let domain = str.slice(protocol_end);
+    
+    if (len(domain) == 0 || !domain.contains('.')) {
+        return false;
+    }
+    
+    return true;
+}
+
+# Check if string is a valid IPv4 address
+function is_ipv4(str) {
+    if (len(str) == 0) {
+        return false;
+    }
+    
+    # Split by dots
+    let parts = str.split('.');
+    
+    if (len(parts) != 4) {
+        return false;
+    }
+    
+    for (let part in parts) {
+        # Each part must be numeric
+        if (!is_numeric(part)) {
+            return false;
+        }
+        
+        # Convert to integer and check range
+        let num = parseInt(part);
+        if (num < 0 || num > 255) {
+            return false;
+        }
+        
+        # No leading zeros (except for "0")
+        if (len(part) > 1 && part[0] == '0') {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Check if string matches a pattern (basic pattern matching)
+function matches_pattern(str, pattern) {
+    if (len(str) != len(pattern)) {
+        return false;
+    }
+    
+    for (let i = 0; i < len(str); i++) {
+        let pattern_char = pattern[i];
+        let str_char = str[i];
+        
+        if (pattern_char == '?') {
+            # Wildcard - matches any character
+            continue;
+        } else if (pattern_char == '*') {
+            # Not implemented in this basic version
+            return false;
+        } else if (pattern_char != str_char) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Test basic validation functions
+print("\n--- Testing Basic Validation Functions ---");
+
+let test_strings = [
+    "",
+    "   ",
+    "hello",
+    "12345",
+    "hello123",
+    "test@example.com",
+    "(555) 123-4567",
+    "https://www.example.com",
+    "192.168.1.1",
+    "abc123"
+];
+
+print("String\t\tEmpty\tWhite\tNum\tAlpha\tAlnum");
+print("------\t\t-----\t-----\t---\t-----");
+
+for (let test_str in test_strings) {
+    print(test_str + "\t\t" + 
+          str(is_empty(test_str)) + "\t" + 
+          str(is_whitespace(test_str)) + "\t" + 
+          str(is_numeric(test_str)) + "\t" + 
+          str(is_alpha(test_str)) + "\t" + 
+          str(is_alphanumeric(test_str)));
+}
+
+# Test email validation
+print("\n--- Testing Email Validation ---");
+
+let email_tests = [
+    "user@example.com",
+    "user.name@domain.co.uk",
+    "user+tag@example.org",
+    "invalid-email",
+    "@missinglocal.com",
+    "missing@domain",
+    "user@.com",
+    "user@com.",
+    "user space@domain.com",
+    ""
+];
+
+print("Email\t\t\t\tValid");
+print("----\t\t\t\t-----");
+
+for (let email in email_tests) {
+    print(email + "\t\t\t" + str(is_email(email)));
+}
+
+# Test phone number validation
+print("\n--- Testing Phone Number Validation ---");
+
+let phone_tests = [
+    "555-123-4567",
+    "(555) 123-4567",
+    "555.123.4567",
+    "5551234567",
+    "1-555-123-4567",
+    "555-123-456",  # Too short
+    "555-123-45678", # Too long
+    "abc-def-ghij",
+    ""
+];
+
+print("Phone Number\t\t\tValid");
+print("------------\t\t\t-----");
+
+for (let phone in phone_tests) {
+    print(phone + "\t\t\t" + str(is_phone_number(phone)));
+}
+
+# Test URL validation
+print("\n--- Testing URL Validation ---");
+
+let url_tests = [
+    "https://www.example.com",
+    "http://example.org",
+    "https://subdomain.example.co.uk",
+    "ftp://example.com",  # Invalid protocol
+    "www.example.com",  # Missing protocol
+    "https://",          # Missing domain
+    "example.com",       # Missing protocol
+    ""
+];
+
+print("URL\t\t\t\tValid");
+print("---\t\t\t\t-----");
+
+for (let url in url_tests) {
+    print(url + "\t\t\t" + str(is_url(url)));
+}
+
+# Test IPv4 validation
+print("\n--- Testing IPv4 Validation ---");
+
+let ip_tests = [
+    "192.168.1.1",
+    "10.0.0.1",
+    "255.255.255.255",
+    "0.0.0.0",
+    "256.1.1.1",    # Invalid octet
+    "192.168.1",     # Missing octet
+    "192.168.1.1.1", # Extra octet
+    "192.168.01.1",  # Leading zero
+    "abc.def.ghi.jkl",
+    ""
+];
+
+print("IP Address\t\tValid");
+print("----------\t\t-----");
+
+for (let ip in ip_tests) {
+    print(ip + "\t\t" + str(is_ipv4(ip)));
+}
+
+# Test pattern matching
+if (false) {
+print("\n--- Testing Pattern Matching ---");
+
+let pattern_tests = [
+    ["hello", "h?llo"],
+    ["world", "w?r?d"],
+    ["test", "????"],
+    ["abc", "???"],
+    ["abcd", "???"],
+    ["123", "???"],
+    ["xyz", "???"]
+];
+
+print("String\tPattern\tMatch");
+print("------\t-------\t-----");
+
+for (let test in pattern_tests) {
+    let test_str = test[0];
+    let pattern = test[1];
+    print(test_str + "\t" + pattern + "\t" + str(matches_pattern(test_str, pattern)));
+}
+
+# Advanced validation functions
+print("\n--- Advanced Validation Functions ---");
+
+# Check password strength
+function check_password_strength(password) {
+    if (len(password) == 0) {
+        return {"strength": "none", "score": 0};
+    }
+    
+    let score = 0;
+    let feedback = [];
+    
+    # Length check
+    if (len(password) >= 8) {
+        score += 2;
+    } else {
+        feedback.push("Password should be at least 8 characters");
+    }
+    
+    # Contains lowercase
+    let has_lower = false;
+    let has_upper = false;
+    let has_digit = false;
+    let has_special = false;
+    
+    for (let i = 0; i < len(password); i++) {
+        let char = password[i];
+        if (char >= 'a' && char <= 'z') {
+            has_lower = true;
+        } else if (char >= 'A' && char <= 'Z') {
+            has_upper = true;
+        } else if (char >= '0' && char <= '9') {
+            has_digit = true;
+        } else {
+            has_special = true;
+        }
+    }
+    
+    if (has_lower) {
+        score += 1;
+    } else {
+        feedback.push("Password should contain lowercase letters");
+    }
+    
+    if (has_upper) {
+        score += 1;
+    } else {
+        feedback.push("Password should contain uppercase letters");
+    }
+    
+    if (has_digit) {
+        score += 1;
+    } else {
+        feedback.push("Password should contain digits");
+    }
+    
+    if (has_special) {
+        score += 1;
+    } else {
+        feedback.push("Password should contain special characters");
+    }
+    
+    # Determine strength
+    let strength;
+    if (score >= 5) {
+        strength = "very strong";
+    } else if (score >= 4) {
+        strength = "strong";
+    } else if (score >= 3) {
+        strength = "moderate";
+    } else if (score >= 2) {
+        strength = "weak";
+    } else {
+        strength = "very weak";
+    }
+    
+    return {
+        "strength": strength,
+        "score": score,
+        "feedback": feedback
+    };
+}
+
+# Test password strength
+let password_tests = [
+    "password",
+    "Password",
+    "Password123",
+    "P@ssw0rd!",
+    "123",
+    "aB1!",
+    "VeryStrongPassword123!"
+];
+
+print("Password\t\t\tStrength\tScore");
+print("--------\t\t\t--------\t-----");
+
+for (let password in password_tests) {
+    let result = check_password_strength(password);
+    print(password + "\t\t\t" + result.strength + "\t" + str(result.score));
+}
+
+# Credit card validation (Luhn algorithm)
+function is_valid_credit_card(card_number) {
+    # Remove spaces and dashes
+    let cleaned = "";
+    for (let i = 0; i < len(card_number); i++) {
+        let char = card_number[i];
+        if (char >= '0' && char <= '9') {
+            cleaned += char;
+        }
+    }
+    
+    if (len(cleaned) < 13 || len(cleaned) > 19) {
+        return false;
+    }
+    
+    # Luhn algorithm
+    let sum = 0;
+    let double_digit = false;
+    
+    for (let i = len(cleaned) - 1; i >= 0; i--) {
+        let digit = parseInt(cleaned[i]);
+        
+        if (double_digit) {
+            digit *= 2;
+            if (digit > 9) {
+                digit = digit - 9;
+            }
+        }
+        
+        sum += digit;
+        double_digit = !double_digit;
+    }
+    
+    return sum % 10 == 0;
+}
+
+# Test credit card validation
+print("\n--- Testing Credit Card Validation ---");
+
+let card_tests = [
+    "4539 1488 0343 6467",  # Valid Visa
+    "6011 1111 1111 1117",  # Valid Discover
+    "378282246310005",      # Valid Amex
+    "5555-5555-5555-4444",  # Valid Mastercard
+    "1234 5678 9012 3456",  # Invalid
+    "4111 1111 1111 1111",  # Valid Visa
+    ""
+];
+
+print("Card Number\t\t\tValid");
+print("-----------\t\t\t-----");
+
+for (let card in card_tests) {
+    print(card + "\t\t\t" + str(is_valid_credit_card(card)));
+}
+
+# String validation class
+print("\n--- String Validation Class ---");
+
+class StringValidator {
+    constructor() {
+        this.validation_history = [];
+    }
+    
+    # Validate with custom rules
+    validate(str, rules) {
+        let results = {};
+        
+        for (let rule_name in rules) {
+            let rule = rules[rule_name];
+            let result = false;
+            
+            if (rule == "required") {
+                result = !is_empty(str);
+            } else if (rule == "numeric") {
+                result = is_numeric(str);
+            } else if (rule == "alpha") {
+                result = is_alpha(str);
+            } else if (rule == "alphanumeric") {
+                result = is_alphanumeric(str);
+            } else if (rule == "email") {
+                result = is_email(str);
+            } else if (rule == "phone") {
+                result = is_phone_number(str);
+            } else if (rule == "url") {
+                result = is_url(str);
+            } else if (rule.slice(0, 11) == "min_length:") {
+                let min_len = parseInt(rule.split(":")[1]);
+                result = len(str) >= min_len;
+            } else if (rule.slice(0, 11) == "max_length:") {
+                let max_len = parseInt(rule.split(":")[1]);
+                result = len(str) <= max_len;
+            }
+            
+            results[rule_name] = result;
+        }
+        
+        # Record validation
+        this.validation_history.push({
+            "input_text": str,
+            "rules": rules,
+            "results": results,
+            "timestamp": time()
+        });
+        
+        return results;
+    }
+    
+    # Get validation history
+    get_history() {
+        return this.validation_history;
+    }
+    
+    # Clear history
+    clear_history() {
+        this.validation_history = [];
+        print("Validation history cleared");
+    }
+}
+
+# Test validation class
+let validator = StringValidator();
+
+print("Testing StringValidator:");
+let validation_rules = {
+    "not_empty": "required",
+    "is_email": "email",
+    "min_length_5": "min_length:5"
+};
+
+let test_inputs = ["", "test", "test@example.com", "a@b.c"];
+
+for (let test_input in test_inputs) {
+    let results = validator.validate(test_input, validation_rules);
+    print("Test Input:", test_input, "Results:", results);
+}
+
+# Form validation example
+print("\n--- Form Validation Example ---");
+
+function validate_registration_form(data) {
+    let errors = [];
+    
+    # Validate name
+    if (is_empty(data.name)) {
+        errors.push("Name is required");
+    } else if (!is_alpha(data.name.replace(" ", ""))) {
+        errors.push("Name should contain only letters");
+    } else if (len(data.name) < 2) {
+        errors.push("Name should be at least 2 characters");
+    }
+    
+    # Validate email
+    if (is_empty(data.email)) {
+        errors.push("Email is required");
+    } else if (!is_email(data.email)) {
+        errors.push("Invalid email format");
+    }
+    
+    # Validate age
+    if (is_empty(data.age)) {
+        errors.push("Age is required");
+    } else if (!is_numeric(data.age)) {
+        errors.push("Age should be a number");
+    } else {
+        let age = parseInt(data.age);
+        if (age < 18 || age > 120) {
+            errors.push("Age should be between 18 and 120");
+        }
+    }
+    
+    # Validate phone
+    if (!is_empty(data.phone) && !is_phone_number(data.phone)) {
+        errors.push("Invalid phone number format");
+    }
+    
+    return errors;
+}
+
+# Test form validation
+let form_data = {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "age": "25",
+    "phone": "(555) 123-4567"
+};
+
+let form_errors = validate_registration_form(form_data);
+
+if (len(form_errors) == 0) {
+    print("Form validation passed!");
+} else {
+    print("Form validation errors:");
+    for (let error in form_errors) {
+        print("  -", error);
+    }
+}
+
+# Performance test
+print("\n--- Performance Test ---");
+
+function performance_test() {
+    let test_string = "The quick brown fox jumps over the lazy dog";
+    let iterations = 10000;
+    
+    # Test is_numeric
+    let start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        is_numeric(test_string);
+    }
+    let numeric_time = time() - start_time;
+    
+    # Test is_alpha
+    start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        is_alpha(test_string);
+    }
+    let alpha_time = time() - start_time;
+    
+    # Test is_alphanumeric
+    start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        is_alphanumeric(test_string);
+    }
+    let alphanumeric_time = time() - start_time;
+    
+    print("Performance test with", iterations, "iterations:");
+    print("is_numeric:", numeric_time, "seconds");
+    print("is_alpha:", alpha_time, "seconds");
+    print("is_alphanumeric:", alphanumeric_time, "seconds");
+}
+
+performance_test();
+
+}
+
+print("\nString validation examples completed!");

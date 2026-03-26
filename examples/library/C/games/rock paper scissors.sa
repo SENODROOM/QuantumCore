@@ -1,0 +1,625 @@
+# rock_paper_scissors.sa - Rock Paper Scissors Game Implementation
+# C-style Rock Paper Scissors implementation in Quantum Language
+
+print("=== Rock Paper Scissors Game ===");
+
+class RockPaperScissors {
+    constructor() {
+        this.choices = ["rock", "paper", "scissors"];
+        this.player_score = 0;
+        this.computer_score = 0;
+        this.draws = 0;
+        this.rounds_played = 0;
+        this.history = [];
+    }
+    
+    # Get computer's choice
+    get_computer_choice() {
+        let index = randint(0, 2);
+        return this.choices[index];
+    }
+    
+    # Determine winner
+    determine_winner(player_choice, computer_choice) {
+        if (player_choice == computer_choice) {
+            return "draw";
+        }
+        
+        if ((player_choice == "rock" && computer_choice == "scissors") ||
+            (player_choice == "paper" && computer_choice == "rock") ||
+            (player_choice == "scissors" && computer_choice == "paper")) {
+            return "player";
+        }
+        
+        return "computer";
+    }
+    
+    # Play a single round
+    play_round(player_choice) {
+        # Validate player choice
+        if (!this.choices.contains(player_choice.lower())) {
+            print("Invalid choice! Please choose: rock, paper, or scissors");
+            return null;
+        }
+        
+        player_choice = player_choice.lower();
+        let computer_choice = this.get_computer_choice();
+        let result = this.determine_winner(player_choice, computer_choice);
+        
+        # Update scores
+        this.rounds_played++;
+        if (result == "player") {
+            this.player_score++;
+        } else if (result == "computer") {
+            this.computer_score++;
+        } else {
+            this.draws++;
+        }
+        
+        # Record history
+        let round_info = {
+            "round": this.rounds_played,
+            "player": player_choice,
+            "computer": computer_choice,
+            "result": result
+        };
+        this.history.push(round_info);
+        
+        # Display results
+        print("\nRound", this.rounds_played);
+        print("You chose:", player_choice);
+        print("Computer chose:", computer_choice);
+        
+        if (result == "player") {
+            print("🎉 You win this round!");
+        } else if (result == "computer") {
+            print("💻 Computer wins this round!");
+        } else {
+            print("🤝 It's a draw!");
+        }
+        
+        print("Score - You:", this.player_score, "Computer:", this.computer_score, "Draws:", this.draws);
+        
+        return round_info;
+    }
+    
+    # Display current score
+    display_score() {
+        print("\n=== CURRENT SCORE ===");
+        print("You:", this.player_score);
+        print("Computer:", this.computer_score);
+        print("Draws:", this.draws);
+        print("Rounds played:", this.rounds_played);
+        print("==================");
+    }
+    
+    # Check if game is over (first to 10 wins)
+    is_game_over() {
+        return this.player_score >= 10 || this.computer_score >= 10;
+    }
+    
+    # Get game winner
+    get_game_winner() {
+        if (this.player_score > this.computer_score) {
+            return "player";
+        } else if (this.computer_score > this.player_score) {
+            return "computer";
+        }
+        return "tie";
+    }
+    
+    # Display game results
+    display_final_results() {
+        print("\n🏆 GAME OVER 🏆");
+        print("================");
+        
+        let winner = this.get_game_winner();
+        if (winner == "player") {
+            print("🎉 Congratulations! You won the game!");
+        } else if (winner == "computer") {
+            print("💻 Computer wins the game. Better luck next time!");
+        } else {
+            print("🤝 The game ended in a tie!");
+        }
+        
+        print("\nFinal Score:");
+        print("You:", this.player_score);
+        print("Computer:", this.computer_score);
+        print("Draws:", this.draws);
+        print("Total rounds:", this.rounds_played);
+        
+        # Calculate win rate
+        let win_rate = (this.player_score / this.rounds_played * 100).toFixed(1);
+        print("Your win rate:", win_rate + "%");
+    }
+    
+    # Reset game
+    reset() {
+        this.player_score = 0;
+        this.computer_score = 0;
+        this.draws = 0;
+        this.rounds_played = 0;
+        this.history = [];
+        print("Game has been reset!");
+    }
+    
+    # Display game history
+    display_history() {
+        if (len(this.history) == 0) {
+            print("No rounds played yet.");
+            return;
+        }
+        
+        print("\n=== GAME HISTORY ===");
+        for (let i = 0; i < len(this.history); i++) {
+            let round = this.history[i];
+            print("Round", round.round, ":", round.player, "vs", round.computer, "-", round.result);
+        }
+        print("==================");
+    }
+    
+    # Get statistics
+    get_statistics() {
+        let player_wins = 0;
+        let computer_wins = 0;
+        let choice_frequency = {"rock": 0, "paper": 0, "scissors": 0};
+        
+        for (let i = 0; i < len(this.history); i++) {
+            let round = this.history[i];
+            if (round.result == "player") {
+                player_wins++;
+            } else if (round.result == "computer") {
+                computer_wins++;
+            }
+            
+            choice_frequency[round.player]++;
+        }
+        
+        return {
+            "total_rounds": this.rounds_played,
+            "player_wins": player_wins,
+            "computer_wins": computer_wins,
+            "draws": this.draws,
+            "win_rate": (this.rounds_played > 0 ? (player_wins / this.rounds_played * 100) : 0).toFixed(1),
+            "choice_frequency": choice_frequency
+        };
+    }
+    
+    # Display statistics
+    display_statistics() {
+        let stats = this.get_statistics();
+        print("\n=== GAME STATISTICS ===");
+        print("Total rounds:", stats.total_rounds);
+        print("Player wins:", stats.player_wins);
+        print("Computer wins:", stats.computer_wins);
+        print("Draws:", stats.draws);
+        print("Win rate:", stats.win_rate + "%");
+        print("\nChoice frequency:");
+        for (let choice in stats.choice_frequency) {
+            print("  " + choice + ":", stats.choice_frequency[choice]);
+        }
+        print("======================");
+    }
+}
+
+# Advanced AI Player
+class AdvancedAI {
+    constructor() {
+        this.pattern_memory = {};
+        this.predictions = [];
+        this.accuracy = 0;
+    }
+    
+    # Learn from player's pattern
+    learn_pattern(history) {
+        if (len(history) < 3) {
+            return;
+        }
+        
+        # Look for patterns in last 2 moves
+        let pattern = history[len(history) - 2].player + "_" + history[len(history) - 1].player;
+        let next_move = history[len(history) - 1].player;
+        
+        if (this.pattern_memory[pattern] == null) {
+            this.pattern_memory[pattern] = {"rock": 0, "paper": 0, "scissors": 0};
+        }
+        
+        this.pattern_memory[pattern][next_move]++;
+    }
+    
+    # Predict player's next move
+    predict_move(history) {
+        if (len(history) < 2) {
+            return null;
+        }
+        
+        let pattern = history[len(history) - 2].player + "_" + history[len(history) - 1].player;
+        
+        if (this.pattern_memory[pattern] == null) {
+            return null;
+        }
+        
+        let frequencies = this.pattern_memory[pattern];
+        let max_count = 0;
+        let prediction = null;
+        
+        for (let choice in frequencies) {
+            if (frequencies[choice] > max_count) {
+                max_count = frequencies[choice];
+                prediction = choice;
+            }
+        }
+        
+        return prediction;
+    }
+    
+    # Get AI's choice based on prediction
+    get_ai_choice(history) {
+        let prediction = this.predict_move(history);
+        
+        if (prediction == null) {
+            # No pattern found, play randomly
+            let choices = ["rock", "paper", "scissors"];
+            return choices[randint(0, 2)];
+        }
+        
+        # Counter the predicted move
+        if (prediction == "rock") {
+            return "paper";
+        } else if (prediction == "paper") {
+            return "scissors";
+        } else {
+            return "rock";
+        }
+    }
+    
+    # Update accuracy
+    update_accuracy(predicted, actual) {
+        if (predicted != null) {
+            if (predicted == actual) {
+                this.accuracy = (this.accuracy * 0.9) + (1.0 * 0.1);  # Moving average
+            } else {
+                this.accuracy = (this.accuracy * 0.9) + (0.0 * 0.1);
+            }
+        }
+    }
+    
+    # Get AI statistics
+    get_stats() {
+        return {
+            "patterns_learned": len(this.pattern_memory),
+            "prediction_accuracy": (this.accuracy * 100).toFixed(1) + "%"
+        };
+    }
+}
+
+# Tournament System
+class Tournament {
+    constructor(players) {
+        this.players = players;
+        this.scores = {};
+        this.matchups = [];
+        
+        # Initialize scores
+        for (let i = 0; i < len(players); i++) {
+            this.scores[players[i]] = 0;
+        }
+    }
+    
+    # Play round-robin tournament
+    play_round_robin(rounds_per_matchup = 10) {
+        print("Starting Round-Robin Tournament");
+        print("Players:", this.players);
+        print("Rounds per matchup:", rounds_per_matchup);
+        print("");
+        
+        for (let i = 0; i < len(players); i++) {
+            for (let j = i + 1; j < len(players); j++) {
+                let player1 = this.players[i];
+                let player2 = this.players[j];
+                
+                print("Match:", player1, "vs", player2);
+                let result = this.play_match(player1, player2, rounds_per_matchup);
+                this.update_scores(result);
+                print("Result:", player1, result[player1], "-", player2, result[player2]);
+                print("");
+            }
+        }
+        
+        this.display_standings();
+    }
+    
+    # Play match between two players
+    play_match(player1, player2, rounds) {
+        let results = {player1: 0, player2: 0, draws: 0};
+        
+        for (let round = 0; round < rounds; round++) {
+            let choice1 = this.get_player_choice(player1);
+            let choice2 = this.get_player_choice(player2);
+            
+            let winner = this.determine_winner(choice1, choice2);
+            
+            if (winner == 1) {
+                results[player1]++;
+            } else if (winner == 2) {
+                results[player2]++;
+            } else {
+                results.draws++;
+            }
+        }
+        
+        return results;
+    }
+    
+    # Get choice based on player type
+    get_player_choice(player) {
+        if (player == "Random") {
+            let choices = ["rock", "paper", "scissors"];
+            return choices[randint(0, 2)];
+        } else if (player == "Always Rock") {
+            return "rock";
+        } else if (player == "Always Paper") {
+            return "paper";
+        } else if (player == "Always Scissors") {
+            return "scissors";
+        } else if (player == "Cyclic") {
+            let choices = ["rock", "paper", "scissors"];
+            return choices[round % 3];  # This would need round counter
+        }
+        
+        return "rock";  # Default
+    }
+    
+    # Determine winner for two choices
+    determine_winner(choice1, choice2) {
+        if (choice1 == choice2) {
+            return 0;  # Draw
+        }
+        
+        if ((choice1 == "rock" && choice2 == "scissors") ||
+            (choice1 == "paper" && choice2 == "rock") ||
+            (choice1 == "scissors" && choice2 == "paper")) {
+            return 1;  # Player 1 wins
+        }
+        
+        return 2;  # Player 2 wins
+    }
+    
+    # Update tournament scores
+    update_scores(match_result) {
+        for (let player in match_result) {
+            if (player != "draws") {
+                this.scores[player] += match_result[player];
+            }
+        }
+    }
+    
+    # Display tournament standings
+    display_standings() {
+        print("=== TOURNAMENT STANDINGS ===");
+        
+        # Sort players by score
+        let sorted_players = [];
+        for (let player in this.scores) {
+            sorted_players.push({"player": player, "score": this.scores[player]});
+        }
+        
+        sorted_players.sort((a, b) => b.score - a.score);
+        
+        for (let i = 0; i < len(sorted_players); i++) {
+            print((i + 1) + ".", sorted_players[i].player, ":", sorted_players[i].score, "points");
+        }
+        print("============================");
+    }
+}
+
+# Game Controller
+class GameController {
+    constructor() {
+        this.game = RockPaperScissors();
+        this.advanced_ai = AdvancedAI();
+        this.mode = "normal";  # normal, advanced, tournament
+    }
+    
+    # Start the game
+    start() {
+        print("🎮 Welcome to Rock Paper Scissors! 🎮");
+        print("=====================================");
+        print("Game modes:");
+        print("1. Normal Mode (vs Computer)");
+        print("2. Advanced AI Mode (vs Learning AI)");
+        print("3. Tournament Mode");
+        print("4. Statistics Mode");
+        
+        let choice = input("Choose mode (1-4): ");
+        
+        if (choice == "1") {
+            this.mode = "normal";
+            this.play_normal_mode();
+        } else if (choice == "2") {
+            this.mode = "advanced";
+            this.play_advanced_mode();
+        } else if (choice == "3") {
+            this.mode = "tournament";
+            this.play_tournament_mode();
+        } else if (choice == "4") {
+            this.mode = "statistics";
+            this.display_statistics();
+        } else {
+            print("Invalid choice. Starting normal mode.");
+            this.play_normal_mode();
+        }
+    }
+    
+    # Play normal mode
+    play_normal_mode() {
+        print("\n🎯 Normal Mode - First to 10 wins!");
+        
+        while (!this.game.is_game_over()) {
+            this.game.display_score();
+            
+            let player_choice = input("Choose (rock/paper/scissors): ");
+            let result = this.game.play_round(player_choice);
+            
+            if (result != null) {
+                sleep(1);  # Pause for readability
+            }
+        }
+        
+        this.game.display_final_results();
+        this.ask_play_again();
+    }
+    
+    # Play advanced AI mode
+    play_advanced_mode() {
+        print("\n🤖 Advanced AI Mode - First to 10 wins!");
+        print("The AI will learn your patterns and try to predict your moves!");
+        
+        while (!this.game.is_game_over()) {
+            this.game.display_score();
+            
+            let player_choice = input("Choose (rock/paper/scissors): ");
+            
+            if (this.game.choices.contains(player_choice.lower())) {
+                # AI makes prediction and choice
+                let ai_choice = this.advanced_ai.get_ai_choice(this.game.history);
+                let result = this.game.play_round(player_choice);
+                
+                # Update AI learning
+                if (len(this.game.history) > 0) {
+                    let last_round = this.game.history[len(this.game.history) - 1];
+                    this.advanced_ai.learn_pattern(this.game.history.slice(0, -1));
+                    this.advanced_ai.update_accuracy(
+                        this.advanced_ai.predict_move(this.game.history.slice(0, -1)),
+                        last_round.player
+                    );
+                }
+                
+                print("AI prediction accuracy:", this.advanced_ai.get_stats().prediction_accuracy);
+                sleep(1);
+            }
+        }
+        
+        this.game.display_final_results();
+        print("AI Statistics:", this.advanced_ai.get_stats());
+        this.ask_play_again();
+    }
+    
+    # Play tournament mode
+    play_tournament_mode() {
+        print("\n🏆 Tournament Mode");
+        let tournament = Tournament([
+            "Random", "Always Rock", "Always Paper", "Always Scissors"
+        ]);
+        tournament.play_round_robin(20);
+    }
+    
+    # Display statistics
+    display_statistics() {
+        let stats = this.game.get_statistics();
+        print("\n📊 Game Statistics");
+        print("==================");
+        print("Total rounds:", stats.total_rounds);
+        print("Your wins:", stats.player_wins);
+        print("Computer wins:", stats.computer_wins);
+        print("Draws:", stats.draws);
+        print("Win rate:", stats.win_rate + "%");
+        
+        print("\nYour choice frequency:");
+        for (let choice in stats.choice_frequency) {
+            let frequency = (stats.total_rounds > 0 ? (stats.choice_frequency[choice] / stats.total_rounds * 100) : 0).toFixed(1);
+            print(choice + ":", frequency + "%");
+        }
+    }
+    
+    # Ask to play again
+    ask_play_again() {
+        let choice = input("\nPlay again? (y/n): ");
+        if (choice.lower() == 'y') {
+            this.game.reset();
+            this.advanced_ai = AdvancedAI();  # Reset AI learning
+            this.start();
+        } else {
+            print("Thanks for playing Rock Paper Scissors! 👋");
+        }
+    }
+}
+
+# Test the game
+print("\n--- Testing Rock Paper Scissors ---");
+
+# Test basic functionality
+let test_game = RockPaperScissors();
+print("Testing basic game mechanics:");
+
+# Test winning scenarios
+print("\nTest 1: Rock vs Scissors (Player should win)");
+test_game.play_round("rock");
+
+print("\nTest 2: Paper vs Rock (Player should win)");
+test_game.play_round("paper");
+
+print("\nTest 3: Scissors vs Paper (Player should win)");
+test_game.play_round("scissors");
+
+# Test draw
+print("\nTest 4: Rock vs Rock (Should be draw)");
+test_game.play_round("rock");
+
+# Test invalid input
+print("\nTest 5: Invalid input");
+test_game.play_round("invalid");
+
+# Test advanced AI
+print("\n--- Testing Advanced AI ---");
+let ai = AdvancedAI();
+
+# Simulate some history
+let sample_history = [
+    {"player": "rock", "computer": "paper", "result": "computer"},
+    {"player": "paper", "computer": "scissors", "result": "computer"},
+    {"player": "scissors", "computer": "rock", "result": "computer"}
+];
+
+# Train AI
+for (let i = 0; i < len(sample_history); i++) {
+    if (i > 0) {
+        ai.learn_pattern(sample_history.slice(0, i));
+    }
+}
+
+print("AI learned patterns:", ai.get_stats().patterns_learned);
+
+# Test tournament
+print("\n--- Testing Tournament ---");
+let test_tournament = Tournament(["Random", "Always Rock", "Always Paper"]);
+test_tournament.play_round_robin(5);
+
+# Simulation of many games
+print("\n--- Running Simulation ---");
+let sim_game = RockPaperScissors();
+let outcomes = {"rock": 0, "paper": 0, "scissors": 0};
+
+# Simulate 1000 games
+for (let i = 0; i < 1000; i++) {
+    let player_choice = ["rock", "paper", "scissors"][randint(0, 2)];
+    sim_game.play_round(player_choice);
+    
+    if (i < 1000 - 1) {
+        # Reset for next game but keep some stats
+        if (i % 100 == 0) {
+            print("Simulated", i, "games...");
+        }
+    }
+}
+
+print("Simulation complete!");
+sim_game.display_final_results();
+sim_game.display_statistics();
+
+# Start the interactive game
+print("\n--- Starting Interactive Game ---");
+let controller = GameController();
+controller.start();
+
+print("\nRock Paper Scissors game completed!");

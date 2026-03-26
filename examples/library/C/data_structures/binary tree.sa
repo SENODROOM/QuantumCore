@@ -1,0 +1,628 @@
+# binary_tree.sa - Binary Tree Data Structure Implementation
+# C-style binary tree implementation in Quantum Language
+
+# Binary Tree Node class
+class TreeNode {
+    constructor(data) {
+        this.data = data;
+        this.left = null;
+        this.right = null;
+    }
+    
+    set_left(node) {
+        this.left = node;
+    }
+    
+    set_right(node) {
+        this.right = node;
+    }
+    
+    is_leaf() {
+        return this.left == null && this.right == null;
+    }
+}
+
+# Binary Tree class
+class BinaryTree {
+    constructor(root_data) {
+        this.root = root_data != null ? TreeNode(root_data) : null;
+    }
+    
+    # Insert a node in the binary tree (level-order insertion)
+    insert(data) {
+        let new_node = TreeNode(data);
+        
+        if (this.root == null) {
+            this.root = new_node;
+            return true;
+        }
+        
+        let queue = [];
+        queue.push(this.root);
+        
+        while (len(queue) > 0) {
+            let current = queue.shift();
+            
+            if (current.left == null) {
+                current.left = new_node;
+                return true;
+            } else {
+                queue.push(current.left);
+            }
+            
+            if (current.right == null) {
+                current.right = new_node;
+                return true;
+            } else {
+                queue.push(current.right);
+            }
+        }
+        
+        return false;
+    }
+    
+    # In-order traversal (Left, Root, Right)
+    inorder_traversal(node, result) {
+        if (node == null) {
+            return;
+        }
+        
+        this.inorder_traversal(node.left, result);
+        result.push(node.data);
+        this.inorder_traversal(node.right, result);
+    }
+    
+    inorder() {
+        let result = [];
+        this.inorder_traversal(this.root, result);
+        return result;
+    }
+    
+    # Pre-order traversal (Root, Left, Right)
+    preorder_traversal(node, result) {
+        if (node == null) {
+            return;
+        }
+        
+        result.push(node.data);
+        this.preorder_traversal(node.left, result);
+        this.preorder_traversal(node.right, result);
+    }
+    
+    preorder() {
+        let result = [];
+        this.preorder_traversal(this.root, result);
+        return result;
+    }
+    
+    # Post-order traversal (Left, Right, Root)
+    postorder_traversal(node, result) {
+        if (node == null) {
+            return;
+        }
+        
+        this.postorder_traversal(node.left, result);
+        this.postorder_traversal(node.right, result);
+        result.push(node.data);
+    }
+    
+    postorder() {
+        let result = [];
+        this.postorder_traversal(this.root, result);
+        return result;
+    }
+    
+    # Level-order traversal (Breadth-First)
+    levelorder() {
+        if (this.root == null) {
+            return [];
+        }
+        
+        let result = [];
+        let queue = [];
+        queue.push(this.root);
+        
+        while (len(queue) > 0) {
+            let current = queue.shift();
+            result.push(current.data);
+            
+            if (current.left != null) {
+                queue.push(current.left);
+            }
+            
+            if (current.right != null) {
+                queue.push(current.right);
+            }
+        }
+        
+        return result;
+    }
+    
+    # Search for a value in the tree
+    search(data) {
+        if (this.root == null) {
+            return false;
+        }
+        
+        let queue = [];
+        queue.push(this.root);
+        
+        while (len(queue) > 0) {
+            let current = queue.shift();
+            
+            if (current.data == data) {
+                return true;
+            }
+            
+            if (current.left != null) {
+                queue.push(current.left);
+            }
+            
+            if (current.right != null) {
+                queue.push(current.right);
+            }
+        }
+        
+        return false;
+    }
+    
+    # Get the height of the tree
+    height(node) {
+        if (node == null) {
+            return 0;
+        }
+        
+        let left_height = this.height(node.left);
+        let right_height = this.height(node.right);
+        
+        return max(left_height, right_height) + 1;
+    }
+    
+    get_height() {
+        return this.height(this.root);
+    }
+    
+    # Count the number of nodes
+    count_nodes(node) {
+        if (node == null) {
+            return 0;
+        }
+        
+        return 1 + this.count_nodes(node.left) + this.count_nodes(node.right);
+    }
+    
+    get_size() {
+        return this.count_nodes(this.root);
+    }
+    
+    # Count leaf nodes
+    count_leaves(node) {
+        if (node == null) {
+            return 0;
+        }
+        
+        if (node.is_leaf()) {
+            return 1;
+        }
+        
+        return this.count_leaves(node.left) + this.count_leaves(node.right);
+    }
+    
+    get_leaf_count() {
+        return this.count_leaves(this.root);
+    }
+    
+    # Display tree structure (visual representation)
+    display() {
+        if (this.root == null) {
+            print("Tree is empty");
+            return;
+        }
+        
+        print("Binary Tree Structure:");
+        this._display_helper(this.root, "", true);
+    }
+    
+    _display_helper(node, prefix, is_last) {
+        if (node == null) {
+            return;
+        }
+        
+        print(prefix + (is_last ? "└── " : "├── ") + str(node.data));
+        
+        if (node.left != null || node.right != null) {
+            let new_prefix = prefix + (is_last ? "    " : "│   ");
+            
+            if (node.left != null) {
+                this._display_helper(node.left, new_prefix, node.right == null);
+            }
+            
+            if (node.right != null) {
+                this._display_helper(node.right, new_prefix, true);
+            }
+        }
+    }
+}
+
+# Binary Search Tree class (extends BinaryTree)
+class BinarySearchTree extends BinaryTree {
+    constructor() {
+        super(null);
+    }
+    
+    # Insert a node in BST
+    insert(data) {
+        this.root = this._insert_recursive(this.root, data);
+    }
+    
+    _insert_recursive(node, data) {
+        if (node == null) {
+            return TreeNode(data);
+        }
+        
+        if (data < node.data) {
+            node.left = this._insert_recursive(node.left, data);
+        } else if (data > node.data) {
+            node.right = this._insert_recursive(node.right, data);
+        }
+        
+        return node;
+    }
+    
+    # Search in BST
+    search(data) {
+        return this._search_recursive(this.root, data);
+    }
+    
+    _search_recursive(node, data) {
+        if (node == null) {
+            return false;
+        }
+        
+        if (data == node.data) {
+            return true;
+        } else if (data < node.data) {
+            return this._search_recursive(node.left, data);
+        } else {
+            return this._search_recursive(node.right, data);
+        }
+    }
+    
+    # Find minimum value node
+    find_min(node) {
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
+    }
+    
+    # Delete a node from BST
+    delete(data) {
+        this.root = this._delete_recursive(this.root, data);
+    }
+    
+    _delete_recursive(node, data) {
+        if (node == null) {
+            return null;
+        }
+        
+        if (data < node.data) {
+            node.left = this._delete_recursive(node.left, data);
+        } else if (data > node.data) {
+            node.right = this._delete_recursive(node.right, data);
+        } else {
+            # Node with only one child or no child
+            if (node.left == null) {
+                return node.right;
+            } else if (node.right == null) {
+                return node.left;
+            }
+            
+            # Node with two children
+            let temp = this.find_min(node.right);
+            node.data = temp.data;
+            node.right = this._delete_recursive(node.right, temp.data);
+        }
+        
+        return node;
+    }
+}
+
+# Test Binary Tree
+print("=== Binary Tree Test ===");
+
+let bt = BinaryTree(1);
+bt.insert(2);
+bt.insert(3);
+bt.insert(4);
+bt.insert(5);
+bt.insert(6);
+bt.insert(7);
+
+print("Tree structure:");
+bt.display();
+
+print("\nTree traversals:");
+print("In-order:", bt.inorder());
+print("Pre-order:", bt.preorder());
+print("Post-order:", bt.postorder());
+print("Level-order:", bt.levelorder());
+
+print("\nTree properties:");
+print("Height:", bt.get_height());
+print("Size:", bt.get_size());
+print("Leaf count:", bt.get_leaf_count());
+
+print("\nSearch operations:");
+print("Search for 4:", bt.search(4));
+print("Search for 8:", bt.search(8));
+
+# Test Binary Search Tree
+print("\n=== Binary Search Tree Test ===");
+
+let bst = BinarySearchTree();
+let values = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45];
+
+for (let value in values) {
+    bst.insert(value);
+    print("Inserted:", value);
+}
+
+print("\nBST structure:");
+bst.display();
+
+print("\nBST traversals:");
+print("In-order (sorted):", bst.inorder());
+print("Pre-order:", bst.preorder());
+print("Level-order:", bst.levelorder());
+
+print("\nBST properties:");
+print("Height:", bst.get_height());
+print("Size:", bst.get_size());
+
+print("\nBST search operations:");
+print("Search for 25:", bst.search(25));
+print("Search for 55:", bst.search(55));
+print("Search for 80:", bst.search(80));
+
+print("\nBST delete operations:");
+bst.delete(20);
+print("Deleted 20 - In-order:", bst.inorder());
+
+bst.delete(30);
+print("Deleted 30 - In-order:", bst.inorder());
+
+bst.delete(50);
+print("Deleted 50 (root) - In-order:", bst.inorder());
+
+print("\nFinal BST structure:");
+bst.display();
+
+# Tree applications
+print("\n=== Tree Applications ===");
+
+# Expression Tree Evaluation
+class ExpressionTree {
+    constructor() {
+        this.root = null;
+    }
+    
+    is_operator(c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    }
+    
+    construct_tree(postfix) {
+        let stack = [];
+        
+        for (let token in postfix) {
+            if (!this.is_operator(token)) {
+                stack.push(TreeNode(token));
+            } else {
+                let right = stack.pop();
+                let left = stack.pop();
+                let node = TreeNode(token);
+                node.left = left;
+                node.right = right;
+                stack.push(node);
+            }
+        }
+        
+        this.root = stack.pop();
+    }
+    
+    evaluate(node) {
+        if (node == null) {
+            return 0;
+        }
+        
+        if (!this.is_operator(node.data)) {
+            return parseFloat(node.data);
+        }
+        
+        let left_val = this.evaluate(node.left);
+        let right_val = this.evaluate(node.right);
+        
+        if (node.data == '+') {
+            return left_val + right_val;
+        } else if (node.data == '-') {
+            return left_val - right_val;
+        } else if (node.data == '*') {
+            return left_val * right_val;
+        } else if (node.data == '/') {
+            return left_val / right_val;
+        } else if (node.data == '^') {
+            return left_val ** right_val;
+        }
+        
+        return 0;
+    }
+    
+    infix_expression(node) {
+        if (node == null) {
+            return "";
+        }
+        
+        if (!this.is_operator(node.data)) {
+            return node.data;
+        }
+        
+        let left_expr = this.infix_expression(node.left);
+        let right_expr = this.infix_expression(node.right);
+        
+        return "(" + left_expr + " " + node.data + " " + right_expr + ")";
+    }
+    
+    display() {
+        print("Expression Tree:");
+        this._display_helper(this.root, "", true);
+    }
+    
+    _display_helper(node, prefix, is_last) {
+        if (node == null) {
+            return;
+        }
+        
+        print(prefix + (is_last ? "└── " : "├── ") + str(node.data));
+        
+        if (node.left != null || node.right != null) {
+            let new_prefix = prefix + (is_last ? "    " : "│   ");
+            
+            if (node.left != null) {
+                this._display_helper(node.left, new_prefix, node.right == null);
+            }
+            
+            if (node.right != null) {
+                this._display_helper(node.right, new_prefix, true);
+            }
+        }
+    }
+}
+
+# Test expression tree
+let expr_tree = ExpressionTree();
+let postfix_expr = ["3", "4", "+", "2", "*", "7", "/"];
+expr_tree.construct_tree(postfix_expr);
+
+print("Expression Tree:");
+expr_tree.display();
+
+print("Postfix:", postfix_expr.join(" "));
+print("Infix:", expr_tree.infix_expression(expr_tree.root));
+print("Result:", expr_tree.evaluate(expr_tree.root));
+
+# Huffman Coding Tree
+print("\n=== Huffman Coding ===");
+
+class HuffmanNode extends TreeNode {
+    constructor(data, freq) {
+        super(data);
+        this.frequency = freq;
+    }
+}
+
+class HuffmanCoding {
+    constructor() {
+        this.root = null;
+        this.codes = {};
+    }
+    
+    build_codes(node, code) {
+        if (node == null) {
+            return;
+        }
+        
+        if (node.data != null && node.data != "") {
+            this.codes[node.data] = code;
+            return;
+        }
+        
+        this.build_codes(node.left, code + "0");
+        this.build_codes(node.right, code + "1");
+    }
+    
+    encode(text) {
+        # Count frequencies
+        let freq_map = {};
+        for (let char in text) {
+            if (freq_map[char] == null) {
+                freq_map[char] = 0;
+            }
+            freq_map[char]++;
+        }
+        
+        # Create priority queue (simple array for demonstration)
+        let nodes = [];
+        for (let char in freq_map) {
+            nodes.push(HuffmanNode(char, freq_map[char]));
+        }
+        
+        # Build Huffman tree
+        while (len(nodes) > 1) {
+            # Sort by frequency
+            nodes.sort((a, b) => a.frequency - b.frequency);
+            
+            let left = nodes.shift();
+            let right = nodes.shift();
+            
+            let parent = HuffmanNode("", left.frequency + right.frequency);
+            parent.left = left;
+            parent.right = right;
+            
+            nodes.push(parent);
+        }
+        
+        this.root = nodes[0];
+        this.build_codes(this.root, "");
+        
+        # Encode text
+        let encoded = "";
+        for (let char in text) {
+            encoded += this.codes[char];
+        }
+        
+        return encoded;
+    }
+    
+    get_codes() {
+        return this.codes;
+    }
+}
+
+# Test Huffman coding
+let huffman = HuffmanCoding();
+let text = "hello world";
+let encoded = huffman.encode(text);
+
+print("Original text:", text);
+print("Huffman codes:", huffman.get_codes());
+print("Encoded:", encoded);
+
+# Performance test
+print("\n=== Performance Test ===");
+
+function performance_test() {
+    let bst = BinarySearchTree();
+    let num_elements = 1000;
+    
+    # Test insertion performance
+    let start_time = time();
+    for (let i = 0; i < num_elements; i++) {
+        bst.insert(randint(1, 10000));
+    }
+    let insert_time = time() - start_time;
+    
+    # Test search performance
+    start_time = time();
+    for (let i = 0; i < 100; i++) {
+        bst.search(randint(1, 10000));
+    }
+    let search_time = time() - start_time;
+    
+    print("BST Performance Test:");
+    print("Inserted", num_elements, "elements in", insert_time, "seconds");
+    print("Performed 100 searches in", search_time, "seconds");
+    print("Tree height:", bst.get_height());
+    print("Tree size:", bst.get_size());
+}
+
+performance_test();

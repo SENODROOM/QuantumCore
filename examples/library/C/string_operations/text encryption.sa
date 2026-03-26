@@ -1,0 +1,705 @@
+# text_encryption.sa - Text Encryption Examples
+# C-style text encryption implementation in Quantum Language
+
+print("=== Text Encryption Examples ===");
+
+# Caesar Cipher
+function caesar_cipher_encrypt(text, shift) {
+    let result = "";
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        
+        if (char >= 'a' && char <= 'z') {
+            let shifted = (char.charCodeAt() - 97 + shift) % 26 + 97;
+            result += chr(shifted);
+        } else if (char >= 'A' && char <= 'Z') {
+            let shifted = (char.charCodeAt() - 65 + shift) % 26 + 65;
+            result += chr(shifted);
+        } else {
+            result += char;
+        }
+    }
+    
+    return result;
+}
+
+function caesar_cipher_decrypt(text, shift) {
+    return caesar_cipher_encrypt(text, -shift);
+}
+
+# ROT13 (special case of Caesar cipher)
+function rot13(text) {
+    return caesar_cipher_encrypt(text, 13);
+}
+
+# Atbash Cipher
+function atbash_cipher(text) {
+    let result = "";
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        
+        if (char >= 'a' && char <= 'z') {
+            let reversed = 122 - (char.charCodeAt() - 97);
+            result += chr(reversed);
+        } else if (char >= 'A' && char <= 'Z') {
+            let reversed = 90 - (char.charCodeAt() - 65);
+            result += chr(reversed);
+        } else {
+            result += char;
+        }
+    }
+    
+    return result;
+}
+
+# Vigenère Cipher
+function vigenere_encrypt(text, key) {
+    let result = "";
+    let key_index = 0;
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        
+        if (char >= 'a' && char <= 'z') {
+            let text_char = char.charCodeAt() - 97;
+            let key_char = key[key_index % len(key)].charCodeAt() - 97;
+            let encrypted = (text_char + key_char) % 26 + 97;
+            result += chr(encrypted);
+            key_index++;
+        } else if (char >= 'A' && char <= 'Z') {
+            let text_char = char.charCodeAt() - 65;
+            let key_char = key[key_index % len(key)].upper().charCodeAt() - 65;
+            let encrypted = (text_char + key_char) % 26 + 65;
+            result += chr(encrypted);
+            key_index++;
+        } else {
+            result += char;
+        }
+    }
+    
+    return result;
+}
+
+function vigenere_decrypt(text, key) {
+    let result = "";
+    let key_index = 0;
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        
+        if (char >= 'a' && char <= 'z') {
+            let text_char = char.charCodeAt() - 97;
+            let key_char = key[key_index % len(key)].charCodeAt() - 97;
+            let decrypted = (text_char - key_char + 26) % 26 + 97;
+            result += chr(decrypted);
+            key_index++;
+        } else if (char >= 'A' && char <= 'Z') {
+            let text_char = char.charCodeAt() - 65;
+            let key_char = key[key_index % len(key)].upper().charCodeAt() - 65;
+            let decrypted = (text_char - key_char + 26) % 26 + 65;
+            result += chr(decrypted);
+            key_index++;
+        } else {
+            result += char;
+        }
+    }
+    
+    return result;
+}
+
+# XOR Cipher
+function xor_cipher(text, key) {
+    let result = "";
+    
+    for (let i = 0; i < len(text); i++) {
+        let text_char = text.charCodeAt(i);
+        let key_char = key.charCodeAt(i % len(key));
+        let encrypted = text_char ^ key_char;
+        result += chr(encrypted);
+    }
+    
+    return result;
+}
+
+# Simple substitution cipher
+function substitution_encrypt(text, substitution_map) {
+    let result = "";
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        let lower_char = char.lower();
+        
+        if (substitution_map[lower_char] != null) {
+            let encrypted = substitution_map[lower_char];
+            # Preserve case
+            if (char >= 'A' && char <= 'Z') {
+                result += encrypted.upper();
+            } else {
+                result += encrypted;
+            }
+        } else {
+            result += char;
+        }
+    }
+    
+    return result;
+}
+
+function create_substitution_map() {
+    let alphabet = "abcdefghijklmnopqrstuvwxyz";
+    let shuffled = alphabet.split("");
+    
+    # Fisher-Yates shuffle
+    for (let i = len(shuffled) - 1; i > 0; i--) {
+        let j = randint(0, i);
+        let temp = shuffled[i];
+        shuffled[i] = shuffled[j];
+        shuffled[j] = temp;
+    }
+    
+    let substitution_map = {};
+    for (let i = 0; i < len(alphabet); i++) {
+        substitution_map[alphabet[i]] = shuffled[i];
+    }
+    
+    return substitution_map;
+}
+
+# Test basic encryption functions
+print("\n--- Testing Basic Encryption Functions ---");
+
+let plaintext = "Hello World! This is a secret message.";
+print("Plaintext:", plaintext);
+
+print("\nCaesar Cipher (shift 3):");
+let caesar_encrypted = caesar_cipher_encrypt(plaintext, 3);
+print("Encrypted:", caesar_encrypted);
+let caesar_decrypted = caesar_cipher_decrypt(caesar_encrypted, 3);
+print("Decrypted:", caesar_decrypted);
+
+print("\nROT13:");
+let rot13_encrypted = rot13(plaintext);
+print("Encrypted:", rot13_encrypted);
+let rot13_decrypted = rot13(rot13_encrypted);  # ROT13 is its own inverse
+print("Decrypted:", rot13_decrypted);
+
+print("\nAtbash Cipher:");
+let atbash_encrypted = atbash_cipher(plaintext);
+print("Encrypted:", atbash_encrypted);
+let atbash_decrypted = atbash_cipher(atbash_encrypted);  # Atbash is its own inverse
+print("Decrypted:", atbash_decrypted);
+
+print("\nVigenère Cipher (key 'secret'):");
+let vigenere_key = "secret";
+let vigenere_encrypted = vigenere_encrypt(plaintext, vigenere_key);
+print("Encrypted:", vigenere_encrypted);
+let vigenere_decrypted = vigenere_decrypt(vigenere_encrypted, vigenere_key);
+print("Decrypted:", vigenere_decrypted);
+
+print("\nXOR Cipher (key 'key'):");
+let xor_key = "key";
+let xor_encrypted = xor_cipher(plaintext, xor_key);
+print("Encrypted:", xor_encrypted);
+let xor_decrypted = xor_cipher(xor_encrypted, xor_key);  # XOR is its own inverse
+print("Decrypted:", xor_decrypted);
+
+print("\nSubstitution Cipher:");
+let sub_map = create_substitution_map();
+print("Substitution map (first 10 chars):");
+let map_keys = [];
+for (let key in sub_map) {
+    map_keys.push(key);
+    if (len(map_keys) >= 10) break;
+}
+for (let key in map_keys) {
+    print(key, "->", sub_map[key]);
+}
+
+let sub_encrypted = substitution_encrypt(plaintext, sub_map);
+print("Encrypted:", sub_encrypted);
+
+# Frequency analysis
+print("\n--- Frequency Analysis ---");
+
+function analyze_frequency(text) {
+    let frequency = {};
+    let total = 0;
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i].lower();
+        if (char >= 'a' && char <= 'z') {
+            if (frequency[char] == null) {
+                frequency[char] = 0;
+            }
+            frequency[char]++;
+            total++;
+        }
+    }
+    
+    # Convert to percentages
+    for (let char in frequency) {
+        frequency[char] = (frequency[char] / total * 100).toFixed(2);
+    }
+    
+    return frequency;
+}
+
+function print_frequency_analysis(frequency, title) {
+    print(title + ":");
+    
+    # Sort by frequency
+    let sorted_chars = [];
+    for (let char in frequency) {
+        sorted_chars.push({"char": char, "freq": frequency[char]});
+    }
+    
+    sorted_chars.sort((a, b) => b.freq - a.freq);
+    
+    for (let item in sorted_chars) {
+        print("  " + item.char + ": " + item.freq + "%");
+    }
+}
+
+let sample_text = "The quick brown fox jumps over the lazy dog. This pangram contains all letters of the alphabet.";
+let original_freq = analyze_frequency(sample_text);
+print_frequency_analysis(original_freq, "Original Text Frequency");
+
+let encrypted_caesar = caesar_cipher_encrypt(sample_text, 5);
+let caesar_freq = analyze_frequency(encrypted_caesar);
+print_frequency_analysis(caesar_freq, "Caesar Encrypted Frequency");
+
+# Breaking Caesar cipher (brute force)
+print("\n--- Breaking Caesar Cipher ---");
+
+function break_caesar_cipher(ciphertext) {
+    print("Attempting to break Caesar cipher...");
+    print("Ciphertext:", ciphertext);
+    
+    for (let shift = 1; shift <= 25; shift++) {
+        let decrypted = caesar_cipher_decrypt(ciphertext, shift);
+        print("Shift", shift, ":", decrypted);
+    }
+}
+
+let mystery_text = caesar_cipher_encrypt("Meet me at midnight", 8);
+print("\nBreaking Caesar cipher:");
+break_caesar_cipher(mystery_text);
+
+# Advanced encryption
+print("\n--- Advanced Encryption ---");
+
+# Rail Fence Cipher
+function rail_fence_encrypt(text, rails) {
+    if (rails <= 1) {
+        return text;
+    }
+    
+    let fence = [];
+    for (let i = 0; i < rails; i++) {
+        fence.push([]);
+    }
+    
+    let rail = 0;
+    let direction = 1;
+    
+    for (let i = 0; i < len(text); i++) {
+        fence[rail].push(text[i]);
+        
+        if (rail == 0) {
+            direction = 1;
+        } else if (rail == rails - 1) {
+            direction = -1;
+        }
+        
+        rail += direction;
+    }
+    
+    let result = "";
+    for (let i = 0; i < rails; i++) {
+        for (let j = 0; j < len(fence[i]); j++) {
+            result += fence[i][j];
+        }
+    }
+    
+    return result;
+}
+
+function rail_fence_decrypt(ciphertext, rails) {
+    if (rails <= 1) {
+        return ciphertext;
+    }
+    
+    # Create fence pattern
+    let fence = [];
+    for (let i = 0; i < rails; i++) {
+        fence.push([]);
+    }
+    
+    let rail = 0;
+    let direction = 1;
+    
+    for (let i = 0; i < len(ciphertext); i++) {
+        fence[rail].push(null);
+        
+        if (rail == 0) {
+            direction = 1;
+        } else if (rail == rails - 1) {
+            direction = -1;
+        }
+        
+        rail += direction;
+    }
+    
+    # Fill fence with ciphertext
+    let index = 0;
+    for (let i = 0; i < rails; i++) {
+        for (let j = 0; j < len(fence[i]); j++) {
+            if (fence[i][j] == null) {
+                fence[i][j] = ciphertext[index++];
+            }
+        }
+    }
+    
+    # Read fence in zigzag pattern
+    let result = "";
+    rail = 0;
+    direction = 1;
+    
+    for (let i = 0; i < len(ciphertext); i++) {
+        result += fence[rail].shift();
+        
+        if (rail == 0) {
+            direction = 1;
+        } else if (rail == rails - 1) {
+            direction = -1;
+        }
+        
+        rail += direction;
+    }
+    
+    return result;
+}
+
+print("\nRail Fence Cipher:");
+let rail_text = "Hello World";
+let rail_encrypted = rail_fence_encrypt(rail_text, 3);
+print("Original:", rail_text);
+print("Encrypted (3 rails):", rail_encrypted);
+let rail_decrypted = rail_fence_decrypt(rail_encrypted, 3);
+print("Decrypted:", rail_decrypted);
+
+# Columnar Transposition
+function columnar_encrypt(text, key) {
+    let key_length = len(key);
+    let num_columns = key_length;
+    let num_rows = (len(text) + key_length - 1) / key_length;
+    
+    # Create grid
+    let grid = [];
+    for (let i = 0; i < num_rows; i++) {
+        grid.push([]);
+        for (let j = 0; j < num_columns; j++) {
+            let index = i * num_columns + j;
+            if (index < len(text)) {
+                grid[i].push(text[index]);
+            } else {
+                grid[i].push(' ');
+            }
+        }
+    }
+    
+    # Determine column order based on key
+    let key_order = [];
+    for (let i = 0; i < key_length; i++) {
+        key_order.push({"char": key[i], "index": i});
+    }
+    key_order.sort((a, b) => a.char - b.char);
+    
+    # Read columns in key order
+    let result = "";
+    for (let i = 0; i < key_length; i++) {
+        let col_index = key_order[i].index;
+        for (let row = 0; row < num_rows; row++) {
+            result += grid[row][col_index];
+        }
+    }
+    
+    return result.trim();
+}
+
+function columnar_decrypt(ciphertext, key) {
+    let key_length = len(key);
+    let num_columns = key_length;
+    let num_rows = (len(ciphertext) + key_length - 1) / key_length;
+    
+    # Determine column order based on key
+    let key_order = [];
+    for (let i = 0; i < key_length; i++) {
+        key_order.push({"char": key[i], "index": i});
+    }
+    key_order.sort((a, b) => a.char - b.char);
+    
+    # Create grid
+    let grid = [];
+    for (let i = 0; i < num_rows; i++) {
+        grid.push([]);
+        for (let j = 0; j < num_columns; j++) {
+            grid[i].push(null);
+        }
+    }
+    
+    # Fill grid with ciphertext
+    let index = 0;
+    for (let i = 0; i < key_length; i++) {
+        let col_index = key_order[i].index;
+        for (let row = 0; row < num_rows; row++) {
+            if (index < len(ciphertext)) {
+                grid[row][col_index] = ciphertext[index++];
+            }
+        }
+    }
+    
+    # Read grid row by row
+    let result = "";
+    for (let row = 0; row < num_rows; row++) {
+        for (let col = 0; col < num_columns; col++) {
+            if (grid[row][col] != null && grid[row][col] != ' ') {
+                result += grid[row][col];
+            }
+        }
+    }
+    
+    return result;
+}
+
+print("\nColumnar Transposition:");
+let columnar_key = "KEY";
+let columnar_text = "HELLO WORLD";
+let columnar_encrypted = columnar_encrypt(columnar_text, columnar_key);
+print("Original:", columnar_text);
+print("Key:", columnar_key);
+print("Encrypted:", columnar_encrypted);
+let columnar_decrypted = columnar_decrypt(columnar_encrypted, columnar_key);
+print("Decrypted:", columnar_decrypted);
+
+# Encryption utilities
+print("\n--- Encryption Utilities ---");
+
+# Text to binary
+function text_to_binary(text) {
+    let result = "";
+    for (let i = 0; i < len(text); i++) {
+        let char_code = text.charCodeAt(i);
+        let binary = "";
+        while (char_code > 0) {
+            binary = str(char_code % 2) + binary;
+            char_code = char_code / 2;
+        }
+        # Pad to 8 bits
+        while (len(binary) < 8) {
+            binary = "0" + binary;
+        }
+        result += binary + " ";
+    }
+    return result.trim();
+}
+
+# Binary to text
+function binary_to_text(binary) {
+    let bytes = binary.split(" ");
+    let result = "";
+    
+    for (let byte in bytes) {
+        if (byte != "") {
+            result += chr(parseInt(byte, 2));
+        }
+    }
+    
+    return result;
+}
+
+# Hex encoding
+function text_to_hex(text) {
+    let result = "";
+    for (let i = 0; i < len(text); i++) {
+        let char_code = text.charCodeAt(i);
+        let hex = "";
+        while (char_code > 0) {
+            let remainder = char_code % 16;
+            if (remainder < 10) {
+                hex = str(remainder) + hex;
+            } else {
+                if (remainder == 10) hex = "a" + hex;
+                else if (remainder == 11) hex = "b" + hex;
+                else if (remainder == 12) hex = "c" + hex;
+                else if (remainder == 13) hex = "d" + hex;
+                else if (remainder == 14) hex = "e" + hex;
+                else if (remainder == 15) hex = "f" + hex;
+            }
+            char_code = char_code / 16;
+        }
+        result += hex;
+    }
+    return result;
+}
+
+function hex_to_text(hex) {
+    let result = "";
+    for (let i = 0; i < len(hex); i += 2) {
+        let byte = hex.slice(i, i + 2);
+        result += chr(parseInt(byte, 16));
+    }
+    return result;
+}
+
+print("\nEncoding Examples:");
+let encoding_text = "Hello";
+print("Original:", encoding_text);
+print("Binary:", text_to_binary(encoding_text));
+print("Hex:", text_to_hex(encoding_text));
+
+print("\nDecoding Examples:");
+let binary_data = text_to_binary(encoding_text);
+let hex_data = text_to_hex(encoding_text);
+print("Binary to text:", binary_to_text(binary_data));
+print("Hex to text:", hex_to_text(hex_data));
+
+# Encryption strength analysis
+print("\n--- Encryption Strength Analysis ---");
+
+function analyze_encryption_strength(original, encrypted) {
+    let original_freq = analyze_frequency(original);
+    let encrypted_freq = analyze_frequency(encrypted);
+    
+    # Calculate frequency distribution difference
+    let total_diff = 0;
+    let letters = "abcdefghijklmnopqrstuvwxyz";
+    
+    for (let letter in letters) {
+        let orig_freq = original_freq[letter] || 0;
+        let enc_freq = encrypted_freq[letter] || 0;
+        total_diff += abs(orig_freq - enc_freq);
+    }
+    
+    return {
+        "frequency_difference": total_diff,
+        "entropy": calculate_entropy(encrypted),
+        "original_length": len(original),
+        "encrypted_length": len(encrypted)
+    };
+}
+
+function calculate_entropy(text) {
+    let frequency = {};
+    let total = 0;
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        if (frequency[char] == null) {
+            frequency[char] = 0;
+        }
+        frequency[char]++;
+        total++;
+    }
+    
+    let entropy = 0;
+    for (let char in frequency) {
+        let prob = frequency[char] / total;
+        entropy -= prob * log(prob) / log(2);
+    }
+    
+    return entropy;
+}
+
+print("\nEncryption Strength Analysis:");
+let strength_analysis = analyze_encryption_strength(plaintext, caesar_encrypted);
+print("Caesar Cipher Analysis:");
+print("  Frequency difference:", strength_analysis.frequency_difference);
+print("  Entropy:", strength_analysis.entropy.toFixed(2));
+
+let xor_analysis = analyze_encryption_strength(plaintext, xor_encrypted);
+print("\nXOR Cipher Analysis:");
+print("  Frequency difference:", xor_analysis.frequency_difference);
+print("  Entropy:", xor_analysis.entropy.toFixed(2));
+
+# Interactive encryption tool
+print("\n--- Interactive Encryption Tool ---");
+
+function interactive_encryption() {
+    print("Interactive Encryption Tool");
+    print("Commands: encrypt <cipher> <text> <key>, decrypt <cipher> <text> <key>, quit");
+    print("Ciphers: caesar, rot13, atbash, vigenere, xor, rail, columnar");
+    
+    while (true) {
+        let user_input = input("Enter command: ");
+        let parts = user_input.split(" ");
+        let command = parts[0].lower();
+        
+        if (command == "quit") {
+            break;
+        } else if (len(parts) >= 3) {
+            let cipher = parts[1].lower();
+            let text = parts[2];
+            let key = parts.length > 3 ? parts[3] : "";
+            
+            if (command == "encrypt") {
+                if (cipher == "caesar") {
+                    let shift = parseInt(key) || 3;
+                    print(caesar_cipher_encrypt(text, shift));
+                } else if (cipher == "rot13") {
+                    print(rot13(text));
+                } else if (cipher == "atbash") {
+                    print(atbash_cipher(text));
+                } else if (cipher == "vigenere") {
+                    if (key == "") {
+                        print("Vigenère cipher requires a key");
+                    } else {
+                        print(vigenere_encrypt(text, key));
+                    }
+                } else if (cipher == "xor") {
+                    if (key == "") {
+                        print("XOR cipher requires a key");
+                    } else {
+                        print(xor_cipher(text, key));
+                    }
+                } else {
+                    print("Unknown cipher:", cipher);
+                }
+            } else if (command == "decrypt") {
+                if (cipher == "caesar") {
+                    let shift = parseInt(key) || 3;
+                    print(caesar_cipher_decrypt(text, shift));
+                } else if (cipher == "rot13") {
+                    print(rot13(text));
+                } else if (cipher == "atbash") {
+                    print(atbash_cipher(text));
+                } else if (cipher == "vigenere") {
+                    if (key == "") {
+                        print("Vigenère cipher requires a key");
+                    } else {
+                        print(vigenere_decrypt(text, key));
+                    }
+                } else if (cipher == "xor") {
+                    if (key == "") {
+                        print("XOR cipher requires a key");
+                    } else {
+                        print(xor_cipher(text, key));
+                    }
+                } else {
+                    print("Unknown cipher:", cipher);
+                }
+            }
+        } else {
+            print("Invalid command format");
+        }
+    }
+    
+    print("Goodbye!");
+}
+
+# Uncomment to run interactive mode
+# interactive_encryption();
+
+print("\nText encryption examples completed!");

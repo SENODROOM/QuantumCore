@@ -1,0 +1,529 @@
+# gcd_lcm.sa - GCD and LCM Calculation Examples
+# C-style GCD and LCM implementation in Quantum Language
+
+print("=== GCD and LCM Calculation Examples ===");
+
+# Euclidean algorithm for GCD (iterative)
+function gcd_iterative(a, b) {
+    a = abs(a);
+    b = abs(b);
+    
+    while (b != 0) {
+        let temp = b;
+        b = a % b;
+        a = temp;
+    }
+    
+    return a;
+}
+
+# Euclidean algorithm for GCD (recursive)
+function gcd_recursive(a, b) {
+    a = abs(a);
+    b = abs(b);
+    
+    if (b == 0) {
+        return a;
+    }
+    
+    return gcd_recursive(b, a % b);
+}
+
+# Extended Euclidean algorithm
+function extended_gcd(a, b) {
+    if (b == 0) {
+        return {"gcd": a, "x": 1, "y": 0};
+    }
+    
+    let result = extended_gcd(b, a % b);
+    let gcd = result.gcd;
+    let x1 = result.x;
+    let y1 = result.y;
+    
+    let x = y1;
+    let y = x1 - (a / b) * y1;
+    
+    return {"gcd": gcd, "x": x, "y": y};
+}
+
+# LCM using GCD
+function lcm(a, b) {
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+    
+    return abs(a * b) / gcd_iterative(a, b);
+}
+
+# GCD of multiple numbers
+function gcd_multiple(numbers) {
+    if (len(numbers) == 0) {
+        return 0;
+    }
+    
+    let result = numbers[0];
+    for (let i = 1; i < len(numbers); i++) {
+        result = gcd_iterative(result, numbers[i]);
+    }
+    
+    return result;
+}
+
+# LCM of multiple numbers
+function lcm_multiple(numbers) {
+    if (len(numbers) == 0) {
+        return 0;
+    }
+    
+    let result = numbers[0];
+    for (let i = 1; i < len(numbers); i++) {
+        result = lcm(result, numbers[i]);
+    }
+    
+    return result;
+}
+
+# Test basic GCD and LCM functions
+print("\n--- Testing Basic GCD and LCM Functions ---");
+
+let test_pairs = [
+    [48, 18],
+    [12, 8],
+    [17, 23],
+    [100, 25],
+    [0, 5],
+    [-12, 18]
+];
+
+for (let pair in test_pairs) {
+    let a = pair[0];
+    let b = pair[1];
+    
+    print("Numbers:", a, "and", b);
+    print("GCD (iterative):", gcd_iterative(a, b));
+    print("GCD (recursive):", gcd_recursive(a, b));
+    print("LCM:", lcm(a, b));
+    print("");
+}
+
+# Test extended Euclidean algorithm
+print("--- Testing Extended Euclidean Algorithm ---");
+
+let extended_test_pairs = [
+    [48, 18],
+    [35, 15],
+    [99, 78],
+    [240, 46]
+];
+
+for (let pair in extended_test_pairs) {
+    let a = pair[0];
+    let b = pair[1];
+    
+    let result = extended_gcd(a, b);
+    print("Extended GCD for", a, "and", b);
+    print("GCD:", result.gcd);
+    print("Coefficients x, y:", result.x, result.y);
+    print("Verification:", a, "*", result.x, "+", b, "*", result.y, "=", 
+          a * result.x + b * result.y);
+    print("");
+}
+
+# Test multiple numbers
+print("--- Testing GCD and LCM of Multiple Numbers ---");
+
+let number_sets = [
+    [12, 18, 24],
+    [5, 10, 15, 20],
+    [7, 11, 13],
+    [48, 64, 80, 96]
+];
+
+for (let numbers in number_sets) {
+    print("Numbers:", numbers);
+    print("GCD:", gcd_multiple(numbers));
+    print("LCM:", lcm_multiple(numbers));
+    print("");
+}
+
+# GCD and LCM properties
+print("\n--- GCD and LCM Properties ---");
+
+function verify_properties() {
+    print("Verifying mathematical properties:");
+    
+    # Test commutative property
+    let a = 48, b = 18;
+    print("Commutative property:");
+    print("GCD(a, b) =", gcd_iterative(a, b), "= GCD(b, a) =", gcd_iterative(b, a));
+    print("LCM(a, b) =", lcm(a, b), "= LCM(b, a) =", lcm(b, a));
+    
+    # Test distributive property
+    print("\nDistributive property:");
+    let c = 6;
+    print("GCD(a * c, b * c) =", gcd_iterative(a * c, b * c));
+    print("c * GCD(a, b) =", c * gcd_iterative(a, b));
+    
+    # Test relationship: GCD(a, b) * LCM(a, b) = |a * b|
+    print("\nRelationship GCD * LCM = |a * b|:");
+    let gcd_val = gcd_iterative(a, b);
+    let lcm_val = lcm(a, b);
+    print("GCD(a, b) * LCM(a, b) =", gcd_val * lcm_val);
+    print("|a * b| =", abs(a * b));
+    
+    # Test GCD with zero
+    print("\nGCD with zero:");
+    print("GCD(0, n) =", gcd_iterative(0, 10));
+    print("GCD(n, 0) =", gcd_iterative(10, 0));
+}
+
+verify_properties();
+
+# Applications of GCD and LCM
+print("\n--- Applications of GCD and LCM ---");
+
+# Simplify fractions
+function simplify_fraction(numerator, denominator) {
+    let gcd_val = gcd_iterative(numerator, denominator);
+    
+    if (gcd_val == 0) {
+        return {"numerator": numerator, "denominator": denominator};
+    }
+    
+    return {
+        "numerator": numerator / gcd_val,
+        "denominator": denominator / gcd_val
+    };
+}
+
+print("Fraction Simplification:");
+let fractions = [
+    [8, 12],
+    [15, 25],
+    [100, 75],
+    [7, 13]
+];
+
+for (let frac in fractions) {
+    let simplified = simplify_fraction(frac[0], frac[1]);
+    print(frac[0], "/", frac[1], "simplified to", 
+          simplified.numerator, "/", simplified.denominator);
+}
+
+# Find least common multiple for scheduling
+print("\nScheduling Problem:");
+print("If event A occurs every 6 days and event B occurs every 8 days,");
+print("when will they occur together again?");
+
+let event_a_period = 6;
+let event_b_period = 8;
+let together_again = lcm(event_a_period, event_b_period);
+
+print("They will occur together again every", together_again, "days");
+
+# Find common divisors
+function find_common_divisors(a, b) {
+    let gcd_val = gcd_iterative(a, b);
+    let divisors = [];
+    
+    for (let i = 1; i <= gcd_val; i++) {
+        if (gcd_val % i == 0) {
+            divisors.push(i);
+        }
+    }
+    
+    return divisors;
+}
+
+print("\nCommon Divisors:");
+let test_numbers = [48, 18];
+let common_divs = find_common_divisors(test_numbers[0], test_numbers[1]);
+print("Common divisors of", test_numbers[0], "and", test_numbers[1], ":", common_divs);
+
+# Chinese Remainder Theorem application
+print("\n--- Chinese Remainder Theorem ---");
+
+function chinese_remainder_theorem(remainders, moduli) {
+    if (len(remainders) != len(moduli)) {
+        print("Error: Number of remainders must equal number of moduli");
+        return -1;
+    }
+    
+    # Check if moduli are pairwise coprime
+    for (let i = 0; i < len(moduli); i++) {
+        for (let j = i + 1; j < len(moduli); j++) {
+            if (gcd_iterative(moduli[i], moduli[j]) != 1) {
+                print("Error: Moduli are not pairwise coprime");
+                return -1;
+            }
+        }
+    }
+    
+    # Calculate the product of all moduli
+    let N = 1;
+    for (let i = 0; i < len(moduli); i++) {
+        N *= moduli[i];
+    }
+    
+    # Calculate the solution
+    let x = 0;
+    for (let i = 0; i < len(moduli); i++) {
+        let Ni = N / moduli[i];
+        let extended = extended_gcd(Ni, moduli[i]);
+        let yi = extended.x;
+        
+        x += remainders[i] * Ni * yi;
+    }
+    
+    return x % N;
+}
+
+# Test Chinese Remainder Theorem
+print("Chinese Remainder Theorem examples:");
+
+# Example: Find x such that:
+# x ≡ 2 (mod 3)
+# x ≡ 3 (mod 5)
+# x ≡ 2 (mod 7)
+let remainders = [2, 3, 2];
+let moduli = [3, 5, 7];
+
+let solution = chinese_remainder_theorem(remainders, moduli);
+print("Solution x ≡", solution, "(mod", moduli[0] * moduli[1] * moduli[2], ")");
+
+# Verify solution
+for (let i = 0; i < len(remainders); i++) {
+    print("Check:", solution, "≡", remainders[i], "(mod", moduli[i], ") -", 
+          solution % moduli[i] == remainders[i]);
+}
+
+# Performance comparison
+print("\n--- Performance Comparison ---");
+
+function performance_test() {
+    let large_a = 123456789;
+    let large_b = 987654321;
+    let iterations = 10000;
+    
+    # Test iterative GCD
+    let start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        gcd_iterative(large_a, large_b);
+    }
+    let iterative_time = time() - start_time;
+    
+    # Test recursive GCD
+    start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        gcd_recursive(large_a, large_b);
+    }
+    let recursive_time = time() - start_time;
+    
+    print("Performance test with large numbers:", large_a, "and", large_b);
+    print("Iterations:", iterations);
+    print("Iterative GCD:", iterative_time, "seconds");
+    print("Recursive GCD:", recursive_time, "seconds");
+}
+
+performance_test();
+
+# GCD and LCM calculator class
+print("\n--- GCD and LCM Calculator Class ---");
+
+class GCDLCMCalculator {
+    constructor() {
+        this.history = [];
+    }
+    
+    # Calculate GCD
+    gcd(a, b) {
+        let result = gcd_iterative(a, b);
+        this.record_operation("GCD", [a, b], result);
+        return result;
+    }
+    
+    # Calculate LCM
+    lcm(a, b) {
+        let result = lcm(a, b);
+        this.record_operation("LCM", [a, b], result);
+        return result;
+    }
+    
+    # Calculate extended GCD
+    extended_gcd(a, b) {
+        let result = extended_gcd(a, b);
+        this.record_operation("Extended GCD", [a, b], result.gcd);
+        return result;
+    }
+    
+    # Record operation in history
+    record_operation(operation, inputs, result) {
+        this.history.push({
+            "operation": operation,
+            "inputs": inputs,
+            "result": result,
+            "timestamp": time()
+        });
+    }
+    
+    # Get operation history
+    get_history() {
+        return this.history;
+    }
+    
+    # Clear history
+    clear_history() {
+        this.history = [];
+        print("History cleared");
+    }
+    
+    # Display statistics
+    display_statistics() {
+        if (len(this.history) == 0) {
+            print("No operations recorded");
+            return;
+        }
+        
+        let gcd_count = 0;
+        let lcm_count = 0;
+        let ext_gcd_count = 0;
+        
+        for (let i = 0; i < len(this.history); i++) {
+            let op = this.history[i];
+            if (op.operation == "GCD") {
+                gcd_count++;
+            } else if (op.operation == "LCM") {
+                lcm_count++;
+            } else if (op.operation == "Extended GCD") {
+                ext_gcd_count++;
+            }
+        }
+        
+        print("Calculator Statistics:");
+        print("GCD operations:", gcd_count);
+        print("LCM operations:", lcm_count);
+        print("Extended GCD operations:", ext_gcd_count);
+        print("Total operations:", len(this.history));
+    }
+}
+
+# Test calculator class
+let calculator = GCDLCMCalculator();
+
+print("Testing GCDLCMCalculator:");
+print("GCD(48, 18) =", calculator.gcd(48, 18));
+print("LCM(48, 18) =", calculator.lcm(48, 18));
+print("Extended GCD(48, 18) =", calculator.extended_gcd(48, 18));
+
+print("\nOperation history:");
+let history = calculator.get_history();
+for (let i = 0; i < len(history); i++) {
+    let op = history[i];
+    print(op.operation, op.inputs, "=", op.result);
+}
+
+calculator.display_statistics();
+
+# Number theory applications
+print("\n--- Number Theory Applications ---");
+
+# Check if two numbers are coprime
+function are_coprime(a, b) {
+    return gcd_iterative(a, b) == 1;
+}
+
+print("Coprime tests:");
+let coprime_pairs = [
+    [8, 15],
+    [12, 25],
+    [7, 13],
+    [6, 9]
+];
+
+for (let pair in coprime_pairs) {
+    let a = pair[0];
+    let b = pair[1];
+    print(a, "and", b, "are coprime:", are_coprime(a, b));
+}
+
+# Euler's totient function (simplified version)
+function euler_totient(n) {
+    if (n == 1) {
+        return 1;
+    }
+    
+    let result = n;
+    let p = 2;
+    
+    while (p * p <= n) {
+        if (n % p == 0) {
+            while (n % p == 0) {
+                n = n / p;
+            }
+            result = result - result / p;
+        }
+        p++;
+    }
+    
+    if (n > 1) {
+        result = result - result / n;
+    }
+    
+    return result;
+}
+
+print("\nEuler's Totient Function:");
+for (let n = 1; n <= 20; n++) {
+    print("φ(" + str(n) + ") =", euler_totient(n));
+}
+
+# Interactive calculator
+print("\n--- Interactive Calculator ---");
+
+function interactive_calculator() {
+    print("Interactive GCD and LCM Calculator");
+    print("Commands: gcd <a> <b>, lcm <a> <b>, extgcd <a> <b>, history, quit");
+    
+    let calc = GCDLCMCalculator();
+    
+    while (true) {
+        let user_input = input("Enter command: ");
+        let parts = user_input.split(" ");
+        let command = parts[0].lower();
+        
+        if (command == "quit") {
+            break;
+        } else if (command == "gcd" && len(parts) == 3) {
+            let a = parseInt(parts[1]);
+            let b = parseInt(parts[2]);
+            print("GCD(" + str(a) + ", " + str(b) + ") =", calc.gcd(a, b));
+        } else if (command == "lcm" && len(parts) == 3) {
+            let a = parseInt(parts[1]);
+            let b = parseInt(parts[2]);
+            print("LCM(" + str(a) + ", " + str(b) + ") =", calc.lcm(a, b));
+        } else if (command == "extgcd" && len(parts) == 3) {
+            let a = parseInt(parts[1]);
+            let b = parseInt(parts[2]);
+            let result = calc.extended_gcd(a, b);
+            print("Extended GCD(" + str(a) + ", " + str(b) + "):");
+            print("  GCD:", result.gcd);
+            print("  Coefficients:", result.x, result.y);
+        } else if (command == "history") {
+            let hist = calc.get_history();
+            print("Operation History:");
+            for (let i = 0; i < len(hist); i++) {
+                let op = hist[i];
+                print("  ", op.operation, op.inputs, "=", op.result);
+            }
+        } else {
+            print("Invalid command or format");
+        }
+    }
+    
+    print("Goodbye!");
+}
+
+# Uncomment to run interactive mode
+# interactive_calculator();
+
+print("\nGCD and LCM calculation examples completed!");

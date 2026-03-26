@@ -1,0 +1,480 @@
+# factorial.sa - Factorial Calculation Examples
+# C-style factorial implementation in Quantum Language
+
+print("=== Factorial Calculation Examples ===");
+
+# Iterative factorial function
+function factorial_iterative(n) {
+    if (n < 0) {
+        print("Error: Factorial is not defined for negative numbers");
+        return -1;
+    }
+    
+    if (n == 0 || n == 1) {
+        return 1;
+    }
+    
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+        result *= i;
+    }
+    
+    return result;
+}
+
+# Recursive factorial function
+function factorial_recursive(n) {
+    if (n < 0) {
+        print("Error: Factorial is not defined for negative numbers");
+        return -1;
+    }
+    
+    if (n == 0 || n == 1) {
+        return 1;
+    }
+    
+    return n * factorial_recursive(n - 1);
+}
+
+# Memoized factorial function
+function factorial_memoized(n) {
+    if (n < 0) {
+        print("Error: Factorial is not defined for negative numbers");
+        return -1;
+    }
+    
+    let cache = {};
+    
+    function factorial_cached(k) {
+        if (k == 0 || k == 1) {
+            return 1;
+        }
+        
+        if (cache[k] != null) {
+            return cache[k];
+        }
+        
+        cache[k] = k * factorial_cached(k - 1);
+        return cache[k];
+    }
+    
+    return factorial_cached(n);
+}
+
+# Test factorial functions
+let test_values = [0, 1, 5, 10, 15];
+
+print("Iterative factorial:");
+for (let value in test_values) {
+    let result = factorial_iterative(value);
+    print(str(value) + "! =", result);
+}
+
+print("\nRecursive factorial:");
+for (let value in test_values) {
+    let result = factorial_recursive(value);
+    print(str(value) + "! =", result);
+}
+
+print("\nMemoized factorial:");
+for (let value in test_values) {
+    let result = factorial_memoized(value);
+    print(str(value) + "! =", result);
+}
+
+# Performance comparison
+print("\n--- Performance Comparison ---");
+
+function performance_test() {
+    let n = 20;
+    let iterations = 1000;
+    
+    # Test iterative
+    let start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        factorial_iterative(n);
+    }
+    let iterative_time = time() - start_time;
+    
+    # Test recursive
+    start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        factorial_recursive(n);
+    }
+    let recursive_time = time() - start_time;
+    
+    # Test memoized
+    start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        factorial_memoized(n);
+    }
+    let memoized_time = time() - start_time;
+    
+    print("Performance test (n =", n, ",", iterations, "iterations):");
+    print("Iterative:", iterative_time, "seconds");
+    print("Recursive:", recursive_time, "seconds");
+    print("Memoized:", memoized_time, "seconds");
+}
+
+performance_test();
+
+# Large factorial calculations
+print("\n--- Large Factorial Calculations ---");
+
+let large_values = [15, 20, 25];
+
+for (let value in large_values) {
+    let result = factorial_iterative(value);
+    print(str(value) + "! =", result);
+    print("Number of digits:", len(str(result)));
+}
+
+# Factorial properties
+print("\n--- Factorial Properties ---");
+
+# Check if a number is a factorial number
+function is_factorial_number(n) {
+    if (n < 1) {
+        return false;
+    }
+    
+    let i = 1;
+    let fact = 1;
+    
+    while (fact < n) {
+        i++;
+        fact *= i;
+    }
+    
+    return fact == n;
+}
+
+# Find factorial numbers in a range
+function find_factorial_numbers(start, end) {
+    let factorial_numbers = [];
+    
+    for (let num = start; num <= end; num++) {
+        if (is_factorial_number(num)) {
+            factorial_numbers.push(num);
+        }
+    }
+    
+    return factorial_numbers;
+}
+
+print("Factorial numbers between 1 and 1000:");
+let factorials_in_range = find_factorial_numbers(1, 1000);
+print(factorials_in_range);
+
+# Check if n! + 1 is prime (Wilson's theorem related)
+function is_prime(num) {
+    if (num < 2) {
+        return false;
+    }
+    
+    if (num == 2) {
+        return true;
+    }
+    
+    if (num % 2 == 0) {
+        return false;
+    }
+    
+    for (let i = 3; i <= sqrt(num); i += 2) {
+        if (num % i == 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function test_wilson_property() {
+    print("Testing n! + 1 for primality (related to Wilsons theorem):");
+    
+    for (let n = 1; n <= 10; n++) {
+        let fact = factorial_iterative(n);
+        let test_value = fact + 1;
+        let is_prime_result = is_prime(test_value);
+        
+        print(str(n) + "! + 1 =", test_value, "- Prime:", is_prime_result);
+    }
+}
+
+test_wilson_property();
+
+# Factorial digit sum
+function digit_sum(n) {
+    let sum = 0;
+    let num_str = str(n);
+    
+    for (let i = 0; i < len(num_str); i++) {
+        sum += parseInt(num_str[i]);
+    }
+    
+    return sum;
+}
+
+function factorial_digit_sum(n) {
+    let fact = factorial_iterative(n);
+    return digit_sum(fact);
+}
+
+print("\nFactorial digit sums:");
+for (let n = 5; n <= 15; n++) {
+    let sum = factorial_digit_sum(n);
+    print("Sum of digits of", str(n) + "! =", sum);
+}
+
+# Binomial coefficients
+function binomial_coefficient(n, k) {
+    if (k > n) {
+        return 0;
+    }
+    
+    # Use the formula: n! / (k! * (n-k)!)
+    let numerator = factorial_iterative(n);
+    let denominator = factorial_iterative(k) * factorial_iterative(n - k);
+    
+    return numerator / denominator;
+}
+
+print("\n--- Binomial Coefficients (Pascal's Triangle) ---");
+
+function generate_pascal_triangle(rows) {
+    print("Pascals Triangle (", rows, "rows):");
+    
+    for (let n = 0; n < rows; n++) {
+        let row = "";
+        for (let k = 0; k <= n; k++) {
+            row += str(binomial_coefficient(n, k)) + " ";
+        }
+        print(row);
+    }
+}
+
+generate_pascal_triangle(8);
+
+# Permutations and combinations
+function permutations(n, r) {
+    if (r > n) {
+        return 0;
+    }
+    return factorial_iterative(n) / factorial_iterative(n - r);
+}
+
+function combinations(n, r) {
+    return binomial_coefficient(n, r);
+}
+
+print("\n--- Permutations and Combinations ---");
+print("P(10, 3) =", permutations(10, 3));
+print("C(10, 3) =", combinations(10, 3));
+
+# Factorial in different bases
+function to_base(n, base) {
+    if (n == 0) {
+        return "0";
+    }
+    
+    let result = "";
+    while (n > 0) {
+        let digit = n % base;
+        if (digit < 10) {
+            result += str(digit);
+        } else {
+            result += chr(ord('A') + digit - 10);
+        }
+        n = n / base;
+    }
+    
+    return result;
+}
+
+function factorial_in_base(n, base) {
+    let fact = factorial_iterative(n);
+    return to_base(fact, base);
+}
+
+print("\n--- Factorial in Different Bases ---");
+print("10! in different bases:");
+print("Decimal:", factorial_in_base(10, 10));
+print("Binary:", factorial_in_base(10, 2));
+print("Octal:", factorial_in_base(10, 8));
+print("Hexadecimal:", factorial_in_base(10, 16));
+
+# Factorial growth analysis
+print("\n--- Factorial Growth Analysis ---");
+
+function analyze_factorial_growth() {
+    print("n\t\tFactorial\t\tApproximation (Stirlings formula)");
+    print("--------------------------------------------------------");
+    
+    for (let n = 1; n <= 10; n++) {
+        let fact = factorial_iterative(n);
+        
+        # Stirlings approximation: n! ≈ sqrt(2πn) * (n/e)^n
+        let stirling = sqrt(2 * PI * n) * pow(n / E, n);
+        
+        print(str(n) + "\t\t" + str(fact) + "\t\t" + str(stirling.toFixed(2)));
+    }
+}
+
+analyze_factorial_growth();
+
+# Factorial calculator class
+print("\n--- Factorial Calculator Class ---");
+
+class FactorialCalculator {
+    constructor() {
+        this.cache = {};
+        this.history = [];
+    }
+    
+    # Calculate factorial with caching
+    calculate(n) {
+        if (this.cache[n] != null) {
+            return this.cache[n];
+        }
+        
+        let result = factorial_iterative(n);
+        this.cache[n] = result;
+        
+        # Record calculation
+        this.history.push({
+            "n": n,
+            "result": result,
+            "timestamp": time()
+        });
+        
+        return result;
+    }
+    
+    # Get all calculated factorials
+    get_all_factorials() {
+        let results = [];
+        for (let n in this.cache) {
+            results.push({"n": parseInt(n), "factorial": this.cache[n]});
+        }
+        return results;
+    }
+    
+    # Clear cache and history
+    clear() {
+        this.cache = {};
+        this.history = [];
+    }
+    
+    # Get calculation history
+    get_history() {
+        return this.history;
+    }
+}
+
+let calc = FactorialCalculator();
+
+# Calculate some factorials
+for (let i = 1; i <= 10; i++) {
+    calc.calculate(i);
+}
+
+let all_factorials = calc.get_all_factorials();
+for (let item in all_factorials) {
+    print(str(item.n) + "! =", item.factorial);
+}
+
+# Interactive factorial calculator
+print("\n--- Interactive Factorial Calculator ---");
+
+function interactive_calculator() {
+    print("Interactive Factorial Calculator");
+    print("Enter \"quit\" to exit");
+    
+    while (true) {
+        let user_input = input("Enter a number (or \"quit\"): ");
+        
+        if (user_input.lower() == "quit") {
+            break;
+        }
+        
+        let n = parseInt(user_input);
+        if (isNaN(n)) {
+            print("Please enter a valid number");
+            continue;
+        }
+        
+        let result = factorial_iterative(n);
+        if (result != -1) {
+            print(str(n) + "! =", result);
+            
+            # Show some interesting facts
+            if (n >= 0) {
+                print("  Number of digits:", len(str(result)));
+                print("  Digit sum:", digit_sum(result));
+                print("  Is factorial number:", is_factorial_number(result));
+            }
+        }
+    }
+    
+    print("Goodbye!");
+}
+
+# Uncomment to run interactive mode
+# interactive_calculator();
+
+# Factorial applications
+print("\n--- Factorial Applications ---");
+
+# Calculate number of ways to arrange n distinct items
+function arrangements(n) {
+    return factorial_iterative(n);
+}
+
+# Calculate number of ways to select k items from n (order matters)
+function permutations_app(n, k) {
+    return permutations(n, k);
+}
+
+# Calculate number of ways to select k items from n (order doesn't matter)
+function combinations_app(n, k) {
+    return combinations(n, k);
+}
+
+# Calculate number of ways to arrange n items in a circle
+function circular_arrangements(n) {
+    if (n <= 2) {
+        return 1;
+    }
+    return factorial_iterative(n - 1);
+}
+
+print("Arrangement problems:");
+print("Ways to arrange 5 people in a line:", arrangements(5));
+print("Ways to arrange 5 people in a circle:", circular_arrangements(5));
+print("Ways to choose 3 people from 5:", combinations_app(5, 3));
+print("Ways to arrange 3 people from 5 in order:", permutations_app(5, 3));
+
+# Factorial overflow simulation
+print("\n--- Factorial Overflow Simulation ---");
+
+function find_overflow_limit() {
+    # Simulate 32-bit integer limit
+    let int32_limit = 2147483647;
+    let n = 1;
+    while (factorial_iterative(n) <= int32_limit) {
+        n++;
+    }
+    print("32-bit integer overflow at", n, "! =", factorial_iterative(n));
+    
+    # Simulate 64-bit integer limit
+    let int64_limit = 9223372036854775807;
+    n = 1;
+    while (factorial_iterative(n) <= int64_limit) {
+        n++;
+    }
+    print("64-bit integer overflow at", n, "! =", factorial_iterative(n));
+}
+
+find_overflow_limit();
+
+print("\nFactorial calculation examples completed!");

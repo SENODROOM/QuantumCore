@@ -1,0 +1,495 @@
+# queue.sa - Queue Data Structure Implementation
+# C-style queue implementation in Quantum Language
+
+# Queue class implementation
+class Queue {
+    constructor() {
+        this.items = [];
+        this.front = 0;
+        this.rear = -1;
+        this.size = 0;
+    }
+    
+    # Enqueue an element to the rear of the queue
+    enqueue(item) {
+        this.items.push(item);
+        this.rear++;
+        this.size++;
+    }
+    
+    # Dequeue an element from the front of the queue
+    dequeue() {
+        if (this.isEmpty()) {
+            print("Error: Queue underflow - cannot dequeue from empty queue");
+            return null;
+        }
+        
+        let item = this.items[this.front];
+        this.front++;
+        this.size--;
+        
+        # Reset pointers when queue becomes empty
+        if (this.isEmpty()) {
+            this.front = 0;
+            this.rear = -1;
+        }
+        
+        return item;
+    }
+    
+    # Peek at the front element without removing it
+    peek() {
+        if (this.isEmpty()) {
+            print("Error: Queue is empty - cannot peek");
+            return null;
+        }
+        return this.items[this.front];
+    }
+    
+    # Check if the queue is empty
+    isEmpty() {
+        return this.size == 0;
+    }
+    
+    # Get the current size of the queue
+    getSize() {
+        return this.size;
+    }
+    
+    # Clear the queue
+    clear() {
+        this.items = [];
+        this.front = 0;
+        this.rear = -1;
+        this.size = 0;
+    }
+    
+    # Display the queue contents
+    display() {
+        if (this.isEmpty()) {
+            print("Queue is empty");
+            return;
+        }
+        
+        print("Queue (front to rear):");
+        for (let i = this.front; i <= this.rear; i++) {
+            print("  ", this.items[i]);
+        }
+    }
+    
+    # Convert queue to array
+    toArray() {
+        let result = [];
+        for (let i = this.front; i <= this.rear; i++) {
+            result.push(this.items[i]);
+        }
+        return result;
+    }
+}
+
+# Test the Queue implementation
+print("=== Queue Implementation Test ===");
+
+let queue = Queue();
+print("Created new queue");
+print("Is queue empty?", queue.isEmpty());
+print("Queue size:", queue.getSize());
+
+# Test enqueue operations
+print("\n--- Testing Enqueue Operations ---");
+queue.enqueue(10);
+queue.enqueue(20);
+queue.enqueue(30);
+queue.enqueue(40);
+queue.enqueue(50);
+
+print("After enqueuing 5 elements:");
+queue.display();
+print("Queue size:", queue.getSize());
+print("Is queue empty?", queue.isEmpty());
+
+# Test peek operation
+print("\n--- Testing Peek Operation ---");
+let front_element = queue.peek();
+print("Front element:", front_element);
+print("Queue size after peek:", queue.getSize());
+queue.display();
+
+# Test dequeue operations
+print("\n--- Testing Dequeue Operations ---");
+let dequeued1 = queue.dequeue();
+print("Dequeued element:", dequeued1);
+print("Queue size after dequeue:", queue.getSize());
+queue.display();
+
+let dequeued2 = queue.dequeue();
+print("Dequeued element:", dequeued2);
+print("Queue size after dequeue:", queue.getSize());
+queue.display();
+
+# Test edge cases
+print("\n--- Testing Edge Cases ---");
+print("Dequeuing all remaining elements:");
+while (!queue.isEmpty()) {
+    let element = queue.dequeue();
+    print("  Dequeued:", element);
+}
+
+print("Final queue size:", queue.getSize());
+print("Is queue empty?", queue.isEmpty());
+
+# Test dequeuing from empty queue
+print("\nTesting dequeue from empty queue:");
+let empty_dequeue = queue.dequeue();
+print("Result:", empty_dequeue);
+
+# Test peek from empty queue
+print("Testing peek from empty queue:");
+let empty_peek = queue.peek();
+print("Result:", empty_peek);
+
+# Queue with different data types
+print("\n=== Queue with Different Data Types ===");
+let mixed_queue = Queue();
+
+mixed_queue.enqueue("Hello");
+mixed_queue.enqueue(42);
+mixed_queue.enqueue(3.14);
+mixed_queue.enqueue(true);
+mixed_queue.enqueue([1, 2, 3]);
+
+print("Mixed data type queue:");
+mixed_queue.display();
+
+print("Dequeuing elements:");
+while (!mixed_queue.isEmpty()) {
+    let element = mixed_queue.dequeue();
+    print("  Type:", typeof(element), "Value:", element);
+}
+
+# Queue application: Task scheduling
+print("\n=== Queue Application: Task Scheduling ===");
+
+class TaskScheduler {
+    constructor() {
+        this.task_queue = Queue();
+        this.completed_tasks = [];
+    }
+    
+    add_task(task_name, priority) {
+        let task = {
+            "name": task_name,
+            "priority": priority,
+            "added_time": time()
+        };
+        this.task_queue.enqueue(task);
+        print("Added task:", task_name, "(Priority:", priority, ")");
+    }
+    
+    execute_next_task() {
+        if (this.task_queue.isEmpty()) {
+            print("No tasks to execute");
+            return;
+        }
+        
+        let task = this.task_queue.dequeue();
+        print("Executing task:", task.name, "(Priority:", task.priority, ")");
+        
+        # Simulate task execution
+        sleep(0.1);
+        
+        task.completed_time = time();
+        this.completed_tasks.push(task);
+        print("Completed task:", task.name);
+    }
+    
+    show_pending_tasks() {
+        if (this.task_queue.isEmpty()) {
+            print("No pending tasks");
+            return;
+        }
+        
+        print("Pending tasks:");
+        let tasks = this.task_queue.toArray();
+        for (let i = 0; i < len(tasks); i++) {
+            print("  ", i + 1, ".", tasks[i].name, "(Priority:", tasks[i].priority, ")");
+        }
+    }
+    
+    show_completed_tasks() {
+        if (len(this.completed_tasks) == 0) {
+            print("No completed tasks");
+            return;
+        }
+        
+        print("Completed tasks:");
+        for (let i = 0; i < len(this.completed_tasks); i++) {
+            let task = this.completed_tasks[i];
+            print("  ", i + 1, ".", task.name, "(Priority:", task.priority, ")");
+        }
+    }
+}
+
+# Test task scheduler
+let scheduler = TaskScheduler();
+scheduler.add_task("Initialize system", 1);
+scheduler.add_task("Load configuration", 2);
+scheduler.add_task("Start services", 3);
+scheduler.add_task("Run diagnostics", 2);
+
+print("\n--- Pending Tasks ---");
+scheduler.show_pending_tasks();
+
+print("\n--- Executing Tasks ---");
+scheduler.execute_next_task();
+scheduler.execute_next_task();
+scheduler.execute_next_task();
+
+print("\n--- Remaining Tasks ---");
+scheduler.show_pending_tasks();
+
+print("\n--- Completed Tasks ---");
+scheduler.show_completed_tasks();
+
+# Queue application: Breadth-First Search (BFS)
+print("\n=== Queue Application: BFS ===");
+
+function bfs_graph_traversal(graph, start_vertex) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let queue = Queue();
+    let traversal_order = [];
+    
+    # Initialize visited array
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    # Start BFS
+    visited[start_vertex] = true;
+    queue.enqueue(start_vertex);
+    
+    while (!queue.isEmpty()) {
+        let vertex = queue.dequeue();
+        traversal_order.push(vertex);
+        
+        # Visit all adjacent vertices
+        for (let i = 0; i < len(graph[vertex]); i++) {
+            let adjacent = graph[vertex][i];
+            if (!visited[adjacent]) {
+                visited[adjacent] = true;
+                queue.enqueue(adjacent);
+            }
+        }
+    }
+    
+    return traversal_order;
+}
+
+# Create a test graph
+let graph = [
+    [1, 2],      # Vertex 0 connected to 1, 2
+    [0, 3, 4],   # Vertex 1 connected to 0, 3, 4
+    [0, 4],      # Vertex 2 connected to 0, 4
+    [1, 5],      # Vertex 3 connected to 1, 5
+    [1, 2, 5],   # Vertex 4 connected to 1, 2, 5
+    [3, 4]       # Vertex 5 connected to 3, 4
+];
+
+print("Graph adjacency list:");
+for (let i = 0; i < len(graph); i++) {
+    print("Vertex", i, ":", graph[i]);
+}
+
+let bfs_order = bfs_graph_traversal(graph, 0);
+print("BFS traversal order starting from vertex 0:", bfs_order);
+
+# Queue application: Print queue simulation
+print("\n=== Queue Application: Print Queue Simulation ===");
+
+class PrintQueue {
+    constructor() {
+        this.print_queue = Queue();
+        this.completed_jobs = [];
+    }
+    
+    add_print_job(document_name, pages, priority) {
+        let job = {
+            "document": document_name,
+            "pages": pages,
+            "priority": priority,
+            "timestamp": time()
+        };
+        this.print_queue.enqueue(job);
+        print("Added print job:", document_name, "(", pages, "pages, Priority:", priority, ")");
+    }
+    
+    process_print_job() {
+        if (this.print_queue.isEmpty()) {
+            print("No print jobs in queue");
+            return;
+        }
+        
+        let job = this.print_queue.dequeue();
+        print("Printing:", job.document, "(", job.pages, "pages)");
+        
+        # Simulate printing time
+        sleep(0.05 * job.pages);
+        
+        job.completed_time = time();
+        this.completed_jobs.push(job);
+        print("Completed printing:", job.document);
+    }
+    
+    show_queue_status() {
+        if (this.print_queue.isEmpty()) {
+            print("Print queue is empty");
+            return;
+        }
+        
+        print("Print queue (", this.print_queue.getSize(), "jobs):");
+        let jobs = this.print_queue.toArray();
+        for (let i = 0; i < len(jobs); i++) {
+            print("  ", i + 1, ".", jobs[i].document, "(", jobs[i].pages, "pages)");
+        }
+    }
+}
+
+# Test print queue
+let print_queue = PrintQueue();
+print_queue.add_print_job("Document1.pdf", 5, 2);
+print_queue.add_print_job("Report.docx", 10, 1);
+print_queue.add_print_job("Presentation.pptx", 15, 3);
+
+print("\n--- Queue Status ---");
+print_queue.show_queue_status();
+
+print("\n--- Processing Print Jobs ---");
+print_queue.process_print_job();
+print_queue.process_print_job();
+print_queue.show_queue_status();
+
+# Circular Queue implementation
+print("\n=== Circular Queue Implementation ===");
+
+class CircularQueue {
+    constructor(capacity) {
+        this.capacity = capacity;
+        this.items = [];
+        for (let i = 0; i < capacity; i++) {
+            this.items.push(null);
+        }
+        this.front = -1;
+        this.rear = -1;
+        this.size = 0;
+    }
+    
+    isFull() {
+        return this.size == this.capacity;
+    }
+    
+    isEmpty() {
+        return this.size == 0;
+    }
+    
+    enqueue(item) {
+        if (this.isFull()) {
+            print("Error: Circular queue is full");
+            return false;
+        }
+        
+        if (this.isEmpty()) {
+            this.front = 0;
+        }
+        
+        this.rear = (this.rear + 1) % this.capacity;
+        this.items[this.rear] = item;
+        this.size++;
+        return true;
+    }
+    
+    dequeue() {
+        if (this.isEmpty()) {
+            print("Error: Circular queue is empty");
+            return null;
+        }
+        
+        let item = this.items[this.front];
+        this.items[this.front] = null;
+        
+        if (this.front == this.rear) {
+            # Queue becomes empty
+            this.front = -1;
+            this.rear = -1;
+        } else {
+            this.front = (this.front + 1) % this.capacity;
+        }
+        
+        this.size--;
+        return item;
+    }
+    
+    display() {
+        if (this.isEmpty()) {
+            print("Circular queue is empty");
+            return;
+        }
+        
+        print("Circular queue (front to rear):");
+        let i = this.front;
+        while (true) {
+            print("  ", this.items[i]);
+            if (i == this.rear) break;
+            i = (i + 1) % this.capacity;
+        }
+    }
+}
+
+# Test circular queue
+let circular_queue = CircularQueue(5);
+print("Created circular queue with capacity 5");
+
+circular_queue.enqueue(10);
+circular_queue.enqueue(20);
+circular_queue.enqueue(30);
+circular_queue.display();
+
+print("Dequeued:", circular_queue.dequeue());
+circular_queue.display();
+
+circular_queue.enqueue(40);
+circular_queue.enqueue(50);
+circular_queue.enqueue(60);
+circular_queue.display();
+
+print("Trying to add to full queue:");
+circular_queue.enqueue(70);
+
+# Performance test
+print("\n=== Performance Test ===");
+
+function performance_test() {
+    let large_queue = Queue();
+    let num_operations = 10000;
+    
+    # Test enqueue performance
+    let start_time = time();
+    for (let i = 0; i < num_operations; i++) {
+        large_queue.enqueue(i);
+    }
+    let enqueue_time = time() - start_time;
+    
+    # Test dequeue performance
+    start_time = time();
+    while (!large_queue.isEmpty()) {
+        large_queue.dequeue();
+    }
+    let dequeue_time = time() - start_time;
+    
+    print("Performance test with", num_operations, "operations:");
+    print("Enqueue time:", enqueue_time, "seconds");
+    print("Dequeue time:", dequeue_time, "seconds");
+    print("Total time:", enqueue_time + dequeue_time, "seconds");
+}
+
+performance_test();

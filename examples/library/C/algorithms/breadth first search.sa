@@ -1,0 +1,416 @@
+# bfs.sa - Breadth First Search Algorithm Implementation
+# C-style BFS implementation in Quantum Language
+
+# Graph representation using adjacency list
+function create_graph(num_vertices) {
+    let graph = [];
+    for (let i = 0; i < num_vertices; i++) {
+        graph.push([]);
+    }
+    return graph;
+}
+
+function add_edge(graph, u, v) {
+    graph[u].push(v);  # For directed graph
+    # For undirected graph, also add: graph[v].push(u);
+}
+
+# BFS implementation using queue
+function bfs(graph, start_vertex) {
+    let num_vertices = len(graph);
+    let visited = [];
+    
+    # Initialize visited array
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    # Create a queue for BFS
+    let queue = [];
+    
+    # Mark the starting vertex as visited and enqueue it
+    visited[start_vertex] = true;
+    queue.push(start_vertex);
+    
+    print("BFS traversal starting from vertex", start_vertex, ":");
+    
+    while (len(queue) > 0) {
+        # Dequeue a vertex and print it
+        let vertex = queue.shift();  # Remove from front
+        print(vertex, " ");
+        
+        # Get all adjacent vertices of the dequeued vertex
+        # If an adjacent vertex has not been visited, mark it visited and enqueue it
+        for (let i = 0; i < len(graph[vertex]); i++) {
+            let adjacent = graph[vertex][i];
+            if (!visited[adjacent]) {
+                visited[adjacent] = true;
+                queue.push(adjacent);
+            }
+        }
+    }
+    print("");
+}
+
+# BFS to find shortest path between two vertices
+function bfs_shortest_path(graph, start, target) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let parent = [];
+    let distance = [];
+    
+    # Initialize arrays
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+        parent.push(-1);
+        distance.push(0);
+    }
+    
+    # Create a queue for BFS
+    let queue = [];
+    
+    # Start BFS from the start vertex
+    visited[start] = true;
+    queue.push(start);
+    
+    while (len(queue) > 0) {
+        let vertex = queue.shift();
+        
+        # If we reached the target, reconstruct and return the path
+        if (vertex == target) {
+            let path = [];
+            let current = target;
+            
+            while (current != -1) {
+                path.unshift(current);  # Add to beginning
+                current = parent[current];
+            }
+            
+            return {"path": path, "distance": distance[target]};
+        }
+        
+        # Explore all adjacent vertices
+        for (let i = 0; i < len(graph[vertex]); i++) {
+            let adjacent = graph[vertex][i];
+            if (!visited[adjacent]) {
+                visited[adjacent] = true;
+                parent[adjacent] = vertex;
+                distance[adjacent] = distance[vertex] + 1;
+                queue.push(adjacent);
+            }
+        }
+    }
+    
+    return {"path": [], "distance": -1};  # No path found
+}
+
+# BFS to find all vertices at a given distance from start vertex
+function bfs_vertices_at_distance(graph, start, target_distance) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let distance = [];
+    
+    # Initialize arrays
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+        distance.push(0);
+    }
+    
+    let queue = [];
+    visited[start] = true;
+    queue.push(start);
+    
+    let result = [];
+    
+    while (len(queue) > 0) {
+        let vertex = queue.shift();
+        
+        if (distance[vertex] == target_distance) {
+            result.push(vertex);
+        }
+        
+        # Only explore if we haven't reached the target distance yet
+        if (distance[vertex] < target_distance) {
+            for (let i = 0; i < len(graph[vertex]); i++) {
+                let adjacent = graph[vertex][i];
+                if (!visited[adjacent]) {
+                    visited[adjacent] = true;
+                    distance[adjacent] = distance[vertex] + 1;
+                    queue.push(adjacent);
+                }
+            }
+        }
+    }
+    
+    return result;
+}
+
+# BFS for level order traversal (tree/graph levels)
+function bfs_level_order(graph, start) {
+    let num_vertices = len(graph);
+    let visited = [];
+    
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    let queue = [];
+    visited[start] = true;
+    queue.push(start);
+    
+    let level = 0;
+    let levels = [];
+    
+    print("Level order traversal:");
+    
+    while (len(queue) > 0) {
+        let level_size = len(queue);
+        let current_level = [];
+        
+        print("Level", level, ":");
+        
+        for (let i = 0; i < level_size; i++) {
+            let vertex = queue.shift();
+            current_level.push(vertex);
+            print("  ", vertex);
+            
+            for (let j = 0; j < len(graph[vertex]); j++) {
+                let adjacent = graph[vertex][j];
+                if (!visited[adjacent]) {
+                    visited[adjacent] = true;
+                    queue.push(adjacent);
+                }
+            }
+        }
+        
+        levels.push(current_level);
+        level++;
+    }
+    
+    return levels;
+}
+
+# BFS to check if graph is connected
+function bfs_is_connected(graph) {
+    let num_vertices = len(graph);
+    if (num_vertices == 0) {
+        return true;
+    }
+    
+    let visited = [];
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    # Start BFS from vertex 0
+    let queue = [];
+    visited[0] = true;
+    queue.push(0);
+    
+    while (len(queue) > 0) {
+        let vertex = queue.shift();
+        
+        for (let i = 0; i < len(graph[vertex]); i++) {
+            let adjacent = graph[vertex][i];
+            if (!visited[adjacent]) {
+                visited[adjacent] = true;
+                queue.push(adjacent);
+            }
+        }
+    }
+    
+    # Check if all vertices were visited
+    for (let i = 0; i < num_vertices; i++) {
+        if (!visited[i]) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+# Test the BFS implementations
+let num_vertices = 6;
+let graph = create_graph(num_vertices);
+
+# Add edges to create a test graph
+add_edge(graph, 0, 1);
+add_edge(graph, 0, 2);
+add_edge(graph, 1, 3);
+add_edge(graph, 2, 4);
+add_edge(graph, 3, 5);
+add_edge(graph, 4, 5);
+
+print("Graph adjacency list:");
+for (let i = 0; i < num_vertices; i++) {
+    print("Vertex", i, ":", graph[i]);
+}
+
+# Perform BFS traversal
+bfs(graph, 0);
+
+# Test shortest path finding
+let start_vertex = 0;
+let target_vertex = 5;
+let path_result = bfs_shortest_path(graph, start_vertex, target_vertex);
+
+if (len(path_result.path) > 0) {
+    print("Shortest path from", start_vertex, "to", target_vertex, ":", path_result.path);
+    print("Distance:", path_result.distance);
+} else {
+    print("No path found from", start_vertex, "to", target_vertex);
+}
+
+# Test vertices at specific distance
+let distance = 2;
+let vertices_at_distance = bfs_vertices_at_distance(graph, start_vertex, distance);
+print("Vertices at distance", distance, "from", start_vertex, ":", vertices_at_distance);
+
+# Test level order traversal
+let levels = bfs_level_order(graph, 0);
+
+# Test connectivity
+print("Graph is connected:", bfs_is_connected(graph));
+
+# Create a disconnected graph for testing
+let disconnected_graph = create_graph(6);
+add_edge(disconnected_graph, 0, 1);
+add_edge(disconnected_graph, 1, 2);
+add_edge(disconnected_graph, 3, 4);
+add_edge(disconnected_graph, 4, 5);
+
+print("\nDisconnected graph adjacency list:");
+for (let i = 0; i < 6; i++) {
+    print("Vertex", i, ":", disconnected_graph[i]);
+}
+
+print("Disconnected graph is connected:", bfs_is_connected(disconnected_graph));
+
+# BFS for finding connected components in undirected graph
+function bfs_connected_components(graph) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let components = [];
+    
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    for (let i = 0; i < num_vertices; i++) {
+        if (!visited[i]) {
+            let component = [];
+            let queue = [];
+            
+            visited[i] = true;
+            queue.push(i);
+            
+            while (len(queue) > 0) {
+                let vertex = queue.shift();
+                component.push(vertex);
+                
+                for (let j = 0; j < len(graph[vertex]); j++) {
+                    let adjacent = graph[vertex][j];
+                    if (!visited[adjacent]) {
+                        visited[adjacent] = true;
+                        queue.push(adjacent);
+                    }
+                }
+            }
+            
+            components.push(component);
+        }
+    }
+    
+    return components;
+}
+
+# Test connected components with undirected graph
+let undirected_graph = create_graph(7);
+add_edge(undirected_graph, 0, 1);
+add_edge(undirected_graph, 1, 0);  # Make it undirected
+add_edge(undirected_graph, 1, 2);
+add_edge(undirected_graph, 2, 1);
+add_edge(undirected_graph, 3, 4);
+add_edge(undirected_graph, 4, 3);
+add_edge(undirected_graph, 5, 6);
+add_edge(undirected_graph, 6, 5);
+
+let components = bfs_connected_components(undirected_graph);
+print("Connected components (BFS):", components);
+
+# BFS for bipartite graph checking
+function bfs_is_bipartite(graph) {
+    let num_vertices = len(graph);
+    let colors = [];
+    
+    # 0 = uncolored, 1 = color A, -1 = color B
+    for (let i = 0; i < num_vertices; i++) {
+        colors.push(0);
+    }
+    
+    for (let i = 0; i < num_vertices; i++) {
+        if (colors[i] == 0) {
+            let queue = [];
+            colors[i] = 1;
+            queue.push(i);
+            
+            while (len(queue) > 0) {
+                let vertex = queue.shift();
+                
+                for (let j = 0; j < len(graph[vertex]); j++) {
+                    let adjacent = graph[vertex][j];
+                    
+                    if (colors[adjacent] == 0) {
+                        colors[adjacent] = -colors[vertex];
+                        queue.push(adjacent);
+                    } else if (colors[adjacent] == colors[vertex]) {
+                        return false;  # Found same color on adjacent vertices
+                    }
+                }
+            }
+        }
+    }
+    
+    return true;
+}
+
+# Test bipartite graph checking
+let bipartite_graph = create_graph(4);
+add_edge(bipartite_graph, 0, 1);
+add_edge(bipartite_graph, 0, 3);
+add_edge(bipartite_graph, 1, 2);
+add_edge(bipartite_graph, 2, 3);
+
+print("Bipartite graph is bipartite:", bfs_is_bipartite(bipartite_graph));
+
+let non_bipartite_graph = create_graph(3);
+add_edge(non_bipartite_graph, 0, 1);
+add_edge(non_bipartite_graph, 1, 2);
+add_edge(non_bipartite_graph, 2, 0);
+
+print("Non-bipartite graph is bipartite:", bfs_is_bipartite(non_bipartite_graph));
+
+# Performance test
+function performance_test() {
+    print("\nPerformance Test:");
+    
+    for (let size = 10; size <= 100; size += 10) {
+        # Create a dense graph
+        let test_graph = create_graph(size);
+        for (let i = 0; i < size; i++) {
+            for (let j = i + 1; j < size; j++) {
+                if (randint(0, 10) < 3) {  # 30% edge probability
+                    add_edge(test_graph, i, j);
+                }
+            }
+        }
+        
+        let start_time = time();
+        bfs(test_graph, 0);
+        let end_time = time();
+        
+        print("Graph size:", size, "BFS time:", (end_time - start_time), "seconds");
+    }
+}
+
+performance_test();

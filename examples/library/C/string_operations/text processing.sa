@@ -1,0 +1,598 @@
+# text_processing.sa - Text Processing Examples
+# C-style text processing implementation in Quantum Language
+
+print("=== Text Processing Examples ===");
+
+# Text statistics
+function get_text_statistics(text) {
+    if (len(text) == 0) {
+        return {
+            "characters": 0,
+            "words": 0,
+            "sentences": 0,
+            "paragraphs": 0,
+            "lines": 0
+        };
+    }
+    
+    let char_count = len(text);
+    
+    # Count words
+    let words = text.split(/\s+/);
+    let word_count = 0;
+    for (let word in words) {
+        if (word.trim() != "") {
+            word_count++;
+        }
+    }
+    
+    # Count sentences (simple approach)
+    let sentence_count = 0;
+    let sentence_endings = [".", "!", "?"];
+    for (let i = 0; i < len(text); i++) {
+        if (sentence_endings.contains(text[i])) {
+            sentence_count++;
+        }
+    }
+    
+    # Count paragraphs
+    let paragraphs = text.split(/\n\s*\n/);
+    let paragraph_count = 0;
+    for (let para in paragraphs) {
+        if (para.trim() != "") {
+            paragraph_count++;
+        }
+    }
+    
+    # Count lines
+    let lines = text.split("\n");
+    let line_count = len(lines);
+    
+    return {
+        "characters": char_count,
+        "words": word_count,
+        "sentences": sentence_count,
+        "paragraphs": paragraph_count,
+        "lines": line_count
+    };
+}
+
+# Text cleaning functions
+function remove_extra_whitespace(text) {
+    # Replace multiple spaces with single space
+    let result = text.replace(/\s+/g, " ");
+    # Trim leading and trailing whitespace
+    return result.trim();
+}
+
+function remove_punctuation(text) {
+    let punctuation = ".,!?;:\"'()[]{}<>-";
+    let result = "";
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        if (!punctuation.contains(char)) {
+            result += char;
+        }
+    }
+    
+    return result;
+}
+
+function to_lowercase(text) {
+    return text.lower();
+}
+
+function to_uppercase(text) {
+    return text.upper();
+}
+
+function capitalize_words(text) {
+    let words = text.split(" ");
+    let result = [];
+    
+    for (let word in words) {
+        if (len(word) > 0) {
+            let capitalized = word[0].upper() + word.slice(1).lower();
+            result.push(capitalized);
+        } else {
+            result.push(word);
+        }
+    }
+    
+    return result.join(" ");
+}
+
+# Text search functions
+function find_all_occurrences(text, search_term, case_sensitive = true) {
+    if (!case_sensitive) {
+        text = text.lower();
+        search_term = search_term.lower();
+    }
+    
+    let occurrences = [];
+    let start = 0;
+    
+    while (true) {
+        let index = text.index(search_term);
+        if (index == -1) {
+            break;
+        }
+        
+        occurrences.push(start + index);
+        text = text.slice(index + 1);
+        start += index + 1;
+    }
+    
+    return occurrences;
+}
+
+function count_occurrences(text, search_term, case_sensitive = true) {
+    return len(find_all_occurrences(text, search_term, case_sensitive));
+}
+
+function replace_all(text, search_term, replacement, case_sensitive = true) {
+    if (!case_sensitive) {
+        # Simple case-insensitive replacement
+        let lower_text = text.lower();
+        let lower_search = search_term.lower();
+        let result = "";
+        let i = 0;
+        
+        while (i < len(text)) {
+            if (i + len(search_term) <= len(text) && 
+                lower_text.slice(i, i + len(search_term)) == lower_search) {
+                result += replacement;
+                i += len(search_term);
+            } else {
+                result += text[i];
+                i++;
+            }
+        }
+        
+        return result;
+    } else {
+        # Case-sensitive replacement
+        return text.replace(search_term, replacement);
+    }
+}
+
+# Text analysis functions
+function get_word_frequency(text) {
+    let words = text.lower().split(/\s+/);
+    let frequency = {};
+    
+    for (let word in words) {
+        word = word.trim();
+        if (word != "") {
+            # Remove punctuation from word
+            word = remove_punctuation(word);
+            
+            if (frequency[word] == null) {
+                frequency[word] = 0;
+            }
+            frequency[word]++;
+        }
+    }
+    
+    return frequency;
+}
+
+function get_most_common_words(text, limit = 10) {
+    let frequency = get_word_frequency(text);
+    
+    # Convert to array and sort by frequency
+    let sorted_words = [];
+    for (let word in frequency) {
+        sorted_words.push({"word": word, "count": frequency[word]});
+    }
+    
+    sorted_words.sort((a, b) => b.count - a.count);
+    
+    return sorted_words.slice(0, limit);
+}
+
+function get_character_frequency(text) {
+    let frequency = {};
+    
+    for (let i = 0; i < len(text); i++) {
+        let char = text[i];
+        if (frequency[char] == null) {
+            frequency[char] = 0;
+        }
+        frequency[char]++;
+    }
+    
+    return frequency;
+}
+
+# Text transformation functions
+function reverse_text(text) {
+    let result = "";
+    for (let i = len(text) - 1; i >= 0; i--) {
+        result += text[i];
+    }
+    return result;
+}
+
+function reverse_words(text) {
+    let words = text.split(" ");
+    let reversed = [];
+    
+    for (let i = len(words) - 1; i >= 0; i--) {
+        reversed.push(words[i]);
+    }
+    
+    return reversed.join(" ");
+}
+
+function pig_latin(text) {
+    let words = text.split(" ");
+    let result = [];
+    
+    for (let word in words) {
+        if (len(word) == 0) {
+            result.push(word);
+            continue;
+        }
+        
+        let first_char = word[0].lower();
+        let rest = word.slice(1);
+        
+        if (len(word) == 1) {
+            result.push(word + "ay");
+        } else if ("aeiou".contains(first_char)) {
+            result.push(word + "way");
+        } else {
+            result.push(rest + first_char + "ay");
+        }
+    }
+    
+    return result.join(" ");
+}
+
+# Test basic text processing
+print("\n--- Testing Basic Text Processing ---");
+
+let sample_text = "The quick brown fox jumps over the lazy dog. This is a sample text for testing. The dog was lazy!";
+
+print("Original text:", sample_text);
+print("");
+
+print("Text Statistics:");
+let stats = get_text_statistics(sample_text);
+print("Characters:", stats.characters);
+print("Words:", stats.words);
+print("Sentences:", stats.sentences);
+print("Paragraphs:", stats.paragraphs);
+print("Lines:", stats.lines);
+
+print("\nText Cleaning:");
+print("Original:", sample_text);
+print("Remove extra whitespace:", remove_extra_whitespace(sample_text));
+print("Remove punctuation:", remove_punctuation(sample_text));
+print("Lowercase:", to_lowercase(sample_text));
+print("Uppercase:", to_uppercase(sample_text));
+print("Capitalize words:", capitalize_words(sample_text));
+
+print("\nText Search:");
+let search_term = "the";
+print("Searching for:", search_term);
+print("Occurrences:", count_occurrences(sample_text, search_term, false));
+print("Positions:", find_all_occurrences(sample_text, search_term, false));
+print("Replace with 'a':", replace_all(sample_text, search_term, "a", false));
+
+# Test text analysis
+print("\n--- Testing Text Analysis ---");
+
+print("Word Frequency:");
+let word_freq = get_word_frequency(sample_text);
+for (let word in word_freq) {
+    print(word + ":", word_freq[word]);
+}
+
+print("\nMost Common Words:");
+let common_words = get_most_common_words(sample_text, 5);
+for (let item in common_words) {
+    print(item.word + ":", item.count);
+}
+
+print("\nCharacter Frequency:");
+let char_freq = get_character_frequency(sample_text);
+for (let char in char_freq) {
+    if (char != " ") {
+        print("'" + char + "':", char_freq[char]);
+    }
+}
+
+# Test text transformation
+print("\n--- Testing Text Transformation ---");
+
+print("Original:", sample_text);
+print("Reversed text:", reverse_text(sample_text));
+print("Reversed words:", reverse_words(sample_text));
+print("Pig Latin:", pig_latin(sample_text));
+
+# Advanced text processing
+print("\n--- Advanced Text Processing ---");
+
+# Text similarity (simple approach)
+function text_similarity(text1, text2) {
+    let words1 = get_word_frequency(text1);
+    let words2 = get_word_frequency(text2);
+    
+    let all_words = {};
+    for (let word in words1) {
+        all_words[word] = true;
+    }
+    for (let word in words2) {
+        all_words[word] = true;
+    }
+    
+    let similarity = 0;
+    let total_words = 0;
+    
+    for (let word in all_words) {
+        let count1 = words1[word] || 0;
+        let count2 = words2[word] || 0;
+        
+        similarity += min(count1, count2);
+        total_words += max(count1, count2);
+    }
+    
+    return total_words == 0 ? 1.0 : similarity / total_words;
+}
+
+# Text summarization (extractive)
+function extract_summary(text, num_sentences = 3) {
+    let sentences = [];
+    let current = "";
+    
+    # Split into sentences
+    for (let i = 0; i < len(text); i++) {
+        current += text[i];
+        if (".!?".contains(text[i])) {
+            sentences.push(current.trim());
+            current = "";
+        }
+    }
+    
+    if (current.trim() != "") {
+        sentences.push(current.trim());
+    }
+    
+    if (len(sentences) <= num_sentences) {
+        return sentences.join(" ");
+    }
+    
+    # Score sentences by word frequency
+    let word_freq = get_word_frequency(text);
+    let sentence_scores = [];
+    
+    for (let sentence in sentences) {
+        let score = 0;
+        let sentence_words = sentence.lower().split(/\s+/);
+        
+        for (let word in sentence_words) {
+            word = remove_punctuation(word);
+            if (word_freq[word] != null) {
+                score += word_freq[word];
+            }
+        }
+        
+        sentence_scores.push({"sentence": sentence, "score": score});
+    }
+    
+    # Sort by score and take top sentences
+    sentence_scores.sort((a, b) => b.score - a.score);
+    
+    let summary_sentences = [];
+    for (let i = 0; i < min(num_sentences, len(sentence_scores)); i++) {
+        summary_sentences.push(sentence_scores[i].sentence);
+    }
+    
+    return summary_sentences.join(" ");
+}
+
+# Test advanced functions
+let text1 = "The quick brown fox jumps over the lazy dog.";
+let text2 = "A fast brown fox leaps over a sleepy dog.";
+
+print("\nText Similarity:");
+print("Text 1:", text1);
+print("Text 2:", text2);
+print("Similarity:", text_similarity(text1, text2));
+
+let long_text = "Artificial intelligence is transforming the world. Machine learning algorithms are becoming more sophisticated. Deep learning enables computers to learn from experience. Natural language processing allows machines to understand human language. Computer vision helps machines interpret visual information. These technologies are revolutionizing industries.";
+
+print("\nText Summarization:");
+print("Original:", long_text);
+print("Summary:", extract_summary(long_text, 2));
+
+# Text processing class
+print("\n--- Text Processing Class ---");
+
+class TextProcessor {
+    constructor() {
+        this.original_text = "";
+        this.processed_text = "";
+        this.statistics = {};
+        this.history = [];
+    }
+    
+    # Load text
+    load_text(text) {
+        this.original_text = text;
+        this.processed_text = text;
+        this.statistics = get_text_statistics(text);
+        this.record_operation("load", text);
+    }
+    
+    # Apply transformation
+    apply_transformation(transformation, ...args) {
+        if (transformation == "clean") {
+            this.processed_text = remove_extra_whitespace(this.processed_text);
+        } else if (transformation == "lowercase") {
+            this.processed_text = to_lowercase(this.processed_text);
+        } else if (transformation == "uppercase") {
+            this.processed_text = to_uppercase(this.processed_text);
+        } else if (transformation == "capitalize") {
+            this.processed_text = capitalize_words(this.processed_text);
+        } else if (transformation == "remove_punctuation") {
+            this.processed_text = remove_punctuation(this.processed_text);
+        } else if (transformation == "reverse") {
+            this.processed_text = reverse_text(this.processed_text);
+        } else if (transformation == "replace") {
+            this.processed_text = replace_all(this.processed_text, args[0], args[1]);
+        }
+        
+        this.record_operation(transformation, args);
+    }
+    
+    # Get word frequency
+    get_word_frequency() {
+        return get_word_frequency(this.processed_text);
+    }
+    
+    # Get most common words
+    get_most_common_words(limit = 10) {
+        return get_most_common_words(this.processed_text, limit);
+    }
+    
+    # Search text
+    search(term, case_sensitive = true) {
+        return {
+            "count": count_occurrences(this.processed_text, term, case_sensitive),
+            "positions": find_all_occurrences(this.processed_text, term, case_sensitive)
+        };
+    }
+    
+    # Record operation
+    record_operation(operation, args) {
+        this.history.push({
+            "operation": operation,
+            "args": args,
+            "timestamp": time()
+        });
+    }
+    
+    # Reset to original
+    reset() {
+        this.processed_text = this.original_text;
+        this.record_operation("reset", []);
+    }
+    
+    # Get current text
+    get_text() {
+        return this.processed_text;
+    }
+    
+    # Get statistics
+    get_statistics() {
+        return get_text_statistics(this.processed_text);
+    }
+    
+    # Get history
+    get_history() {
+        return this.history;
+    }
+}
+
+# Test text processor class
+let processor = TextProcessor();
+processor.load_text(sample_text);
+
+print("Testing TextProcessor:");
+print("Original length:", len(processor.get_text()));
+
+processor.apply_transformation("lowercase");
+print("After lowercase:", processor.get_text());
+
+processor.apply_transformation("remove_punctuation");
+print("After removing punctuation:", processor.get_text());
+
+processor.apply_transformation("clean");
+print("After cleaning:", processor.get_text());
+
+print("\nSearch results:");
+let search_results = processor.search("lazy", false);
+print("Found 'lazy' count:", search_results.count);
+print("Positions:", search_results.positions);
+
+print("\nMost common words:");
+let common = processor.get_most_common_words(3);
+for (let item in common) {
+    print(item.word + ":", item.count);
+}
+
+# File processing
+if (false) {
+print("\n--- File Processing ---");
+
+function process_file_content(filename) {
+    let content = read_file(filename);
+    if (content != null) {
+        print("Processing file:", filename);
+        
+        let stats = get_text_statistics(content);
+        print("File statistics:");
+        print("  Characters:", stats.characters);
+        print("  Words:", stats.words);
+        print("  Lines:", stats.lines);
+        
+        let word_freq = get_word_frequency(content);
+        let most_common = get_most_common_words(content, 5);
+        
+        print("Most common words:");
+        for (let item in most_common) {
+            print("  ", item.word + ":", item.count);
+        }
+        
+        return content;
+    }
+    
+    return null;
+}
+
+# Create a sample file for testing
+let sample_file_content = "This is a sample file.\nIt contains multiple lines.\nAnd some text to process.";
+write_file("sample_text.txt", sample_file_content);
+
+print("Processing file content:");
+process_file_content("sample_text.txt");
+
+# Performance test
+print("\n--- Performance Test ---");
+
+function performance_test() {
+    let large_text = "";
+    for (let i = 0; i < 1000; i++) {
+        large_text += "This is line " + str(i) + " of the test text. ";
+    }
+    
+    let iterations = 100;
+    
+    # Test word frequency
+    let start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        get_word_frequency(large_text);
+    }
+    let word_freq_time = time() - start_time;
+    
+    # Test text statistics
+    start_time = time();
+    for (let i = 0; i < iterations; i++) {
+        get_text_statistics(large_text);
+    }
+    let stats_time = time() - start_time;
+    
+    print("Performance test with", len(large_text), "characters,", iterations, "iterations:");
+    print("Word frequency:", word_freq_time, "seconds");
+    print("Text statistics:", stats_time, "seconds");
+}
+
+performance_test();
+
+}
+
+print("\nText processing examples completed!");

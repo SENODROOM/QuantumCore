@@ -1,0 +1,100 @@
+# insertion_sort.sa - Insertion Sort Algorithm Implementation
+# C-style insertion sort implementation in Quantum Language
+
+function insertion_sort(arr) {
+    let n = len(arr);
+    
+    for (let i = 1; i < n; i++) {
+        let key = arr[i];
+        let j = i - 1;
+        
+        # Move elements of arr[0..i-1] that are greater than key
+        # to one position ahead of their current position
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+    
+    return arr;
+}
+
+# Test the insertion sort implementation
+let test_array = [12, 11, 13, 5, 6];
+print("Original array:", test_array);
+
+let sorted_array = insertion_sort(test_array.copy());
+print("Sorted array:", sorted_array);
+
+# Test with already sorted array
+let already_sorted = [1, 2, 3, 4, 5];
+print("Already sorted:", already_sorted);
+print("After insertion sort:", insertion_sort(already_sorted.copy()));
+
+# Test with reverse sorted array
+let reverse_sorted = [5, 4, 3, 2, 1];
+print("Reverse sorted:", reverse_sorted);
+print("After insertion sort:", insertion_sort(reverse_sorted.copy()));
+
+# Test with duplicate elements
+let duplicates = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3];
+print("With duplicates:", duplicates);
+print("After insertion sort:", insertion_sort(duplicates.copy()));
+
+# Test with negative numbers
+let negative_numbers = [-3, 0, -1, 5, -2, 3];
+print("Negative numbers:", negative_numbers);
+print("After insertion sort:", insertion_sort(negative_numbers.copy()));
+
+# Demonstrate stability of insertion sort
+let students = [
+    {"name": "Alice", "score": 85},
+    {"name": "Bob", "score": 92},
+    {"name": "Charlie", "score": 85},
+    {"name": "Diana", "score": 78}
+];
+
+print("Original students (name, score):");
+for (let student in students) {
+    print("  ", student.name, ":", student.score);
+}
+
+# Sort by score while maintaining relative order of equal elements
+function insertion_sort_objects(arr, key_func) {
+    let n = len(arr);
+    
+    for (let i = 1; i < n; i++) {
+        let key = arr[i];
+        let j = i - 1;
+        
+        while (j >= 0 && key_func(arr[j]) > key_func(key)) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+    
+    return arr;
+}
+
+let sorted_students = insertion_sort_objects(students.copy(), (s) => s.score);
+print("Students sorted by score (stable sort):");
+for (let student in sorted_students) {
+    print("  ", student.name, ":", student.score);
+}
+
+# Performance comparison with different array sizes
+print("\nPerformance Test:");
+for (let size = 10; size <= 100; size += 10) {
+    let random_array = [];
+    for (let i = 0; i < size; i++) {
+        random_array.push(randint(0, 100));
+    }
+    
+    let start_time = time();
+    insertion_sort(random_array.copy());
+    let end_time = time();
+    
+    print("Array size:", size, "Time:", (end_time - start_time), "seconds");
+}

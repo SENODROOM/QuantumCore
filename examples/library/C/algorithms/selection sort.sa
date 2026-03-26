@@ -1,0 +1,147 @@
+# selection_sort.sa - Selection Sort Algorithm Implementation
+# C-style selection sort implementation in Quantum Language
+
+function selection_sort(arr) {
+    let n = len(arr);
+    
+    # One by one move boundary of unsorted subarray
+    for (let i = 0; i < n - 1; i++) {
+        # Find the minimum element in unsorted array
+        let min_idx = i;
+        for (let j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+        
+        # Swap the found minimum element with the first element
+        if (min_idx != i) {
+            let temp = arr[min_idx];
+            arr[min_idx] = arr[i];
+            arr[i] = temp;
+        }
+    }
+    
+    return arr;
+}
+
+# Test the selection sort implementation
+let test_array = [64, 25, 12, 22, 11];
+print("Original array:", test_array);
+
+let sorted_array = selection_sort(test_array.copy());
+print("Sorted array:", sorted_array);
+
+# Test with already sorted array
+let already_sorted = [1, 2, 3, 4, 5];
+print("Already sorted:", already_sorted);
+print("After selection sort:", selection_sort(already_sorted.copy()));
+
+# Test with reverse sorted array
+let reverse_sorted = [5, 4, 3, 2, 1];
+print("Reverse sorted:", reverse_sorted);
+print("After selection sort:", selection_sort(reverse_sorted.copy()));
+
+# Test with duplicate elements
+let duplicates = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3];
+print("With duplicates:", duplicates);
+print("After selection sort:", selection_sort(duplicates.copy()));
+
+# Test with negative numbers
+let negative_numbers = [-3, 0, -1, 5, -2, 3];
+print("Negative numbers:", negative_numbers);
+print("After selection sort:", selection_sort(negative_numbers.copy()));
+
+# Demonstrate selection sort with custom comparison
+function selection_sort_custom(arr, compare_func) {
+    let n = len(arr);
+    
+    for (let i = 0; i < n - 1; i++) {
+        let min_idx = i;
+        for (let j = i + 1; j < n; j++) {
+            if (compare_func(arr[j], arr[min_idx]) < 0) {
+                min_idx = j;
+            }
+        }
+        
+        if (min_idx != i) {
+            let temp = arr[min_idx];
+            arr[min_idx] = arr[i];
+            arr[i] = temp;
+        }
+    }
+    
+    return arr;
+}
+
+# Sort strings by length
+let strings = ["apple", "banana", "kiwi", "orange", "grape"];
+print("Original strings:", strings);
+
+let sorted_by_length = selection_sort_custom(strings.copy(), (a, b) => len(a) - len(b));
+print("Sorted by length:", sorted_by_length);
+
+# Sort objects by a property
+let people = [
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25},
+    {"name": "Charlie", "age": 35},
+    {"name": "Diana", "age": 20}
+];
+
+print("Original people:");
+for (let person in people) {
+    print("  ", person.name, ":", person.age);
+}
+
+let sorted_by_age = selection_sort_custom(people.copy(), (a, b) => a.age - b.age);
+print("People sorted by age:");
+for (let person in sorted_by_age) {
+    print("  ", person.name, ":", person.age);
+}
+
+# Count number of swaps and comparisons
+function selection_sort_with_stats(arr) {
+    let n = len(arr);
+    let comparisons = 0;
+    let swaps = 0;
+    
+    for (let i = 0; i < n - 1; i++) {
+        let min_idx = i;
+        for (let j = i + 1; j < n; j++) {
+            comparisons++;
+            if (arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+        
+        if (min_idx != i) {
+            let temp = arr[min_idx];
+            arr[min_idx] = arr[i];
+            arr[i] = temp;
+            swaps++;
+        }
+    }
+    
+    return {"sorted": arr, "comparisons": comparisons, "swaps": swaps};
+}
+
+let stats = selection_sort_with_stats([64, 25, 12, 22, 11]);
+print("Sorted array:", stats.sorted);
+print("Comparisons:", stats.comparisons);
+print("Swaps:", stats.swaps);
+
+# Performance test
+print("\nPerformance Test:");
+for (let size = 10; size <= 50; size += 10) {
+    let random_array = [];
+    for (let i = 0; i < size; i++) {
+        random_array.push(randint(0, 100));
+    }
+    
+    let start_time = time();
+    selection_sort(random_array.copy());
+    let end_time = time();
+    
+    print("Array size:", size, "Time:", (end_time - start_time), "seconds");
+}

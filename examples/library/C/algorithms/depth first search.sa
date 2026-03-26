@@ -1,0 +1,331 @@
+# dfs.sa - Depth First Search Algorithm Implementation
+# C-style DFS implementation in Quantum Language
+
+# Graph representation using adjacency list
+function create_graph(num_vertices) {
+    let graph = [];
+    for (let i = 0; i < num_vertices; i++) {
+        graph.push([]);
+    }
+    return graph;
+}
+
+function add_edge(graph, u, v) {
+    graph[u].push(v);  # For directed graph
+    # For undirected graph, also add: graph[v].push(u);
+}
+
+# DFS implementation using recursion
+function dfs_recursive(graph, vertex, visited) {
+    # Mark the current vertex as visited
+    visited[vertex] = true;
+    print(vertex, " ");
+    
+    # Recur for all adjacent vertices
+    for (let i = 0; i < len(graph[vertex]); i++) {
+        let adjacent = graph[vertex][i];
+        if (!visited[adjacent]) {
+            dfs_recursive(graph, adjacent, visited);
+        }
+    }
+}
+
+function dfs(graph, start_vertex) {
+    let num_vertices = len(graph);
+    let visited = [];
+    
+    # Initialize visited array
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    print("DFS traversal starting from vertex", start_vertex, ":");
+    dfs_recursive(graph, start_vertex, visited);
+    print("");
+}
+
+# DFS implementation using stack (iterative)
+function dfs_iterative(graph, start_vertex) {
+    let num_vertices = len(graph);
+    let visited = [];
+    
+    # Initialize visited array
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    # Create a stack for DFS
+    let stack = [];
+    stack.push(start_vertex);
+    
+    print("DFS (iterative) traversal starting from vertex", start_vertex, ":");
+    
+    while (len(stack) > 0) {
+        let vertex = stack.pop();
+        
+        if (!visited[vertex]) {
+            visited[vertex] = true;
+            print(vertex, " ");
+            
+            # Push all adjacent vertices to stack
+            # Note: We push in reverse order to maintain order similar to recursive
+            for (let i = len(graph[vertex]) - 1; i >= 0; i--) {
+                let adjacent = graph[vertex][i];
+                if (!visited[adjacent]) {
+                    stack.push(adjacent);
+                }
+            }
+        }
+    }
+    print("");
+}
+
+# Test the DFS implementations
+let num_vertices = 6;
+let graph = create_graph(num_vertices);
+
+# Add edges to create a test graph
+add_edge(graph, 0, 1);
+add_edge(graph, 0, 2);
+add_edge(graph, 1, 3);
+add_edge(graph, 1, 4);
+add_edge(graph, 2, 4);
+add_edge(graph, 3, 4);
+add_edge(graph, 3, 5);
+add_edge(graph, 4, 5);
+
+print("Graph adjacency list:");
+for (let i = 0; i < num_vertices; i++) {
+    print("Vertex", i, ":", graph[i]);
+}
+
+# Perform DFS traversals
+dfs(graph, 0);
+dfs_iterative(graph, 0);
+
+# DFS to find a path between two vertices
+function dfs_find_path(graph, current, target, visited, path) {
+    visited[current] = true;
+    path.push(current);
+    
+    if (current == target) {
+        return true;  # Path found
+    }
+    
+    for (let i = 0; i < len(graph[current]); i++) {
+        let adjacent = graph[current][i];
+        if (!visited[adjacent]) {
+            if (dfs_find_path(graph, adjacent, target, visited, path)) {
+                return true;
+            }
+        }
+    }
+    
+    path.pop();  # Backtrack
+    return false;
+}
+
+function find_path(graph, start, target) {
+    let num_vertices = len(graph);
+    let visited = [];
+    
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    let path = [];
+    if (dfs_find_path(graph, start, target, visited, path)) {
+        return path;
+    }
+    return [];  # No path found
+}
+
+let start_vertex = 0;
+let target_vertex = 5;
+let path = find_path(graph, start_vertex, target_vertex);
+
+if (len(path) > 0) {
+    print("Path from", start_vertex, "to", target_vertex, ":", path);
+} else {
+    print("No path found from", start_vertex, "to", target_vertex);
+}
+
+# DFS to detect cycles in a directed graph
+function dfs_has_cycle(graph, vertex, visited, rec_stack) {
+    if (!visited[vertex]) {
+        visited[vertex] = true;
+        rec_stack[vertex] = true;
+        
+        for (let i = 0; i < len(graph[vertex]); i++) {
+            let adjacent = graph[vertex][i];
+            
+            if (!visited[adjacent] && dfs_has_cycle(graph, adjacent, visited, rec_stack)) {
+                return true;
+            } else if (rec_stack[adjacent]) {
+                return true;
+            }
+        }
+    }
+    
+    rec_stack[vertex] = false;
+    return false;
+}
+
+function has_cycle(graph) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let rec_stack = [];
+    
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+        rec_stack.push(false);
+    }
+    
+    for (let i = 0; i < num_vertices; i++) {
+        if (!visited[i]) {
+            if (dfs_has_cycle(graph, i, visited, rec_stack)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+# Test cycle detection
+let cyclic_graph = create_graph(4);
+add_edge(cyclic_graph, 0, 1);
+add_edge(cyclic_graph, 1, 2);
+add_edge(cyclic_graph, 2, 0);  # Creates a cycle
+add_edge(cyclic_graph, 2, 3);
+
+print("Cyclic graph has cycle:", has_cycle(cyclic_graph));
+
+let acyclic_graph = create_graph(4);
+add_edge(acyclic_graph, 0, 1);
+add_edge(acyclic_graph, 1, 2);
+add_edge(acyclic_graph, 2, 3);
+
+print("Acyclic graph has cycle:", has_cycle(acyclic_graph));
+
+# DFS for topological sorting
+function dfs_topological_sort(graph, vertex, visited, stack) {
+    visited[vertex] = true;
+    
+    for (let i = 0; i < len(graph[vertex]); i++) {
+        let adjacent = graph[vertex][i];
+        if (!visited[adjacent]) {
+            dfs_topological_sort(graph, adjacent, visited, stack);
+        }
+    }
+    
+    stack.push(vertex);
+}
+
+function topological_sort(graph) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let stack = [];
+    
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    for (let i = 0; i < num_vertices; i++) {
+        if (!visited[i]) {
+            dfs_topological_sort(graph, i, visited, stack);
+        }
+    }
+    
+    # Reverse the stack to get topological order
+    let topological_order = [];
+    while (len(stack) > 0) {
+        topological_order.push(stack.pop());
+    }
+    
+    return topological_order;
+}
+
+# Test topological sorting
+let dag = create_graph(6);
+add_edge(dag, 5, 2);
+add_edge(dag, 5, 0);
+add_edge(dag, 4, 0);
+add_edge(dag, 4, 1);
+add_edge(dag, 2, 3);
+add_edge(dag, 3, 1);
+
+let topo_order = topological_sort(dag);
+print("Topological order:", topo_order);
+
+# DFS to find connected components in an undirected graph
+function dfs_connected_components(graph, vertex, visited, component) {
+    visited[vertex] = true;
+    component.push(vertex);
+    
+    for (let i = 0; i < len(graph[vertex]); i++) {
+        let adjacent = graph[vertex][i];
+        if (!visited[adjacent]) {
+            dfs_connected_components(graph, adjacent, visited, component);
+        }
+    }
+}
+
+function connected_components(graph) {
+    let num_vertices = len(graph);
+    let visited = [];
+    let components = [];
+    
+    for (let i = 0; i < num_vertices; i++) {
+        visited.push(false);
+    }
+    
+    for (let i = 0; i < num_vertices; i++) {
+        if (!visited[i]) {
+            let component = [];
+            dfs_connected_components(graph, i, visited, component);
+            components.push(component);
+        }
+    }
+    
+    return components;
+}
+
+# Test connected components (undirected graph)
+let undirected_graph = create_graph(7);
+add_edge(undirected_graph, 0, 1);
+add_edge(undirected_graph, 1, 0);  # Make it undirected
+add_edge(undirected_graph, 1, 2);
+add_edge(undirected_graph, 2, 1);
+add_edge(undirected_graph, 3, 4);
+add_edge(undirected_graph, 4, 3);
+add_edge(undirected_graph, 5, 6);
+add_edge(undirected_graph, 6, 5);
+
+let components = connected_components(undirected_graph);
+print("Connected components:", components);
+
+# Performance test
+function performance_test() {
+    print("\nPerformance Test:");
+    
+    for (let size = 10; size <= 100; size += 10) {
+        # Create a dense graph
+        let test_graph = create_graph(size);
+        for (let i = 0; i < size; i++) {
+            for (let j = i + 1; j < size; j++) {
+                if (randint(0, 10) < 3) {  # 30% edge probability
+                    add_edge(test_graph, i, j);
+                }
+            }
+        }
+        
+        let start_time = time();
+        dfs(test_graph, 0);
+        let end_time = time();
+        
+        print("Graph size:", size, "DFS time:", (end_time - start_time), "seconds");
+    }
+}
+
+performance_test();

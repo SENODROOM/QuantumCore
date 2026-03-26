@@ -1,0 +1,384 @@
+# stack.sa - Stack Data Structure Implementation
+# C-style stack implementation in Quantum Language
+
+# Stack class implementation
+class Stack {
+    constructor() {
+        this.items = [];
+        this.top = -1;
+    }
+    
+    # Push an element onto the stack
+    push(item) {
+        this.items.push(item);
+        this.top++;
+    }
+    
+    # Pop the top element from the stack
+    pop() {
+        if (this.isEmpty()) {
+            print("Error: Stack underflow - cannot pop from empty stack");
+            return null;
+        }
+        this.top--;
+        return this.items.pop();
+    }
+    
+    # Peek at the top element without removing it
+    peek() {
+        if (this.isEmpty()) {
+            print("Error: Stack is empty - cannot peek");
+            return null;
+        }
+        return this.items[this.top];
+    }
+    
+    # Check if the stack is empty
+    isEmpty() {
+        return this.top == -1;
+    }
+    
+    # Get the size of the stack
+    size() {
+        return this.top + 1;
+    }
+    
+    # Clear the stack
+    clear() {
+        this.items = [];
+        this.top = -1;
+    }
+    
+    # Display the stack contents
+    display() {
+        if (this.isEmpty()) {
+            print("Stack is empty");
+            return;
+        }
+        
+        print("Stack (top to bottom):");
+        for (let i = this.top; i >= 0; i--) {
+            print("  ", this.items[i]);
+        }
+    }
+    
+    # Convert stack to array
+    toArray() {
+        return this.items.copy();
+    }
+}
+
+# Test the Stack implementation
+print("=== Stack Implementation Test ===");
+
+let stack = Stack();
+print("Created new stack");
+print("Is stack empty?", stack.isEmpty());
+print("Stack size:", stack.size());
+
+# Test push operations
+print("\n--- Testing Push Operations ---");
+stack.push(10);
+stack.push(20);
+stack.push(30);
+stack.push(40);
+stack.push(50);
+
+print("After pushing 5 elements:");
+stack.display();
+print("Stack size:", stack.size());
+print("Is stack empty?", stack.isEmpty());
+
+# Test peek operation
+print("\n--- Testing Peek Operation ---");
+let top_element = stack.peek();
+print("Top element:", top_element);
+print("Stack size after peek:", stack.size());
+stack.display();
+
+# Test pop operations
+print("\n--- Testing Pop Operations ---");
+let popped1 = stack.pop();
+print("Popped element:", popped1);
+print("Stack size after pop:", stack.size());
+stack.display();
+
+let popped2 = stack.pop();
+print("Popped element:", popped2);
+print("Stack size after pop:", stack.size());
+stack.display();
+
+# Test edge cases
+print("\n--- Testing Edge Cases ---");
+print("Popping all remaining elements:");
+while (!stack.isEmpty()) {
+    let element = stack.pop();
+    print("  Popped:", element);
+}
+
+print("Final stack size:", stack.size());
+print("Is stack empty?", stack.isEmpty());
+
+# Test popping from empty stack
+print("\nTesting pop from empty stack:");
+let empty_pop = stack.pop();
+print("Result:", empty_pop);
+
+# Test peek from empty stack
+print("Testing peek from empty stack:");
+let empty_peek = stack.peek();
+print("Result:", empty_peek);
+
+# Stack with different data types
+print("\n=== Stack with Different Data Types ===");
+let mixed_stack = Stack();
+
+mixed_stack.push("Hello");
+mixed_stack.push(42);
+mixed_stack.push(3.14);
+mixed_stack.push(true);
+mixed_stack.push([1, 2, 3]);
+
+print("Mixed data type stack:");
+mixed_stack.display();
+
+print("Popping elements:");
+while (!mixed_stack.isEmpty()) {
+    let element = mixed_stack.pop();
+    print("  Type:", typeof(element), "Value:", element);
+}
+
+# Stack application: Parentheses matching
+print("\n=== Stack Application: Parentheses Matching ===");
+
+function is_balanced_parentheses(expression) {
+    let stack = Stack();
+    
+    for (let i = 0; i < len(expression); i++) {
+        let char = expression[i];
+        
+        if (char == '(' || char == '{' || char == '[') {
+            stack.push(char);
+        } else if (char == ')' || char == '}' || char == ']') {
+            if (stack.isEmpty()) {
+                return false;
+            }
+            
+            let top = stack.pop();
+            if ((top == '(' && char != ')') ||
+                (top == '{' && char != '}') ||
+                (top == '[' && char != ']')) {
+                return false;
+            }
+        }
+    }
+    
+    return stack.isEmpty();
+}
+
+# Test parentheses matching
+let test_expressions = [
+    "((a+b)*c)",
+    "{[()()]}",
+    "((a+b)",
+    "([)]",
+    "({[]})",
+    ""
+];
+
+for (let expr in test_expressions) {
+    let is_balanced = is_balanced_parentheses(expr);
+    print("Expression:", expr, "- Balanced:", is_balanced);
+}
+
+# Stack application: Expression evaluation
+print("\n=== Stack Application: Expression Evaluation ===");
+
+function evaluate_postfix(expression) {
+    let stack = Stack();
+    let tokens = expression.split(" ");
+    
+    for (let token in tokens) {
+        if (token == "") {
+            continue;
+        }
+        
+        if (token.isdigit()) {
+            stack.push(parseFloat(token));
+        } else {
+            # Operator
+            if (stack.size() < 2) {
+                print("Error: Invalid expression");
+                return null;
+            }
+            
+            let operand2 = stack.pop();
+            let operand1 = stack.pop();
+            let result;
+            
+            if (token == '+') {
+                result = operand1 + operand2;
+            } else if (token == '-') {
+                result = operand1 - operand2;
+            } else if (token == '*') {
+                result = operand1 * operand2;
+            } else if (token == '/') {
+                result = operand1 / operand2;
+            } else if (token == '^') {
+                result = operand1 ** operand2;
+            } else {
+                print("Error: Unknown operator", token);
+                return null;
+            }
+            
+            stack.push(result);
+        }
+    }
+    
+    if (stack.size() != 1) {
+        print("Error: Invalid expression");
+        return null;
+    }
+    
+    return stack.pop();
+}
+
+# Test postfix expression evaluation
+let postfix_expressions = [
+    "3 4 + 2 * 7 /",        # ((3+4)*2)/7 = 2
+    "5 1 2 + 4 * + 3 -",    # 5 + ((1+2)*4) - 3 = 14
+    "2 3 1 * + 9 -",        # 2 + (3*1) - 9 = -4
+    "10 2 8 * + 3 -",       # 10 + (2*8) - 3 = 23
+    "4 2 ^ 3 5 * +"         # 4^2 + 3*5 = 31
+];
+
+for (let expr in postfix_expressions) {
+    let result = evaluate_postfix(expr);
+    print("Postfix:", expr, "= Result:", result);
+}
+
+# Stack application: String reversal
+print("\n=== Stack Application: String Reversal ===");
+
+function reverse_string(input_str) {
+    let stack = Stack();
+    
+    # Push all characters onto stack
+    for (let i = 0; i < len(input_str); i++) {
+        stack.push(input_str[i]);
+    }
+    
+    # Pop all characters to reverse the string
+    let reversed = "";
+    while (!stack.isEmpty()) {
+        reversed += stack.pop();
+    }
+    
+    return reversed;
+}
+
+let test_strings = ["Hello", "World", "Quantum", "Language", ""];
+for (let str in test_strings) {
+    let reversed = reverse_string(str);
+    print("Original:", str, "- Reversed:", reversed);
+}
+
+# Stack application: Undo/Redo functionality
+print("\n=== Stack Application: Undo/Redo System ===");
+
+class TextEditor {
+    constructor() {
+        this.content = "";
+        this.undo_stack = Stack();
+        this.redo_stack = Stack();
+    }
+    
+    type(text) {
+        # Save current state to undo stack
+        this.undo_stack.push(this.content);
+        this.content += text;
+        # Clear redo stack when new action is performed
+        this.redo_stack.clear();
+        print("Typed:", text, "- Current content:", this.content);
+    }
+    
+    undo() {
+        if (this.undo_stack.isEmpty()) {
+            print("Nothing to undo");
+            return;
+        }
+        
+        # Save current state to redo stack
+        this.redo_stack.push(this.content);
+        # Restore previous state
+        this.content = this.undo_stack.pop();
+        print("Undo performed - Current content:", this.content);
+    }
+    
+    redo() {
+        if (this.redo_stack.isEmpty()) {
+            print("Nothing to redo");
+            return;
+        }
+        
+        # Save current state to undo stack
+        this.undo_stack.push(this.content);
+        # Restore next state
+        this.content = this.redo_stack.pop();
+        print("Redo performed - Current content:", this.content);
+    }
+    
+    get_content() {
+        return this.content;
+    }
+}
+
+# Test undo/redo system
+let editor = TextEditor();
+editor.type("Hello");
+editor.type(" ");
+editor.type("World");
+editor.type("!");
+
+print("\n--- Testing Undo ---");
+editor.undo();
+editor.undo();
+editor.undo();
+editor.undo();  # Should show "Nothing to undo"
+
+print("\n--- Testing Redo ---");
+editor.redo();
+editor.redo();
+editor.type(" Quantum");
+editor.undo();
+editor.redo();
+editor.redo();  # Should show "Nothing to redo"
+
+# Performance test
+print("\n=== Performance Test ===");
+
+function performance_test() {
+    let large_stack = Stack();
+    let num_operations = 10000;
+    
+    # Test push performance
+    let start_time = time();
+    for (let i = 0; i < num_operations; i++) {
+        large_stack.push(i);
+    }
+    let push_time = time() - start_time;
+    
+    # Test pop performance
+    start_time = time();
+    while (!large_stack.isEmpty()) {
+        large_stack.pop();
+    }
+    let pop_time = time() - start_time;
+    
+    print("Performance test with", num_operations, "operations:");
+    print("Push time:", push_time, "seconds");
+    print("Pop time:", pop_time, "seconds");
+    print("Total time:", push_time + pop_time, "seconds");
+}
+
+performance_test();
