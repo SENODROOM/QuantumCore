@@ -1,0 +1,134 @@
+# To-Do List Manager
+# Simple task management system
+
+class Task:
+    def __init__(self, title, description=""):
+        self.title = title
+        self.description = description
+        self.completed = False
+    
+    def mark_complete(self):
+        self.completed = True
+    
+    def mark_incomplete(self):
+        self.completed = False
+    
+    def __str__(self):
+        status = "✓" if self.completed else "○"
+        return f"{status} {self.title}"
+
+class TodoList:
+    def __init__(self):
+        self.tasks = []
+        self.task_id_counter = 1
+    
+    def add_task(self, title, description=""):
+        task = Task(title, description)
+        self.tasks.append(task)
+        print(f"Added: {title}")
+        return task
+    
+    def remove_task(self, index):
+        if 0 <= index < len(self.tasks):
+            removed = self.tasks.pop(index)
+            print(f"Removed: {removed.title}")
+            return removed
+        else:
+            print("Invalid task number")
+            return None
+    
+    def mark_task_complete(self, index):
+        if 0 <= index < len(self.tasks):
+            self.tasks[index].mark_complete()
+            print(f"Completed: {self.tasks[index].title}")
+        else:
+            print("Invalid task number")
+    
+    def mark_task_incomplete(self, index):
+        if 0 <= index < len(self.tasks):
+            self.tasks[index].mark_incomplete()
+            print(f"Marked incomplete: {self.tasks[index].title}")
+        else:
+            print("Invalid task number")
+    
+    def list_tasks(self):
+        if not self.tasks:
+            print("No tasks in the list")
+            return
+        
+        print("\nYour Tasks:")
+        print("-" * 30)
+        for i, task in enumerate(self.tasks):
+            print(f"{i}. {task}")
+        
+        completed = sum(1 for task in self.tasks if task.completed)
+        total = len(self.tasks)
+        print(f"\nProgress: {completed}/{total} tasks completed")
+    
+    def clear_completed(self):
+        completed_tasks = [task for task in self.tasks if task.completed]
+        self.tasks = [task for task in self.tasks if not task.completed]
+        print(f"Cleared {len(completed_tasks)} completed tasks")
+
+def main():
+    todo = TodoList()
+    
+    print("To-Do List Manager")
+    print("=" * 20)
+    
+    while True:
+        print("\nOptions:")
+        print("1. Add task")
+        print("2. List tasks")
+        print("3. Mark task complete")
+        print("4. Mark task incomplete")
+        print("5. Remove task")
+        print("6. Clear completed tasks")
+        print("7. Exit")
+        
+        choice = input("Enter your choice (1-7): ")
+        
+        if choice == '1':
+            title = input("Enter task title: ")
+            description = input("Enter description (optional): ")
+            todo.add_task(title, description)
+        
+        elif choice == '2':
+            todo.list_tasks()
+        
+        elif choice == '3':
+            todo.list_tasks()
+            try:
+                index = int(input("Enter task number to mark complete: "))
+                todo.mark_task_complete(index)
+            except ValueError:
+                print("Please enter a valid number")
+        
+        elif choice == '4':
+            todo.list_tasks()
+            try:
+                index = int(input("Enter task number to mark incomplete: "))
+                todo.mark_task_incomplete(index)
+            except ValueError:
+                print("Please enter a valid number")
+        
+        elif choice == '5':
+            todo.list_tasks()
+            try:
+                index = int(input("Enter task number to remove: "))
+                todo.remove_task(index)
+            except ValueError:
+                print("Please enter a valid number")
+        
+        elif choice == '6':
+            todo.clear_completed()
+        
+        elif choice == '7':
+            print("Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the to-do list manager
+main()

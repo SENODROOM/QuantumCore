@@ -1,0 +1,366 @@
+# Tic-Tac-Toe Game
+# Classic two-player game with AI opponent
+
+class TicTacToe:
+    def __init__(self):
+        self.board = [' '] * 9
+        self.current_player = 'X'
+        self.game_over = False
+        self.winner = None
+    
+    def display_board(self):
+        """Display the game board"""
+        print(f"\n {self.board[0]} | {self.board[1]} | {self.board[2]} ")
+        print("---+---+---")
+        print(f" {self.board[3]} | {self.board[4]} | {self.board[5]} ")
+        print("---+---+---")
+        print(f" {self.board[6]} | {self.board[7]} | {self.board[8]} ")
+    
+    def make_move(self, position):
+        """Make a move on the board"""
+        if 0 <= position < 9 and self.board[position] == ' ' and not self.game_over:
+            self.board[position] = self.current_player
+            
+            if self.check_winner():
+                self.winner = self.current_player
+                self.game_over = True
+            elif self.is_board_full():
+                self.game_over = True
+            else:
+                self.switch_player()
+            return True
+        return False
+    
+    def switch_player(self):
+        """Switch the current player"""
+        self.current_player = 'O' if self.current_player == 'X' else 'X'
+    
+    def check_winner(self):
+        """Check if there's a winner"""
+        # Check rows
+        for i in range(0, 9, 3):
+            if self.board[i] == self.board[i+1] == self.board[i+2] != ' ':
+                return True
+        
+        # Check columns
+        for i in range(3):
+            if self.board[i] == self.board[i+3] == self.board[i+6] != ' ':
+                return True
+        
+        # Check diagonals
+        if self.board[0] == self.board[4] == self.board[8] != ' ':
+            return True
+        if self.board[2] == self.board[4] == self.board[6] != ' ':
+            return True
+        
+        return False
+    
+    def is_board_full(self):
+        """Check if the board is full"""
+        return ' ' not in self.board
+    
+    def get_empty_positions(self):
+        """Get list of empty positions"""
+        return [i for i, spot in enumerate(self.board) if spot == ' ']
+    
+    def reset_game(self):
+        """Reset the game"""
+        self.board = [' '] * 9
+        self.current_player = 'X'
+        self.game_over = False
+        self.winner = None
+
+class AIPlayer:
+    def __init__(self, symbol='O'):
+        self.symbol = symbol
+    
+    def get_move(self, game):
+        """Get AI move using minimax algorithm"""
+        best_score = float('-inf')
+        best_move = None
+        
+        for position in game.get_empty_positions():
+            game.board[position] = self.symbol
+            score = self.minimax(game, 0, False)
+            game.board[position] = ' '
+            
+            if score > best_score:
+                best_score = score
+                best_move = position
+        
+        return best_move
+    
+    def minimax(self, game, depth, is_maximizing):
+        """Minimax algorithm for AI decision making"""
+        # Check for terminal states
+        if game.check_winner():
+            if game.board.count('O') > game.board.count('X'):
+                return 10 - depth
+            else:
+                return depth - 10
+        elif game.is_board_full():
+            return 0
+        
+        if is_maximizing:
+            best_score = float('-inf')
+            for position in game.get_empty_positions():
+                game.board[position] = 'O'
+                score = self.minimax(game, depth + 1, False)
+                game.board[position] = ' '
+                best_score = max(score, best_score)
+            return best_score
+        else:
+            best_score = float('inf')
+            for position in game.get_empty_positions():
+                game.board[position] = 'X'
+                score = self.minimax(game, depth + 1, True)
+                game.board[position] = ' '
+                best_score = min(score, best_score)
+            return best_score
+
+class RandomAI:
+    def __init__(self, symbol='O'):
+        self.symbol = symbol
+    
+    def get_move(self, game):
+        """Get random AI move"""
+        import random
+        empty_positions = game.get_empty_positions()
+        return random.choice(empty_positions) if empty_positions else None
+
+def get_player_move(game):
+    """Get move from human player"""
+    while True:
+        try:
+            move = int(input(f"Enter position (1-9): ")) - 1
+            if 0 <= move < 9:
+                if game.make_move(move):
+                    break
+                else:
+                    print("Position already taken!")
+            else:
+                print("Please enter a number between 1 and 9")
+        except ValueError:
+            print("Please enter a valid number")
+
+def play_human_vs_human():
+    """Play human vs human game"""
+    game = TicTacToe()
+    
+    print("Human vs Human Game")
+    print("=" * 25)
+    
+    while not game.game_over:
+        game.display_board()
+        print(f"Player {game.current_player}'s turn")
+        
+        get_player_move(game)
+        
+        if game.game_over:
+            game.display_board()
+            if game.winner:
+                print(f"🎉 Player {game.winner} wins!")
+            else:
+                print("🤝 It's a tie!")
+
+def play_human_vs_ai(ai_type='smart'):
+    """Play human vs AI game"""
+    game = TicTacToe()
+    ai = AIPlayer('O') if ai_type == 'smart' else RandomAI('O')
+    
+    print(f"Human vs AI Game ({ai_type} AI)")
+    print("=" * 35)
+    print("You are X, AI is O")
+    
+    while not game.game_over:
+        game.display_board()
+        
+        if game.current_player == 'X':
+            print("Your turn (X)")
+            get_player_move(game)
+        else:
+            print("AI's turn (O)")
+            ai_move = ai.get_move(game)
+            if ai_move is not None:
+                game.make_move(ai_move)
+                print(f"AI chose position {ai_move + 1}")
+        
+        if game.game_over:
+            game.display_board()
+            if game.winner:
+                if game.winner == 'X':
+                    print("🎉 You win!")
+                else:
+                    print("🤖 AI wins!")
+            else:
+                print("🤝 It's a tie!")
+
+def play_ai_vs_ai():
+    """Watch AI vs AI game"""
+    game = TicTacToe()
+    ai1 = AIPlayer('X')
+    ai2 = AIPlayer('O')
+    
+    print("AI vs AI Game")
+    print("=" * 20)
+    
+    input("Press Enter to start...")
+    
+    while not game.game_over:
+        game.display_board()
+        print(f"{'AI 1 (X)' if game.current_player == 'X' else 'AI 2 (O)'} thinking...")
+        
+        import time
+        time.sleep(1)  # Add delay for visibility
+        
+        if game.current_player == 'X':
+            ai_move = ai1.get_move(game)
+        else:
+            ai_move = ai2.get_move(game)
+        
+        if ai_move is not None:
+            game.make_move(ai_move)
+            print(f"AI chose position {ai_move + 1}")
+        
+        if game.game_over:
+            game.display_board()
+            if game.winner:
+                print(f"🤖 AI {game.winner} wins!")
+            else:
+                print("🤝 It's a tie!")
+
+def tournament_mode():
+    """Tournament mode with multiple games"""
+    print("Tournament Mode")
+    print("=" * 20)
+    
+    try:
+        rounds = int(input("Enter number of rounds (1-10): "))
+        rounds = max(1, min(10, rounds))
+    except ValueError:
+        rounds = 5
+    
+    ai_type = input("AI type (smart/random): ").lower()
+    if ai_type not in ['smart', 'random']:
+        ai_type = 'smart'
+    
+    human_wins = 0
+    ai_wins = 0
+    ties = 0
+    
+    for round_num in range(1, rounds + 1):
+        print(f"\n{'='*40}")
+        print(f"Round {round_num} of {rounds}")
+        print(f"{'='*40}")
+        
+        game = TicTacToe()
+        ai = AIPlayer('O') if ai_type == 'smart' else RandomAI('O')
+        
+        while not game.game_over:
+            game.display_board()
+            
+            if game.current_player == 'X':
+                print("Your turn (X)")
+                get_player_move(game)
+            else:
+                print("AI's turn (O)")
+                ai_move = ai.get_move(game)
+                if ai_move is not None:
+                    game.make_move(ai_move)
+                    print(f"AI chose position {ai_move + 1}")
+        
+        game.display_board()
+        
+        if game.winner:
+            if game.winner == 'X':
+                human_wins += 1
+                print("🎉 You win this round!")
+            else:
+                ai_wins += 1
+                print("🤖 AI wins this round!")
+        else:
+            ties += 1
+            print("🤝 This round is a tie!")
+        
+        if round_num < rounds:
+            input("Press Enter for next round...")
+    
+    # Show tournament results
+    print(f"\n{'='*40}")
+    print("TOURNAMENT RESULTS")
+    print(f"{'='*40}")
+    print(f"Rounds played: {rounds}")
+    print(f"Your wins: {human_wins}")
+    print(f"AI wins: {ai_wins}")
+    print(f"Ties: {ties}")
+    print(f"Your win rate: {(human_wins/rounds)*100:.1f}%")
+    
+    if human_wins > ai_wins:
+        print("🏆 You won the tournament!")
+    elif ai_wins > human_wins:
+        print("🤖 AI won the tournament!")
+    else:
+        print("🤝 Tournament ended in a tie!")
+
+def main_menu():
+    """Main menu for Tic-Tac-Toe"""
+    print("TIC-TAC-TOE GAME")
+    print("=" * 20)
+    
+    while True:
+        print("\nMain Menu:")
+        print("1. Human vs Human")
+        print("2. Human vs AI (Smart)")
+        print("3. Human vs AI (Random)")
+        print("4. AI vs AI")
+        print("5. Tournament Mode")
+        print("6. Instructions")
+        print("7. Exit")
+        
+        choice = input("Enter your choice (1-7): ")
+        
+        if choice == '1':
+            play_human_vs_human()
+        
+        elif choice == '2':
+            play_human_vs_ai('smart')
+        
+        elif choice == '3':
+            play_human_vs_ai('random')
+        
+        elif choice == '4':
+            play_ai_vs_ai()
+        
+        elif choice == '5':
+            tournament_mode()
+        
+        elif choice == '6':
+            print("\nHOW TO PLAY TIC-TAC-TOE:")
+            print("-" * 35)
+            print("1. The game is played on a 3x3 grid")
+            print("2. Players take turns placing X's and O's")
+            print("3. First to get 3 in a row wins")
+            print("4. Rows can be horizontal, vertical, or diagonal")
+            print("5. If the board fills up with no winner, it's a tie")
+            print("\nBOARD POSITIONS:")
+            print(" 1 | 2 | 3 ")
+            print("---+---+---")
+            print(" 4 | 5 | 6 ")
+            print("---+---+---")
+            print(" 7 | 8 | 9 ")
+        
+        elif choice == '7':
+            print("Thanks for playing Tic-Tac-Toe!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+        
+        if choice != '7':
+            play_again = input("\nPlay again? (y/n): ").lower()
+            if play_again != 'y':
+                print("Thanks for playing Tic-Tac-Toe!")
+                break
+
+# Run the Tic-Tac-Toe game
+main_menu()

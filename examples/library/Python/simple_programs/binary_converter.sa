@@ -1,0 +1,311 @@
+# Binary Number Converter
+# Convert between binary, decimal, octal, and hexadecimal
+
+def decimal_to_binary(n):
+    """Convert decimal integer to binary string"""
+    if n == 0:
+        return "0"
+    
+    if n < 0:
+        return "-" + decimal_to_binary(-n)
+    
+    binary = ""
+    while n > 0:
+        binary = str(n % 2) + binary
+        n = n // 2
+    
+    return binary
+
+def binary_to_decimal(binary_str):
+    """Convert binary string to decimal integer"""
+    try:
+        # Remove any prefix and handle negative
+        binary_str = binary_str.strip()
+        is_negative = binary_str.startswith('-')
+        if is_negative:
+            binary_str = binary_str[1:]
+        
+        # Remove common prefixes
+        if binary_str.startswith('0b'):
+            binary_str = binary_str[2:]
+        
+        # Validate binary string
+        if not all(c in '01' for c in binary_str):
+            raise ValueError("Invalid binary number")
+        
+        decimal = 0
+        for i, digit in enumerate(reversed(binary_str)):
+            decimal += int(digit) * (2 ** i)
+        
+        return -decimal if is_negative else decimal
+    
+    except ValueError:
+        raise ValueError("Invalid binary number")
+
+def decimal_to_octal(n):
+    """Convert decimal integer to octal string"""
+    if n == 0:
+        return "0"
+    
+    if n < 0:
+        return "-" + decimal_to_octal(-n)
+    
+    octal = ""
+    while n > 0:
+        octal = str(n % 8) + octal
+        n = n // 8
+    
+    return octal
+
+def octal_to_decimal(octal_str):
+    """Convert octal string to decimal integer"""
+    try:
+        octal_str = octal_str.strip()
+        is_negative = octal_str.startswith('-')
+        if is_negative:
+            octal_str = octal_str[1:]
+        
+        if octal_str.startswith('0o'):
+            octal_str = octal_str[2:]
+        
+        if not all(c in '01234567' for c in octal_str):
+            raise ValueError("Invalid octal number")
+        
+        decimal = 0
+        for i, digit in enumerate(reversed(octal_str)):
+            decimal += int(digit) * (8 ** i)
+        
+        return -decimal if is_negative else decimal
+    
+    except ValueError:
+        raise ValueError("Invalid octal number")
+
+def decimal_to_hexadecimal(n):
+    """Convert decimal integer to hexadecimal string"""
+    if n == 0:
+        return "0"
+    
+    if n < 0:
+        return "-" + decimal_to_hexadecimal(-n)
+    
+    hex_digits = "0123456789ABCDEF"
+    hexadecimal = ""
+    
+    while n > 0:
+        hexadecimal = hex_digits[n % 16] + hexadecimal
+        n = n // 16
+    
+    return hexadecimal
+
+def hexadecimal_to_decimal(hex_str):
+    """Convert hexadecimal string to decimal integer"""
+    try:
+        hex_str = hex_str.strip().upper()
+        is_negative = hex_str.startswith('-')
+        if is_negative:
+            hex_str = hex_str[1:]
+        
+        if hex_str.startswith('0X'):
+            hex_str = hex_str[2:]
+        
+        hex_digits = "0123456789ABCDEF"
+        if not all(c in hex_digits for c in hex_str):
+            raise ValueError("Invalid hexadecimal number")
+        
+        decimal = 0
+        for i, digit in enumerate(reversed(hex_str)):
+            decimal += hex_digits.index(digit) * (16 ** i)
+        
+        return -decimal if is_negative else decimal
+    
+    except ValueError:
+        raise ValueError("Invalid hexadecimal number")
+
+def convert_number(number, from_base, to_base):
+    """Convert number from one base to another"""
+    try:
+        # Convert input to decimal
+        if from_base == 2:
+            decimal = binary_to_decimal(str(number))
+        elif from_base == 8:
+            decimal = octal_to_decimal(str(number))
+        elif from_base == 10:
+            decimal = int(number)
+        elif from_base == 16:
+            decimal = hexadecimal_to_decimal(str(number))
+        else:
+            raise ValueError("Unsupported base")
+        
+        # Convert decimal to target base
+        if to_base == 2:
+            return decimal_to_binary(decimal)
+        elif to_base == 8:
+            return decimal_to_octal(decimal)
+        elif to_base == 10:
+            return str(decimal)
+        elif to_base == 16:
+            return decimal_to_hexadecimal(decimal)
+        else:
+            raise ValueError("Unsupported base")
+    
+    except ValueError as e:
+        return f"Error: {e}"
+
+def binary_calculator():
+    """Simple binary calculator"""
+    print("Binary Calculator")
+    print("=" * 20)
+    
+    while True:
+        print("\nOptions:")
+        print("1. Add binary numbers")
+        print("2. Subtract binary numbers")
+        print("3. Multiply binary numbers")
+        print("4. Back to main menu")
+        
+        choice = input("Enter choice (1-4): ")
+        
+        if choice == '4':
+            break
+        
+        if choice in ['1', '2', '3']:
+            try:
+                bin1 = input("Enter first binary number: ")
+                bin2 = input("Enter second binary number: ")
+                
+                dec1 = binary_to_decimal(bin1)
+                dec2 = binary_to_decimal(bin2)
+                
+                if choice == '1':
+                    result = dec1 + dec2
+                    op = "+"
+                elif choice == '2':
+                    result = dec1 - dec2
+                    op = "-"
+                elif choice == '3':
+                    result = dec1 * dec2
+                    op = "*"
+                
+                bin_result = decimal_to_binary(result)
+                
+                print(f"\n{bin1} ({dec1}) {op} {bin2} ({dec2}) = {bin_result} ({result})")
+                
+            except ValueError:
+                print("Invalid binary number(s)")
+        
+        else:
+            print("Invalid choice")
+
+def main_converter():
+    print("Number Base Converter")
+    print("=" * 25)
+    
+    while True:
+        print("\nMain Menu:")
+        print("1. Convert number")
+        print("2. Binary calculator")
+        print("3. Show all conversions")
+        print("4. Exit")
+        
+        choice = input("Enter your choice (1-4): ")
+        
+        if choice == '1':
+            print("\nSelect conversion:")
+            print("1. Decimal to Binary")
+            print("2. Binary to Decimal")
+            print("3. Decimal to Octal")
+            print("4. Octal to Decimal")
+            print("5. Decimal to Hexadecimal")
+            print("6. Hexadecimal to Decimal")
+            print("7. Custom conversion")
+            
+            conv_choice = input("Enter choice (1-7): ")
+            
+            if conv_choice == '1':
+                try:
+                    num = int(input("Enter decimal number: "))
+                    binary = decimal_to_binary(num)
+                    print(f"Decimal {num} = Binary {binary}")
+                except ValueError:
+                    print("Invalid decimal number")
+            
+            elif conv_choice == '2':
+                binary = input("Enter binary number: ")
+                try:
+                    decimal = binary_to_decimal(binary)
+                    print(f"Binary {binary} = Decimal {decimal}")
+                except ValueError:
+                    print("Invalid binary number")
+            
+            elif conv_choice == '3':
+                try:
+                    num = int(input("Enter decimal number: "))
+                    octal = decimal_to_octal(num)
+                    print(f"Decimal {num} = Octal {octal}")
+                except ValueError:
+                    print("Invalid decimal number")
+            
+            elif conv_choice == '4':
+                octal = input("Enter octal number: ")
+                try:
+                    decimal = octal_to_decimal(octal)
+                    print(f"Octal {octal} = Decimal {decimal}")
+                except ValueError:
+                    print("Invalid octal number")
+            
+            elif conv_choice == '5':
+                try:
+                    num = int(input("Enter decimal number: "))
+                    hex_num = decimal_to_hexadecimal(num)
+                    print(f"Decimal {num} = Hexadecimal {hex_num}")
+                except ValueError:
+                    print("Invalid decimal number")
+            
+            elif conv_choice == '6':
+                hex_num = input("Enter hexadecimal number: ")
+                try:
+                    decimal = hexadecimal_to_decimal(hex_num)
+                    print(f"Hexadecimal {hex_num} = Decimal {decimal}")
+                except ValueError:
+                    print("Invalid hexadecimal number")
+            
+            elif conv_choice == '7':
+                try:
+                    number = input("Enter number: ")
+                    from_base = int(input("From base (2, 8, 10, 16): "))
+                    to_base = int(input("To base (2, 8, 10, 16): "))
+                    
+                    result = convert_number(number, from_base, to_base)
+                    print(f"Result: {result}")
+                    
+                except ValueError:
+                    print("Invalid input")
+            
+            else:
+                print("Invalid choice")
+        
+        elif choice == '2':
+            binary_calculator()
+        
+        elif choice == '3':
+            try:
+                num = int(input("Enter decimal number: "))
+                
+                print(f"\nAll conversions for {num}:")
+                print(f"Decimal: {num}")
+                print(f"Binary: {decimal_to_binary(num)}")
+                print(f"Octal: {decimal_to_octal(num)}")
+                print(f"Hexadecimal: {decimal_to_hexadecimal(num)}")
+                
+            except ValueError:
+                print("Invalid decimal number")
+        
+        elif choice == '4':
+            print("Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the converter
+main_converter()

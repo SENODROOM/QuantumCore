@@ -1,0 +1,285 @@
+# Prime Numbers
+# Functions to work with prime numbers
+
+def is_prime(n):
+    """Check if a number is prime"""
+    if n <= 1:
+        return False
+    elif n <= 3:
+        return True
+    elif n % 2 == 0 or n % 3 == 0:
+        return False
+    
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    
+    return True
+
+def generate_primes_up_to(limit):
+    """Generate all prime numbers up to a limit using Sieve of Eratosthenes"""
+    if limit < 2:
+        return []
+    
+    sieve = [True] * (limit + 1)
+    sieve[0] = sieve[1] = False
+    
+    for i in range(2, int(limit ** 0.5) + 1):
+        if sieve[i]:
+            for j in range(i*i, limit + 1, i):
+                sieve[j] = False
+    
+    primes = [i for i, is_prime in enumerate(sieve) if is_prime]
+    return primes
+
+def generate_first_n_primes(n):
+    """Generate the first n prime numbers"""
+    if n <= 0:
+        return []
+    
+    primes = []
+    num = 2
+    
+    while len(primes) < n:
+        if is_prime(num):
+            primes.append(num)
+        num += 1
+    
+    return primes
+
+def prime_factorization(n):
+    """Find prime factors of a number"""
+    if n <= 1:
+        return []
+    
+    factors = []
+    
+    # Handle 2s
+    while n % 2 == 0:
+        factors.append(2)
+        n = n // 2
+    
+    # Handle odd numbers
+    i = 3
+    while i * i <= n:
+        while n % i == 0:
+            factors.append(i)
+            n = n // i
+        i += 2
+    
+    if n > 2:
+        factors.append(n)
+    
+    return factors
+
+def is_twin_prime(n):
+    """Check if n is part of a twin prime pair"""
+    return is_prime(n) and (is_prime(n - 2) or is_prime(n + 2))
+
+def find_twin_primes_up_to(limit):
+    """Find all twin prime pairs up to a limit"""
+    if limit < 3:
+        return []
+    
+    primes = generate_primes_up_to(limit + 1)
+    twin_pairs = []
+    
+    for i in range(len(primes) - 1):
+        if primes[i + 1] - primes[i] == 2:
+            twin_pairs.append((primes[i], primes[i + 1]))
+    
+    return twin_pairs
+
+def gcd(a, b):
+    """Calculate greatest common divisor"""
+    while b:
+        a, b = b, a % b
+    return a
+
+def are_coprime(a, b):
+    """Check if two numbers are coprime"""
+    return gcd(a, b) == 1
+
+def euler_totient(n):
+    """Calculate Euler's Totient function"""
+    if n == 1:
+        return 1
+    
+    result = n
+    p = 2
+    
+    while p * p <= n:
+        if n % p == 0:
+            while n % p == 0:
+                n = n // p
+            result -= result // p
+        p += 1
+    
+    if n > 1:
+        result -= result // n
+    
+    return result
+
+def prime_calculator():
+    print("Prime Number Calculator")
+    print("=" * 30)
+    
+    while True:
+        print("\nOptions:")
+        print("1. Check if number is prime")
+        print("2. Generate primes up to limit")
+        print("3. Generate first n primes")
+        print("4. Prime factorization")
+        print("5. Find twin primes")
+        print("6. Check if coprime")
+        print("7. Euler's Totient function")
+        print("8. Prime statistics")
+        print("9. Exit")
+        
+        choice = input("Enter your choice (1-9): ")
+        
+        if choice == '1':
+            try:
+                num = int(input("Enter number to check: "))
+                if is_prime(num):
+                    print(f"{num} is prime!")
+                else:
+                    print(f"{num} is not prime")
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '2':
+            try:
+                limit = int(input("Enter upper limit: "))
+                if limit < 2:
+                    print("Please enter a number >= 2")
+                    continue
+                
+                primes = generate_primes_up_to(limit)
+                print(f"Primes up to {limit}:")
+                print(primes)
+                print(f"Total: {len(primes)} primes")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '3':
+            try:
+                n = int(input("Enter number of primes: "))
+                if n <= 0:
+                    print("Please enter a positive number")
+                    continue
+                
+                primes = generate_first_n_primes(n)
+                print(f"First {n} primes:")
+                print(primes)
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '4':
+            try:
+                num = int(input("Enter number to factorize: "))
+                if num <= 1:
+                    print("Please enter a number > 1")
+                    continue
+                
+                factors = prime_factorization(num)
+                print(f"Prime factors of {num}: {factors}")
+                
+                # Show factorization in exponent form
+                if factors:
+                    factor_counts = {}
+                    for factor in factors:
+                        factor_counts[factor] = factor_counts.get(factor, 0) + 1
+                    
+                    factorization_str = " × ".join([f"{p}^{e}" if e > 1 else str(p) for p, e in factor_counts.items()])
+                    print(f"Factorization: {factorization_str}")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '5':
+            try:
+                limit = int(input("Enter upper limit: "))
+                if limit < 3:
+                    print("Please enter a number >= 3")
+                    continue
+                
+                twin_pairs = find_twin_primes_up_to(limit)
+                print(f"Twin prime pairs up to {limit}:")
+                for pair in twin_pairs:
+                    print(f"({pair[0]}, {pair[1]})")
+                print(f"Total: {len(twin_pairs)} twin pairs")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '6':
+            try:
+                a = int(input("Enter first number: "))
+                b = int(input("Enter second number: "))
+                
+                if are_coprime(a, b):
+                    print(f"{a} and {b} are coprime")
+                else:
+                    print(f"{a} and {b} are not coprime")
+                    print(f"GCD: {gcd(a, b)}")
+                
+            except ValueError:
+                print("Please enter valid integers")
+        
+        elif choice == '7':
+            try:
+                n = int(input("Enter number: "))
+                if n <= 0:
+                    print("Please enter a positive number")
+                    continue
+                
+                phi = euler_totient(n)
+                print(f"φ({n}) = {phi}")
+                print(f"There are {phi} numbers ≤ {n} that are coprime with {n}")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '8':
+            try:
+                limit = int(input("Enter upper limit for statistics: "))
+                if limit < 2:
+                    print("Please enter a number >= 2")
+                    continue
+                
+                primes = generate_primes_up_to(limit)
+                twin_pairs = find_twin_primes_up_to(limit)
+                
+                print(f"\nPrime Statistics up to {limit}:")
+                print("-" * 35)
+                print(f"Total primes: {len(primes)}")
+                print(f"Twin prime pairs: {len(twin_pairs)}")
+                
+                if len(primes) > 0:
+                    prime_density = len(primes) / limit * 100
+                    print(f"Prime density: {prime_density:.2f}%")
+                    print(f"Average gap: {(limit / len(primes)):.2f}")
+                    
+                    if len(primes) >= 2:
+                        max_gap = max(primes[i+1] - primes[i] for i in range(len(primes)-1))
+                        min_gap = min(primes[i+1] - primes[i] for i in range(len(primes)-1))
+                        print(f"Maximum gap: {max_gap}")
+                        print(f"Minimum gap: {min_gap}")
+                
+            except ValueError:
+                print("Please enter a valid integer")
+        
+        elif choice == '9':
+            print("Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the prime calculator
+prime_calculator()
