@@ -1,0 +1,70 @@
+// Simple Timer Utility
+class Timer {
+  constructor() {
+    this.startTime = null;
+    this.endTime = null;
+    this.interval = null;
+  }
+  
+  start() {
+    this.startTime = Date.now();
+    console.log('Timer started');
+  }
+  
+  stop() {
+    this.endTime = Date.now();
+    const duration = this.endTime - this.startTime;
+    console.log(`Timer stopped: ${duration}ms`);
+    return duration;
+  }
+  
+  getDuration() {
+    if (this.startTime && this.endTime) {
+      return this.endTime - this.startTime;
+    }
+    return this.startTime ? Date.now() - this.startTime : 0;
+  }
+}
+
+function countdown(seconds, callback) {
+  let remaining = seconds;
+  
+  const interval = setInterval(() => {
+    console.log(`Countdown: ${remaining}s`);
+    remaining--;
+    
+    if (remaining < 0) {
+      clearInterval(interval);
+      callback();
+    }
+  }, 1000);
+  
+  return interval;
+}
+
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Usage examples
+const timer = new Timer();
+timer.start();
+
+setTimeout(() => {
+  const duration = timer.stop();
+  console.log(`Operation took ${duration}ms`);
+}, 2000);
+
+countdown(5, () => {
+  console.log('Countdown finished!');
+});
+
+const debouncedSearch = debounce((query) => {
+  console.log('Searching for:', query);
+}, 500);
+
+console.log('Timer utility ready!');

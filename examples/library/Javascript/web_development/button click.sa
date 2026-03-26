@@ -1,0 +1,26 @@
+// Simple Button Click Handler
+function setupButton() {
+  const button = document.getElementById('myButton');
+  
+  button.addEventListener('click', function() {
+    alert('Button clicked!');
+    this.style.backgroundColor = '#4CAF50';
+    this.textContent = 'Clicked!';
+  });
+}
+
+// Alternative with arrow function
+const setupModernButton = () => {
+  const button = document.querySelector('.modern-btn');
+  
+  button.onclick = () => {
+    console.log('Modern button clicked');
+    button.classList.toggle('active');
+  };
+};
+
+// Usage
+setupButton();
+setupModernButton();
+
+console.log('Button handlers ready!');

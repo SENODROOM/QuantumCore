@@ -1,0 +1,53 @@
+// Simple Storage Helper
+function saveToStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    console.log('Saved to storage:', key);
+  } catch (error) {
+    console.error('Error saving to storage:', error);
+  }
+}
+
+function getFromStorage(key) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+  } catch (error) {
+    console.error('Error getting from storage:', error);
+    return null;
+  }
+}
+
+function removeFromStorage(key) {
+  localStorage.removeItem(key);
+  console.log('Removed from storage:', key);
+}
+
+function clearStorage() {
+  localStorage.clear();
+  console.log('Storage cleared');
+}
+
+// Session storage helpers
+function saveToSession(key, value) {
+  sessionStorage.setItem(key, JSON.stringify(value));
+}
+
+function getFromSession(key) {
+  const value = sessionStorage.getItem(key);
+  return value ? JSON.parse(value) : null;
+}
+
+// Usage examples
+saveToStorage('username', 'JohnDoe');
+saveToStorage('settings', { theme: 'dark', notifications: true });
+
+const username = getFromStorage('username');
+const settings = getFromStorage('settings');
+
+console.log('Username:', username);
+console.log('Settings:', settings);
+
+saveToSession('tempData', { step: 1, score: 100 });
+
+console.log('Storage helper ready!');

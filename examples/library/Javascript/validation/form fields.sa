@@ -1,0 +1,90 @@
+// Simple Form Field Validation
+function validateRequired(value) {
+  return value && value.trim().length > 0;
+}
+
+function validateMinLength(value, minLength) {
+  return value && value.length >= minLength;
+}
+
+function validateMaxLength(value, maxLength) {
+  return !value || value.length <= maxLength;
+}
+
+function validateNumber(value) {
+  return !isNaN(value) && value.trim() !== '';
+}
+
+function validateRange(value, min, max) {
+  const num = parseFloat(value);
+  return !isNaN(num) && num >= min && num <= max;
+}
+
+function validateCheckbox(checked) {
+  return checked === true;
+}
+
+function validateRadio(name) {
+  const radios = document.getElementsByName(name);
+  return Array.from(radios).some(radio => radio.checked);
+}
+
+function validateSelect(selectId) {
+  const select = document.getElementById(selectId);
+  return select.value !== '';
+}
+
+// Form validator
+function validateForm(formData) {
+  const errors = {};
+
+  if (!validateRequired(formData.name)) {
+    errors.name = 'Name is required';
+  }
+
+  if (!validateEmail(formData.email)) {
+    errors.email = 'Valid email is required';
+  }
+
+  if (!validateMinLength(formData.password, 8)) {
+    errors.password = 'Password must be at least 8 characters';
+  }
+
+  if (!validateNumber(formData.age)) {
+    errors.age = 'Age must be a number';
+  } else if (!validateRange(formData.age, 18, 120)) {
+    errors.age = 'Age must be between 18 and 120';
+  }
+
+  if (!validateCheckbox(formData.terms)) {
+    errors.terms = 'You must accept the terms';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+// Helper function (assuming email validator exists)
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Usage example
+const formData = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  password: 'password123',
+  age: '25',
+  terms: true
+};
+
+const result = validateForm(formData);
+console.log('Form valid:', result.isValid);
+if (!result.isValid) {
+  console.log('Errors:', result.errors);
+}
+
+console.log('Form fields validator ready!');

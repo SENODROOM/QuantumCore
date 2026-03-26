@@ -1,0 +1,54 @@
+// Simple Phone Validator
+function validatePhone(phone) {
+  // Remove all non-digit characters
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  // Check if it's 10 digits (US format)
+  return cleanPhone.length === 10;
+}
+
+function formatPhone(phone) {
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  if (cleanPhone.length === 10) {
+    return `(${cleanPhone.substring(0, 3)}) ${cleanPhone.substring(3, 6)}-${cleanPhone.substring(6)}`;
+  }
+  
+  return phone; // Return original if not 10 digits
+}
+
+function validateInternationalPhone(phone) {
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  // International numbers: 10-15 digits
+  return cleanPhone.length >= 10 && cleanPhone.length <= 15;
+}
+
+function getPhoneType(phone) {
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  if (cleanPhone.length === 10) return 'US Local';
+  if (cleanPhone.length > 10 && cleanPhone.startsWith('1')) return 'US International';
+  if (cleanPhone.length >= 10 && cleanPhone.length <= 15) return 'International';
+  
+  return 'Invalid';
+}
+
+// Usage examples
+const phones = [
+  '1234567890',
+  '(123) 456-7890',
+  '123-456-7890',
+  '+1 123 456 7890',
+  '+44 20 7946 0958',
+  '123'
+];
+
+phones.forEach(phone => {
+  console.log(`"${phone}": ${validatePhone(phone)}`);
+  console.log(`  Formatted: ${formatPhone(phone)}`);
+  console.log(`  Type: ${getPhoneType(phone)}`);
+  console.log('');
+});
+
+console.log('Phone validator ready!');

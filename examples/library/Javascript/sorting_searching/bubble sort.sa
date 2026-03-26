@@ -1,0 +1,49 @@
+// Simple Bubble Sort
+function bubbleSort(arr) {
+  const n = arr.length;
+  const sortedArr = [...arr]; // Create copy to avoid modifying original
+  
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      if (sortedArr[j] > sortedArr[j + 1]) {
+        // Swap elements
+        [sortedArr[j], sortedArr[j + 1]] = [sortedArr[j + 1], sortedArr[j]];
+      }
+    }
+  }
+  
+  return sortedArr;
+}
+
+// Optimized bubble sort with early exit
+function bubbleSortOptimized(arr) {
+  const n = arr.length;
+  const sortedArr = [...arr];
+  
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    
+    for (let j = 0; j < n - i - 1; j++) {
+      if (sortedArr[j] > sortedArr[j + 1]) {
+        [sortedArr[j], sortedArr[j + 1]] = [sortedArr[j + 1], sortedArr[j]];
+        swapped = true;
+      }
+    }
+    
+    // If no swapping occurred, array is sorted
+    if (!swapped) break;
+  }
+  
+  return sortedArr;
+}
+
+// Usage examples
+const numbers = [64, 34, 25, 12, 22, 11, 90];
+console.log('Original:', numbers);
+console.log('Bubble sorted:', bubbleSort(numbers));
+console.log('Optimized bubble sorted:', bubbleSortOptimized(numbers));
+
+const strings = ['banana', 'apple', 'cherry', 'date'];
+console.log('Strings:', bubbleSort(strings));
+
+console.log('Bubble sort ready!');
