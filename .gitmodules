@@ -1,8 +1,0 @@
-[submodule "Website"]
-	path = Website
-	url = https://github.com/SENODROOM/QuantumLanguage-Website.git
-	branch = main
-[submodule "design"]
-	path = docs/design
-	url = https://github.com/SENODROOM/QLang-DesginDocs.git
-	branch = main
