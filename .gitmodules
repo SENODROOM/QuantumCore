@@ -2,10 +2,6 @@
 	path = Website
 	url = https://github.com/SENODROOM/QuantumLanguage-Website.git
 	branch = main
-[submodule "demo"]
-	path = examples/demo
-	url = https://github.com/SENODROOM/QuantumCodeDemo.git
-	branch = main
 [submodule "extensions"]
 	path = extensions
 	url = https://github.com/SENODROOM/QLang-DesginDocs.git
