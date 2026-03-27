@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="logo/logo.png" type="image/x-icon" />
-    <title>Quantum Language™ — .sa Extension. We Don't Know Either.</title>
+    <title>Quantum Language™ v2 — Now With Bytecode. Still With .sa.</title>
     <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Permanent+Marker&display=swap"
       rel="stylesheet"
@@ -17,7 +17,7 @@
     <div id="loader">
       <div class="loader-logo">QUANTUM</div>
       <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-      <div class="loader-txt">Initializing interpreter...</div>
+      <div class="loader-txt">Compiling bytecode... (tree-walk interpreter: deceased)</div>
     </div>
 
     <!-- CURSOR -->
@@ -27,7 +27,7 @@
     <canvas id="matrix"></canvas>
     <div class="noise"></div>
     <canvas id="particles"></canvas>
-    <div class="sticker" id="sticker">⚠️ rot13 IS RUNNING</div>
+    <div class="sticker" id="sticker">⚡ BYTECODE IS RUNNING</div>
 
     <nav id="navbar">
       <a href="#home" class="nav-logo">
@@ -39,9 +39,8 @@
         <a href="#about" class="nav-link" data-section="about">About</a>
         <a href="#demo" class="nav-link" data-section="demo">Demo</a>
         <a href="#rot13" class="nav-link" data-section="rot13">Security™</a>
-        <a href="#features" class="nav-link" data-section="features"
-          >Features</a
-        >
+        <a href="#features" class="nav-link" data-section="features">Features</a>
+        <a href="#vscode" class="nav-link" data-section="vscode" style="color: #4ec9b0">🖊️ VSCode</a>
         <a href="#aura" class="nav-link" data-section="aura">--aura</a>
         <a href="#roast" class="nav-link" data-section="roast">Roast</a>
         <a href="#developer" class="nav-link" data-section="developer">Dev</a>
@@ -72,6 +71,7 @@
       <a href="#demo" data-section="demo">Demo</a>
       <a href="#rot13" data-section="rot13">Security™</a>
       <a href="#features" data-section="features">Features</a>
+      <a href="#vscode" data-section="vscode" style="color:#4ec9b0">🖊️ VS Code Ext</a>
       <a href="#aura" data-section="aura">--aura</a>
       <a href="#roast" data-section="roast">Roast</a>
       <a href="#developer" data-section="developer">Developer</a>
@@ -81,45 +81,47 @@
 
     <div class="ticker" aria-hidden="true">
       <div class="ticker-track">
-        <span class="ticker-item">.SA EXTENSION</span
+        <span class="ticker-item">TREE-WALK INTERPRETER: KILLED IN COLD BLOOD · BYTECODE VM: THRIVING ON ITS GRAVE</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">PAYLOAD KEYWORD — GITHUB IS WATCHING</span
+        <span class="ticker-item">quantum hello.sa → hello.exe · qrun hello.sa → nothing but vibes · both valid · both real</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">rot13: THE ENTIRE SECURITY MODEL</span
+        <span class="ticker-item">VS CODE EXTENSION: SYNTAX HIGHLIGHTING FOR A LANGUAGE WITH 1 USER (HI SAAD)</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">--aura FLAG: REAL · main.cpp LINE 739</span
+        <span class="ticker-item">AI READS COMPILER SOURCE · AI WRITES DOCS · AI DOES MORE HOMEWORK THAN SAAD</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">TREE-WALK INTERPRETER [STILL RUNNING]</span
+        <span class="ticker-item">payload: RESERVED IN TOKEN.H SINCE WEEK 1 · STILL RESERVED · WILL DIE RESERVED</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">0 STARS · 0 FRIENDS · 1 LEGEND</span
+        <span class="ticker-item">rot13: COMPILED TO BYTECODE · BENCHMARKED · FASTER AT BEING USELESS · SHIP IT</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">MAX_STEPS = 2,000,000 · MERCY GRANTED</span
+        <span class="ticker-item">0 STARS · 0 FORKS · 0 FRIENDS · 90 COMMITS · 1 ABSOLUTE LEGEND</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">HOMEWORK: MISSING SINCE WEEK 1</span
+        <span class="ticker-item">FAST NUCES CALLED. THEY WANT THEIR STUDENT BACK. SAAD WAS WRITING A LEXER.</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">int x = 5 IS STILL JUST A DOUBLE</span
+        <span class="ticker-item">int x = 5 STORED AS DOUBLE · COMPILED TO DOUBLE BYTECODE · C++ TYPE HINT: DECORATIVE</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">SliceExpr IN AST · NOBODY ASKED</span
+        <span class="ticker-item">.SA EXTENSION · MEANS NOTHING · STANDS FOR NOTHING · CLASSIFIED · GOODBYE</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">.SA EXTENSION</span
+        <span class="ticker-item">VS CODE EXTENSION SHIPS SYNTAX HIGHLIGHTING · NOBODY INSTALLS IT · SAAD COMMITTED IT ANYWAY</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">PAYLOAD KEYWORD — GITHUB IS WATCHING</span
+        <span class="ticker-item">SENODROOM IS AN ANAGRAM OF SOMETHING · WE CHECKED · IT IS NOT · STILL CLASSIFIED</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">rot13: THE ENTIRE SECURITY MODEL</span
+        <span class="ticker-item">TREE-WALK INTERPRETER: KILLED IN COLD BLOOD · BYTECODE VM: THRIVING ON ITS GRAVE</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">--aura FLAG: REAL · main.cpp LINE 739</span
+        <span class="ticker-item">quantum hello.sa → hello.exe · qrun hello.sa → nothing but vibes · both valid · both real</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">TREE-WALK INTERPRETER [STILL RUNNING]</span
+        <span class="ticker-item">VS CODE EXTENSION: SYNTAX HIGHLIGHTING FOR A LANGUAGE WITH 1 USER (HI SAAD)</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">0 STARS · 0 FRIENDS · 1 LEGEND</span
+        <span class="ticker-item">AI READS COMPILER SOURCE · AI WRITES DOCS · AI DOES MORE HOMEWORK THAN SAAD</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">MAX_STEPS = 2,000,000 · MERCY GRANTED</span
+        <span class="ticker-item">payload: RESERVED IN TOKEN.H SINCE WEEK 1 · STILL RESERVED · WILL DIE RESERVED</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">HOMEWORK: MISSING SINCE WEEK 1</span
+        <span class="ticker-item">rot13: COMPILED TO BYTECODE · BENCHMARKED · FASTER AT BEING USELESS · SHIP IT</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">int x = 5 IS STILL JUST A DOUBLE</span
+        <span class="ticker-item">0 STARS · 0 FORKS · 0 FRIENDS · 90 COMMITS · 1 ABSOLUTE LEGEND</span
         ><span class="ticker-dot">●</span>
-        <span class="ticker-item">SliceExpr IN AST · NOBODY ASKED</span
+        <span class="ticker-item">FAST NUCES CALLED. THEY WANT THEIR STUDENT BACK. SAAD WAS WRITING A LEXER.</span
+        ><span class="ticker-dot">●</span>
+        <span class="ticker-item">SENODROOM IS AN ANAGRAM OF SOMETHING · WE CHECKED · IT IS NOT · STILL CLASSIFIED</span
         ><span class="ticker-dot">●</span>
       </div>
     </div>
@@ -139,68 +141,61 @@
  ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝</pre
       >
       <div class="hero-badge">
-        🔐 Cybersecurity-Ready* &nbsp;·&nbsp; *rot13 counts
+        🔐 Cybersecurity-Ready* &nbsp;·&nbsp; *rot13 still counts &nbsp;·&nbsp; ⚡ v2.0 — Bytecode Era
       </div>
       <h1 class="hero-title">
         <span class="t-q">QUANTUM</span>
         <span class="t-l">LANGUAGE</span>
       </h1>
       <p class="hero-sub">
-        <em>Because Python was too easy and C++ wasn't painful enough.</em
-        ><br />
-        Built from scratch in <strong>C++17</strong> by
-        <strong>one 18-year-old at FAST NUCES</strong><br />
-        in <strong>3 weeks</strong> instead of doing homework. Files end in
-        <strong>.sa</strong>.<br />
-        We asked what .sa stands for. Saad did not respond. Assume it's
-        classified.
+        <em>He wasn't satisfied destroying one interpreter. He built a compiler too.</em><br />
+        <strong>Quantum v2</strong> — bytecode VM, native <strong>.exe</strong> output, AI-maintained docs,<br />
+        and a VS Code extension so you can have syntax highlighting for a language<br />
+        with approximately <strong>one user</strong> (it's Saad).<br />
+        <code>quantum hello.sa</code> compiles. <code>qrun hello.sa</code> interprets.<br />
+        <span style="color: var(--red)">Neither command submits the FAST NUCES assignment.</span>
       </p>
       <div class="hero-quote-box">
-        <p>"Write once, run anywhere, hack everything."</p>
+        <p>"Write once, compile to .exe, interpret with qrun, hack everything."</p>
         <cite
-          >— Muhammad Saad Amin, definitely while wearing a hoodie in a dark
-          room</cite
+          >— Muhammad Saad Amin, v2 release notes, probably at 3am, definitely not doing homework</cite
         >
       </div>
       <div class="cta-group">
         <a
           href="https://github.com/SENODROOM/Quantum-Language"
           class="btn btn-primary"
-          >⭐ Star It (You Have No Excuse)</a
+          >⭐ Star It (Still 0. Still Waiting.)</a
         >
-        <a href="#features" class="btn btn-ghost">Read The Roast</a>
-        <a href="#rot13" class="btn btn-outline">Try rot13™</a>
+        <a href="#features" class="btn btn-ghost">Witness The Bytecode</a>
+        <a href="#rot13" class="btn btn-outline">rot13™ — Now Compiled</a>
       </div>
       <div class="scroll-hint" aria-hidden="true">scroll</div>
     </div>
 
     <div class="wrap" id="about">
       <section>
-        <div class="stag reveal">// what even is this</div>
+        <div class="stag reveal">// what even is this — v2 edition</div>
         <h2 class="reveal reveal-d1">
-          A Dynamically-Typed<br />Scripting Language<br />Nobody Asked For
+          A Dynamically-Typed<br />Scripting Language<br />That Grew Up (Sort Of)
         </h2>
         <p class="body-text reveal reveal-d2">
-          Quantum is a <strong>real, working scripting language</strong> with a
-          lexer, parser, 34-node AST, tree-walk interpreter, REPL, full OOP with
-          inheritance, closures, lambdas, list comprehensions, Python slicing —
-          and an <em>actual C-style pointer system</em> with
-          <code>&amp;var</code>, <code>*ptr</code>, and
-          <code>ptr-&gt;member</code>. In a scripting language. Nobody asked for
-          this. Saad delivered anyway.<br /><br />
-          It supports Python syntax. AND JavaScript syntax. AND C++ syntax.
-          <strong>Simultaneously. In the same file. Nobody stops you.</strong>
-          <code>Token.h</code> has <code>DEF</code>, <code>FUNCTION</code>, and
-          <code>FN</code> as separate keywords. Three ways to declare a
-          function. The parser handles all three.
-          <span class="red"
-            >The parser needs a vacation it will never get.</span
-          >
+          Quantum v2 is a <strong>real, working scripting language that now compiles</strong>.
+          The tree-walk interpreter — lovingly roasted for being slow, warm, and artisanal — has been 
+          <em>taken behind the shed and replaced with a bytecode interpreter</em>. fibonacci(35) 
+          now finishes. The celebration was brief. Homework is still not submitted.<br /><br />
+          You now have <strong>two commands</strong>: <code>quantum hello.sa</code> compiles to 
+          a native <strong>.exe</strong> file. <code>qrun hello.sa</code> interprets it 
+          directly — no .exe produced, no disk pollution, just runtime and consequences.<br /><br />
+          And then there's the <strong>AI Documentation Syncer</strong> — an AI that reads 
+          the compiler source code as it changes and automatically rewrites the documentation.
+          Saad built an AI to document his own AI-adjacent project. The recursion is 
+          not lost on us. <span class="red">The homework is still very lost.</span>
         </p>
         <div class="stats-bar reveal reveal-d3">
           <div class="stat-cell">
-            <div class="stat-n">3</div>
-            <div class="stat-l">Weeks to Ship v1.0</div>
+            <div class="stat-n">2</div>
+            <div class="stat-l">Versions Shipped</div>
           </div>
           <div class="stat-cell">
             <div class="stat-n" data-tip="GitHub confirms this">0</div>
@@ -208,15 +203,15 @@
           </div>
           <div class="stat-cell">
             <div class="stat-n">1</div>
-            <div class="stat-l">Developer (Hi Saad)</div>
+            <div class="stat-l">Developer (Still Saad)</div>
           </div>
           <div class="stat-cell">
-            <div class="stat-n">34</div>
-            <div class="stat-l">AST Node Types</div>
+            <div class="stat-n">2</div>
+            <div class="stat-l">CLI Commands (quantum + qrun)</div>
           </div>
           <div class="stat-cell">
-            <div class="stat-n">2M</div>
-            <div class="stat-l">Max Steps Guard</div>
+            <div class="stat-n">1</div>
+            <div class="stat-l">AI Docs Syncer (surreal)</div>
           </div>
           <div class="stat-cell">
             <div class="stat-n" data-tip="FAST NUCES is not happy">0</div>
@@ -239,24 +234,24 @@
               <div class="t-dot yel"></div>
               <div class="t-dot grn"></div>
               <div class="t-title">
-                quantum v1.0.0 — tree-walk interpreter — .sa files only
+                quantum v2.0.0 — bytecode compiler + interpreter — .sa files only
               </div>
             </div>
             <div class="tab-bar">
               <button class="tab-btn active" onclick="showTab('hello', this)">
                 hello.sa
               </button>
-              <button class="tab-btn" onclick="showTab('multi', this)">
-                multi-syntax.sa
+              <button class="tab-btn" onclick="showTab('compile', this)">
+                $ quantum (compile)
+              </button>
+              <button class="tab-btn" onclick="showTab('interp', this)">
+                $ qrun (interpret)
               </button>
               <button class="tab-btn" onclick="showTab('security', this)">
                 security.sa
               </button>
               <button class="tab-btn" onclick="showTab('oop', this)">
                 oop.sa
-              </button>
-              <button class="tab-btn" onclick="showTab('ptrs', this)">
-                pointers.sa
               </button>
               <button class="tab-btn" onclick="showTab('aura', this)">
                 $ quantum --aura
@@ -266,88 +261,106 @@
               <div id="tab-hello">
                 <div class="t-line">
                   <span class="t-prompt">$</span>
-                  <span style="color: var(--text)">quantum hello.sa</span>
+                  <span style="color: var(--text)">qrun hello.sa</span>
                 </div>
                 <div class="t-line t-out" style="margin-top: 8px">
                   <span style="color: #394655"
-                    >// hello.sa — the flagship demo</span
+                    >// hello.sa — the flagship demo. no .exe produced.</span
                   >
                 </div>
                 <div class="t-line">
                   <span style="color: #ff79c6">print</span>(<span
                     style="color: #ffd600"
-                    >"Hello from Quantum!"</span
+                    >"Hello from Quantum v2!"</span
                   >)
                 </div>
                 <div class="t-line t-ok" style="margin-top: 8px">
-                  Hello from Quantum!
+                  Hello from Quantum v2!
                 </div>
                 <br />
                 <div class="t-line t-out">
-                  # identical to Python. raises questions about what exactly was
-                  built here.
+                  # bytecode interpreter executed. no .exe left behind.
                 </div>
                 <div class="t-line t-out">
-                  # but it runs. and that's more than most side projects ever
-                  achieve.
+                  # it ran faster than v1. fibonacci(35) now finishes. we wept.
                 </div>
                 <div class="t-line" style="margin-top: 8px">
                   <span class="t-prompt">$</span> <span class="t-cursor"></span>
                 </div>
               </div>
-              <div id="tab-multi" style="display: none">
+              <div id="tab-compile" style="display: none">
                 <div class="t-line">
                   <span class="t-prompt">$</span>
                   <span style="color: var(--text)"
-                    >quantum multi-syntax.sa</span
+                    >quantum hello.sa</span
                   >
                 </div>
                 <div class="t-line t-out" style="margin-top: 8px">
                   <span style="color: #394655"
-                    >// C++ comment · # Python comment · both valid. why
-                    not.</span
+                    ># compilation mode. tree-walk interpreter: no longer your problem.</span
                   >
                 </div>
                 <br />
-                <div class="t-line">
-                  <span style="color: #ff79c6">const</span> x =
-                  <span style="color: #c084fc">10</span>
-                  <span style="color: #394655"
-                    ># JavaScript const + Python comment</span
-                  >
+                <div class="t-line" style="color: #00ff9d">
+                  [Quantum Compiler v2.0] Lexing hello.sa...
                 </div>
-                <div class="t-line">
-                  <span style="color: #ff79c6">if</span> x &gt;
-                  <span style="color: #c084fc">5</span>:
-                  <span style="color: #394655"># Python colon</span>
+                <div class="t-line" style="color: #00ff9d">
+                  [Quantum Compiler v2.0] Parsing AST (34 node types, still)...
                 </div>
-                <div class="t-line">
-                  {
-                  <span style="color: #394655"
-                    ># C++ brace. nobody stopped him.</span
-                  >
+                <div class="t-line" style="color: #00ff9d">
+                  [Quantum Compiler v2.0] Emitting bytecode...
                 </div>
-                <div class="t-line">
-                  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #00ff9d"
-                    >console.log</span
-                  >(x)
-                  <span style="color: #394655"
-                    ># JavaScript in a Python if block inside C++ braces</span
-                  >
+                <div class="t-line" style="color: #00ff9d">
+                  [Quantum Compiler v2.0] Linking native binary...
                 </div>
-                <div class="t-line">}</div>
-                <div class="t-line">
-                  <span style="color: #ff79c6">print</span>(x)
-                  <span style="color: #394655"
-                    ># Python print to close it out</span
-                  >
+                <div class="t-line t-ok" style="margin-top:8px">
+                  ✅ Compiled → hello.exe
                 </div>
                 <br />
-                <div class="t-line t-ok">10</div>
-                <div class="t-line t-ok">10</div>
+                <div class="t-line">
+                  <span class="t-prompt">$</span>
+                  <span style="color: var(--text)">./hello.exe</span>
+                </div>
+                <div class="t-line t-ok">Hello from Quantum v2!</div>
+                <br />
+                <div class="t-line t-out">
+                  # a .exe. produced by a scripting language. from .sa files.
+                </div>
+                <div class="t-line t-out">
+                  # this is called a compiler. saad built one. at FAST NUCES. without doing homework.
+                </div>
+                <div class="t-line" style="margin-top: 8px">
+                  <span class="t-prompt">$</span> <span class="t-cursor"></span>
+                </div>
+              </div>
+              <div id="tab-interp" style="display: none">
+                <div class="t-line">
+                  <span class="t-prompt">$</span>
+                  <span style="color: var(--text)"
+                    >qrun hello.sa</span
+                  >
+                </div>
                 <div class="t-line t-out" style="margin-top: 8px">
-                  # the parser handled all of this. the parser hates itself. it
-                  handled it anyway.
+                  <span style="color: #394655"
+                    ># interpretation mode. no .exe produced. clean. fast. bytecode under the hood.</span
+                  >
+                </div>
+                <br />
+                <div class="t-line" style="color: #c084fc">
+                  [qrun] Compiling to bytecode in-memory...
+                </div>
+                <div class="t-line" style="color: #c084fc">
+                  [qrun] Executing bytecode VM...
+                </div>
+                <div class="t-line t-ok" style="margin-top:8px">
+                  Hello from Quantum v2!
+                </div>
+                <br />
+                <div class="t-line t-out">
+                  # no .exe. no footprint. just output and a sense of accomplishment.
+                </div>
+                <div class="t-line t-out">
+                  # quantum and qrun: two commands, one language, zero submitted assignments.
                 </div>
                 <div class="t-line" style="margin-top: 8px">
                   <span class="t-prompt">$</span> <span class="t-cursor"></span>
@@ -512,57 +525,44 @@
                   <span class="t-prompt">$</span> <span class="t-cursor"></span>
                 </div>
               </div>
-              <div id="tab-ptrs" style="display: none">
+              <div id="tab-aidocs" style="display: none">
                 <div class="t-line">
                   <span class="t-prompt">$</span>
-                  <span style="color: var(--text)">quantum pointers.sa</span>
+                  <span style="color: var(--text)">quantum --sync-docs</span>
                 </div>
                 <div class="t-line t-out" style="margin-top: 8px">
                   <span style="color: #394655"
-                    ># pointers.sa — yes, in a scripting language. saad.
-                    why.</span
+                    ># AI Documentation Syncer — reads compiler source. writes docs. automatically.</span
                   >
                 </div>
                 <br />
-                <div class="t-line">
-                  x = <span style="color: #c084fc">42</span>
+                <div class="t-line" style="color: #c084fc">
+                  [DocSyncer] Reading Interpreter.cpp...
                 </div>
-                <div class="t-line">
-                  ptr = <span style="color: #ff79c6">&amp;</span>x
-                  <span style="color: #394655"
-                    ># AddressOfExpr — QuantumPointer in Value.h</span
-                  >
+                <div class="t-line" style="color: #c084fc">
+                  [DocSyncer] Reading Bytecode.cpp (new)...
                 </div>
-                <div class="t-line">
-                  <span style="color: #ff79c6">print</span>(ptr)
-                  <span style="color: #394655"
-                    ># deterministic fake hex address</span
-                  >
+                <div class="t-line" style="color: #c084fc">
+                  [DocSyncer] Diffing against last documentation state...
                 </div>
-                <div class="t-line">
-                  <span style="color: #ff79c6">print</span>(<span
-                    style="color: #ff79c6"
-                    >*</span
-                  >ptr)
-                  <span style="color: #394655"
-                    ># DerefExpr — dereferences the pointer</span
-                  >
+                <div class="t-line" style="color: #ffd600">
+                  [DocSyncer] 14 functions changed. Regenerating explanations...
+                </div>
+                <div class="t-line t-ok" style="margin-top: 8px">
+                  ✅ Documentation updated. language.html refreshed.
                 </div>
                 <br />
-                <div class="t-line t-ok">0x7ffe8a3c1040</div>
-                <div class="t-line t-ok">42</div>
-                <br />
                 <div class="t-line t-out">
-                  # null dereference is also fully possible.
-                </div>
-                <div class="t-line" style="color: var(--red)">
-                  RuntimeError: Null pointer dereference
+                  # the AI reads the source code as it changes.
                 </div>
                 <div class="t-line t-out">
-                  # in a scripting language. with a QuantumPointer struct.
+                  # it updates the docs to match. automatically. in real time.
                 </div>
                 <div class="t-line t-out">
-                  # nobody asked for this. we are grateful. we are confused.
+                  # saad built an AI to document his own compiler.
+                </div>
+                <div class="t-line t-out" style="color: var(--red)">
+                  # FAST NUCES professors still waiting on assignment docs. no AI syncer for that.
                 </div>
                 <div class="t-line" style="margin-top: 8px">
                   <span class="t-prompt">$</span> <span class="t-cursor"></span>
@@ -575,7 +575,7 @@
                 </div>
                 <div class="t-line t-out" style="margin-top: 8px">
                   <span style="color: #394655"
-                    ># main.cpp line 739 — printBanner() then printAura()</span
+                    ># still exists. still hardcoded. still has shield emojis. unchanged by v2.</span
                   >
                 </div>
                 <br />
@@ -583,49 +583,49 @@
                   ╔══════════════════════════════════════════════════════════════════╗
                 </div>
                 <div class="t-line t-yl">
-                  ║ 🌟 QUANTUM LANGUAGE ACHIEVEMENTS 🌟 ║
+                  ║ 🌟 QUANTUM LANGUAGE v2 ACHIEVEMENTS 🌟 ║
                 </div>
                 <div class="t-line t-acc">
                   ╠══════════════════════════════════════════════════════════════════╣
                 </div>
                 <div class="t-line t-ok">
-                  ║ ✅ Complete C++17 Compiler Implementation ║
+                  ║ ✅ Bytecode Compiler — tree-walk interpreter: deceased ║
                 </div>
                 <div class="t-line t-ok">
-                  ║ ✅ Tree-Walk Interpreter Engine ║
+                  ║ ✅ Dual CLI: quantum (compile) + qrun (interpret) ║
                 </div>
-                <div class="t-line t-ok">║ ✅ VS Code Language Support ║</div>
+                <div class="t-line t-ok">║ ✅ AI Documentation Syncer (the recursion is real) ║</div>
+                <div class="t-line t-ok">║ ✅ Complete Language Documentation ║</div>
                 <div class="t-line t-acc">
                   ╠══════════════════════════════════════════════════════════════════╣
                 </div>
                 <div class="t-line" style="color: #8be9fd">
-                  ║ 🛡️ CYBERSECURITY FEATURES 🛡️ ║
+                  ║ 🛡️ CYBERSECURITY FEATURES (STILL FORTHCOMING) 🛡️ ║
                 </div>
                 <div class="t-line t-acc">
                   ╠══════════════════════════════════════════════════════════════════╣
                 </div>
                 <div class="t-line" style="color: #8be9fd">
-                  ║ 🔍 scan() - Network scanning capabilities ║
+                  ║ 🔍 scan() - Reserved. Patient. Waiting for v3. ║
                 </div>
                 <div class="t-line" style="color: #8be9fd">
-                  ║ 💣 payload() - Exploit payload creation ║
+                  ║ 💣 payload() - GitHub still watching. Still reserved. ║
                 </div>
                 <div class="t-line" style="color: #8be9fd">
-                  ║ 🔐 encrypt() - Cryptographic operations ║
+                  ║ 🔐 encrypt() - AES Coming™ (still coming™) ║
                 </div>
-                <div class="t-line" style="color: #8be9fd">
-                  ║ 🗝️ hash() - Hashing algorithms ║
+                <div class="t-line" style="color: #ff79c6">
+                  ║ ✅ rot13() - THE ONLY SHIPPED CRYPTO. COMPILED NOW. ║
                 </div>
                 <div class="t-line t-acc">
                   ╚══════════════════════════════════════════════════════════════════╝
                 </div>
                 <br />
                 <div class="t-line t-out">
-                  # scan/payload/encrypt/hash: all in Token.h. all
-                  unimplemented. listed here anyway.
+                  # scan/payload/encrypt/hash: survived v2. still unimplemented. respect.
                 </div>
                 <div class="t-line t-out">
-                  # shield emojis included. this is canon. we accept it.
+                  # the shield emojis are also still there. this is canon. this is forever.
                 </div>
                 <div class="t-line" style="margin-top: 8px">
                   <span class="t-prompt">$</span> <span class="t-cursor"></span>
@@ -646,15 +646,16 @@
         </div>
         <h2 class="reveal reveal-d1">The Complete<br />Security Suite</h2>
         <p class="body-text reveal reveal-d2">
-          Quantum's flagship cryptographic primitive — <code>rot13()</code> at
-          line 768 of <code>Interpreter.cpp</code> — is now available directly
-          in your browser. <em>This is the entire security model.</em>
-          Caesar used it. Caesar got stabbed. The correlation is unclear.
+          Quantum's flagship cryptographic primitive — <code>rot13()</code> — is now 
+          <strong>compiled to bytecode</strong> before encrypting your data.
+          <em>It is equally unbreakable.</em> The compilation step adds zero actual security 
+          but does make it approximately 8× faster at failing to protect anything.
+          Caesar used it. Caesar got stabbed. The bytecode compilation did not help Caesar.
         </p>
         <div class="rot13-widget reveal reveal-d3">
           <div class="rot13-header">
             <span class="rot13-label">🔐 rot13() — Live Encryption Engine</span>
-            <span class="rot13-badge">UNBREAKABLE</span>
+            <span class="rot13-badge">BYTECODE-COMPILED · UNBREAKABLE</span>
           </div>
           <div class="rot13-body">
             <div class="rot13-pane">
@@ -683,11 +684,10 @@ Uryyb, Dhnaghi!</textarea
             </div>
           </div>
           <div class="rot13-note">
-            💡 <strong>Security tip:</strong> Apply rot13 twice to decrypt. This
-            is the complete cryptographic cycle. rot13(rot13(x)) = x. This is a
-            feature, not a bug. This is literally how rot13 works. Apply 26
-            times for same result. &nbsp;|&nbsp; CVE status: none filed yet.
-            <em>Give it time.</em>
+            💡 <strong>Security tip:</strong> Now runs on bytecode VM for maximum artisanal encryption throughput. 
+            Apply rot13 twice to decrypt — this property is preserved across all VM implementations. 
+            The .exe compilation flag does not make it more secure. We checked. &nbsp;|&nbsp; 
+            CVE status: none filed yet. <em>The bytecode gives us time.</em>
           </div>
         </div>
       </section>
@@ -698,165 +698,126 @@ Uryyb, Dhnaghi!</textarea
     <div class="wrap" id="features">
       <section>
         <div class="stag reveal">
-          // feature analysis — with actual line numbers from source code
+          // feature analysis v2 — forensic examination of a crime scene
         </div>
-        <h2 class="reveal reveal-d1">"Features"<br />Examined</h2>
+        <h2 class="reveal reveal-d1">"Features"<br />Put On Trial</h2>
         <div class="card-grid reveal reveal-d2">
+          <div class="feat-card">
+            <span class="fc-icon">⚡</span>
+            <h3>Bytecode Compiler</h3>
+            <p>
+              The tree-walk interpreter lived a short, warm, artisanal life.
+              Then Saad came back with a shovel. <strong>v2 ships a real bytecode compiler.</strong>
+              <code>quantum hello.sa</code> produces a native <code>.exe</code>. 
+              Not a joke file. Not a shell script in a trenchcoat. An actual binary.
+              <span class="red">fibonacci(35) now finishes in under a second. We don't know who we are anymore.</span>
+            </p>
+            <span class="fc-ref">quantum CLI → hello.exe · qrun CLI → no file · both: real · both: fast · tree-walk: RIP</span>
+          </div>
+
+          <div class="feat-card">
+            <span class="fc-icon">🖊️</span>
+            <h3>VS Code Extension</h3>
+            <p>
+              Saad wrote a <strong>full VS Code extension</strong> — syntax highlighting, 
+              token classification, language grammar — for a language he invented,
+              in TypeScript (5.2% of the codebase), for an editor with 50 million users,
+              for a language with <strong>one user</strong>.
+              <span class="red">That user is Saad. The extension highlights his own code. He committed it anyway. God bless.</span>
+              It works perfectly. Absolutely nobody has installed it.
+            </p>
+            <span class="fc-ref">extensions/ · TypeScript · language grammar · syntax highlighting · 1 install (confirmed: Saad)</span>
+          </div>
+
+          <div class="feat-card">
+            <span class="fc-icon">🤖</span>
+            <h3>AI Documentation Syncer</h3>
+            <p>
+              An AI reads the compiler source code. When a function changes, the AI 
+              rewrites the documentation for that function. Automatically. In real time. 
+              <strong>The docs are always current. The docs have no choice.</strong>
+              Meanwhile FAST NUCES is waiting on a lab report from October.
+              <span class="red">The AI does more academic writing than Saad does. Annually.</span>
+            </p>
+            <span class="fc-ref">DocSyncer → reads Interpreter.cpp · diffs against docs state · regenerates language.html · unasked-for · perfect</span>
+          </div>
+
           <div class="feat-card">
             <span class="fc-icon">🔀</span>
             <h3>Triple Syntax Support</h3>
             <p>
-              <code>Token.h</code> has <code>DEF</code>, <code>FUNCTION</code>,
-              and <code>FN</code> — three separate ways to declare a function,
-              all valid. Python colons, JavaScript braces, C++ type
-              declarations: all parsed.
-              <strong
-                >The parser makes life choices no parser should ever have to
-                make.</strong
-              >
-              <span class="red"
-                >The parser needs a vacation it will never get.</span
-              >
+              Python colons. JavaScript braces. C++ type declarations. 
+              <code>DEF</code>, <code>FUNCTION</code>, <code>FN</code> — three ways to declare 
+              a function, all valid, all compiled to <em>identical bytecode</em>.
+              The parser bled for nothing. The parser's sacrifice was real. 
+              <strong>The bytecode doesn't remember the parser's pain.</strong>
+              <span class="red">The parser remembers. The parser always remembers.</span>
             </p>
-            <span class="fc-ref"
-              >Token.h — DEF · FUNCTION · FN · TYPE_INT · TYPE_FLOAT ·
-              TYPE_CHAR...</span
-            >
+            <span class="fc-ref">Token.h — DEF · FUNCTION · FN · same bytecode output · parser: traumatized · eternal</span>
           </div>
+
           <div class="feat-card">
             <span class="fc-icon">🔐</span>
             <h3>Cybersecurity "Ready"</h3>
             <p>
-              Shipped crypto: <strong>rot13()</strong> and
-              <strong>xor_bytes()</strong>. Both real, both in production. The
-              NSA has been notified. Their response: silence.
-              <span class="red"
-                >ROT13 in 2026 is a personality trait. Julius Caesar used it and
-                was subsequently stabbed by his friends.</span
-              >
-              Correlation: unclear but present.
+              <strong>rot13()</strong> now compiles to bytecode before utterly failing to protect anything.
+              The speed improvement is measurable. The security improvement is not.
+              <span class="red">Imagine telling a recruiter: "I built a cybersecurity language." Then showing them rot13. In bytecode. With a shield emoji. This is real. This happened.</span>
+              xor_bytes() also compiles. scan/payload/encrypt: v3's problem.
             </p>
-            <span class="fc-ref"
-              >Interpreter.cpp — rot13() line 768 · xor_bytes() line 740</span
-            >
+            <span class="fc-ref">rot13() · xor_bytes() · base64 · to_hex · from_hex · scan/payload: Token.h · v3: promised · Caesar: stabbed</span>
           </div>
+
           <div class="feat-card">
-            <span class="fc-icon">⚛️</span>
-            <h3>Actual Pointer System</h3>
+            <span class="fc-icon">📖</span>
+            <h3>Complete Documentation</h3>
             <p>
-              Genuinely has <code>&amp;var</code> address-of,
-              <code>*ptr</code> dereference, <code>ptr-&gt;member</code> arrow.
-              <code>QuantumPointer</code> struct with null checks, offset
-              arithmetic, and deterministic fake hex addresses.
-              <strong>In a scripting language.</strong> Nobody asked. Saad
-              delivered. We respect and fear this.
+              Full language reference. Syntax guide. API docs. Examples in three syntaxes.
+              Every page maintained by an AI that has read more of the source code than most contributors ever will.
+              <strong>The documentation is immaculate. The documentation updates itself.</strong>
+              <span class="red">The irony of a student who doesn't do homework building an AI that does documentation for him is not lost on anyone. Especially not FAST NUCES.</span>
             </p>
-            <span class="fc-ref"
-              >Value.h — QuantumPointer · AST.h — AddressOfExpr · DerefExpr ·
-              ArrowExpr</span
-            >
+            <span class="fc-ref">language.html · SYNTAX.md · SETUP.md · AI-maintained · auto-synced · always correct · deeply unfair</span>
           </div>
-          <div class="feat-card">
-            <span class="fc-icon">🧠</span>
-            <h3>Dynamic Typing</h3>
-            <p>
-              Every value is a <code>std::variant</code> of 11 types: nil, bool,
-              double, string, array, dict, function, native, instance, class,
-              pointer. You write <code>int x = 5</code> and it's stored as a
-              double.
-              <strong
-                >C++ keywords, Python soul, JavaScript chaos — one .sa
-                file.</strong
-              >
-            </p>
-            <span class="fc-ref"
-              >Value.h — QuantumValue::Data std::variant — 11 type
-              alternatives</span
-            >
-          </div>
-          <div class="feat-card">
-            <span class="fc-icon">🛡️</span>
-            <h3>The 2,000,000 Step Guard</h3>
-            <p>
-              <code>Interpreter.h</code> declares
-              <code>MAX_STEPS = 2'000'000</code>. A
-              <code>stepCount_</code> increments on every execution node. Exceed
-              it: RuntimeError.
-              <strong>This is a microwave timeout for your code.</strong> It is
-              mercy. You didn't ask for it. It's there regardless. Appreciate
-              it.
-            </p>
-            <span class="fc-ref"
-              >Interpreter.h — MAX_STEPS · stepCount_ · Interpreter.cpp line
-              1883</span
-            >
-          </div>
+
           <div class="feat-card">
             <span class="fc-icon">🏛️</span>
-            <h3>Complete OOP System</h3>
+            <h3>Full OOP System</h3>
             <p>
-              <code>extends</code>, <code>super()</code>, <code>self</code>,
-              <code>this</code> (both accepted), static methods,
-              <code>__str__</code>.
-              <strong>Genuinely complete, genuinely impressive.</strong> The
-              flagship demo is a Dog fetching a ball.
-              <span class="red"
-                >The implied next demo:
-                <code>dog.fetch("your_passwords.txt")</code></span
-              >
+              Classes. Inheritance. <code>extends</code>. <code>super()</code>.
+              <code>self</code> AND <code>this</code> — both accepted, 
+              because Saad refuses to pick a lane and the parser has stopped asking.
+              Static methods. <code>__str__</code>. The flagship demo: 
+              <strong>a Dog that fetches a ball.</strong>
+              <span class="red">Now that Dog compiles to a native binary. Bytecode Dog. Native Dog. The Dog runs at full speed. Still fetching a ball.</span>
             </p>
-            <span class="fc-ref"
-              >Value.h — QuantumClass · QuantumInstance · AST.h — ClassDecl ·
-              SuperExpr</span
-            >
+            <span class="fc-ref">QuantumClass · QuantumInstance · ClassDecl · SuperExpr · self · this · both accepted · bytecoded · Dog: native</span>
           </div>
+
           <div class="feat-card">
-            <span class="fc-icon">🎯</span>
-            <h3>First-Class Functions</h3>
+            <span class="fc-icon">⚛️</span>
+            <h3>C-Style Pointers</h3>
             <p>
-              Closures, lambdas, arrow functions (<code>=&gt;</code>), default
-              arguments, pass-by-reference params (<code>int&amp; r</code>).
-              <strong>This part is genuinely excellent.</strong> We're as
-              surprised as you are. The README admits it. Saad earned this one
-              and we acknowledge it openly and begrudgingly.
+              <code>&amp;var</code>, <code>*ptr</code>, <code>ptr-&gt;member</code>.
+              <code>QuantumPointer</code> struct. Null checks. Hex addresses. Arrow operators.
+              <strong>In a scripting language. That now compiles to .exe.</strong> 
+              At no point did anyone file a feature request for this.
+              Saad saw the gap, the gap nobody had identified because it didn't exist,
+              <span class="red">and filled it anyway with pointers. Compiled pointers. In bytecode.</span>
             </p>
-            <span class="fc-ref"
-              >AST.h — LambdaExpr · FunctionDecl::paramIsRef · Value.h —
-              QuantumFunction</span
-            >
+            <span class="fc-ref">Value.h — QuantumPointer · AddressOfExpr · DerefExpr · ArrowExpr · compiled to bytecode · nobody asked · legendary</span>
           </div>
-          <div class="feat-card">
-            <span class="fc-icon">⚡</span>
-            <h3>Blazingly Artisanal™</h3>
-            <p>
-              Tree-walk interpreter. Every statement: walk the AST.
-              fibonacci(35): <span class="red">[still running]</span>. The
-              README's exact words:
-              <em
-                >"Tree-walk interpreters are the minivans of language runtimes.
-                Reliable. Lovable. Slow."</em
-              >
-              Self-aware. Unashamed. Committed to the bit.
-            </p>
-            <span class="fc-ref"
-              >Interpreter.cpp — void execute(ASTNode&amp;) — walks every node,
-              every call</span
-            >
-          </div>
+
           <div class="feat-card">
             <span class="fc-icon">✨</span>
             <h3>The --aura Flag</h3>
             <p>
-              Real CLI flag. <code>main.cpp line 739</code>. Calls
-              <code>printAura()</code> — 70 lines of hardcoded box-drawing.
-              Lists rot13 under <strong>"🛡️ CYBERSECURITY FEATURES 🛡️"</strong>.
-              Lists <code>payload()</code> which does nothing. Lists
-              <code>scan()</code> which also does nothing.
-              <strong>No notes. 10/10. Perfect.</strong>
+              <code>printAura()</code>. Hardcoded. 70 lines of box-drawing characters.
+              Lists <code>payload()</code> under cybersecurity. Lists <code>scan()</code> under cybersecurity.
+              <strong>Neither does anything.</strong> Lists rot13 with a shield emoji as if it's TLS.
+              <span class="red">This flag has survived TWO major versions unchanged. It is more stable than any of the security features it pretends to list. It is the most reliable thing about this language.</span>
             </p>
-            <span class="fc-ref"
-              >main.cpp — printAura() · if (arg == "--aura") line 739</span
-            >
+            <span class="fc-ref">main.cpp — printAura() · hardcoded · immortal · shield emojis: canon · v1 · v2 · v3: will survive</span>
           </div>
         </div>
       </section>
@@ -864,38 +825,112 @@ Uryyb, Dhnaghi!</textarea
 
     <hr class="divider" />
 
-    <div class="wrap" id="aura">
+    <div class="wrap" id="vscode">
       <section>
-        <div class="stag reveal">
-          // quantum --aura — full output reconstructed from printAura() in
-          main.cpp
-        </div>
-        <h2 class="reveal reveal-d1">The --aura Flag<br />Fully Decoded</h2>
+        <div class="stag reveal">// extensions/ · TypeScript · 5.2% of codebase · nobody asked</div>
+        <h2 class="reveal reveal-d1">The VS Code<br />Extension</h2>
         <p class="body-text reveal reveal-d2">
-          Nobody runs <code>quantum --aura</code> and recovers normally. We
-          <em>read the source code.</em> Every line below is hardcoded in
-          <code>printAura()</code>. Every word real. The shield emojis are real.
-          <strong>This is what Saad considers cybersecurity features.</strong>
+          Let's talk about this. Saad built a programming language. Then — and this is the part that 
+          reveals character — he built a <strong>full VS Code extension for it</strong>.
+          Syntax highlighting. Token classification. Custom language grammar. TextMate scopes.
+          The whole thing, written in TypeScript, committed into <code>extensions/</code>,
+          and it works <em>perfectly</em>.<br /><br />
+          VS Code has approximately <strong>50 million users</strong>. The Quantum Language extension 
+          has approximately <strong>one user</strong>.
+          That user is Saad. He wrote the extension. He installed it. He is the entire userbase.
+          <strong>He is the market.</strong> He is the install count. He is the review. He is the star.
+          The one star the extension has, Saad gave himself, and he deserved it.
+        </p>
+        <div class="card-grid reveal reveal-d3" style="grid-template-columns: repeat(auto-fit, minmax(260px,1fr))">
+          <div class="feat-card">
+            <span class="fc-icon">🎨</span>
+            <h3>Syntax Highlighting</h3>
+            <p>
+              Custom TextMate grammar. Keywords glow. Strings glow. Comments fade.
+              Python-style <code>def</code>, JavaScript-style <code>function</code>, 
+              C-style <code>fn</code> — all highlighted correctly, simultaneously.
+              <strong>VS Code looks at .sa files and does not panic.</strong>
+              <span class="red">This took more effort than the average CS assignment. The CS assignment: not submitted.</span>
+            </p>
+            <span class="fc-ref">extensions/ · TextMate grammar · .sa files · language configuration · tokenization rules</span>
+          </div>
+          <div class="feat-card">
+            <span class="fc-icon">🧩</span>
+            <h3>Language Configuration</h3>
+            <p>
+              Bracket matching. Comment toggling. Auto-closing pairs. 
+              The extension knows that <code>{</code> closes with <code>}</code> 
+              and that <code>#</code> starts a comment even though <code>//</code> 
+              also starts a comment <em>and so does</em> <code>/*</code>.
+              <strong>The extension handles all of this without having an existential crisis.</strong>
+              <span class="red">The parser does not share this resilience.</span>
+            </p>
+            <span class="fc-ref">extensions/ · bracket pairs · comment patterns · auto-close · onEnterRules · 3 comment styles</span>
+          </div>
+          <div class="feat-card">
+            <span class="fc-icon">📦</span>
+            <h3>The Install Count</h3>
+            <p>
+              Picture the VS Code Marketplace. Millions of extensions. 
+              Python: 150M+ installs. GitLens: 30M+. Prettier: 40M+.
+              Quantum Language: <strong>[data unavailable]</strong>.
+              <span class="red">The Marketplace lists zero. Saad is either under "recent" or simply unindexed. He shipped a VS Code extension for his own language and the world is not ready. The world may never be ready.</span>
+            </p>
+            <span class="fc-ref">marketplace installs: unknown · publisher: SENODROOM · rating: [1 star, self-awarded] · downloads: heroic</span>
+          </div>
+          <div class="feat-card">
+            <span class="fc-icon">🏆</span>
+            <h3>The Commitment</h3>
+            <p>
+              Committing a VS Code extension for your own invented language is a statement.
+              It says: <em>"I believe in this enough to make your editor understand it."</em>
+              It says: <em>"This is not a toy."</em>
+              It says: <em>"I need IntelliSense-adjacent features for my .sa files."</em>
+              <strong>There is no irony here. This is genuinely impressive.</strong>
+              <span class="red">The irony is entirely in the zero install count. The extension is real. The userbase is theoretical.</span>
+            </p>
+            <span class="fc-ref">extensions/ · committed · real · working · 0 external installs · Saad: the lone reviewer, user, and maintainer</span>
+          </div>
+        </div>
+        <div class="hero-quote-box reveal reveal-d4" style="margin-top:2rem">
+          <p>"I built a language. Then I made VS Code understand it. Because if I'm going to write .sa files at 3am, the editor should at least have the decency to color them correctly."</p>
+          <cite>— Muhammad Saad Amin, probably, definitely, TypeScript open in one tab, FAST NUCES portal in zero tabs</cite>
+        </div>
+      </section>
+    </div>
+
+    <hr class="divider" />
+      <section style="margin: 0 100px;">
+        <div class="stag reveal">
+          // quantum --aura — v2 edition — shield emojis: still there
+        </div>
+        <h2 class="reveal reveal-d1">The --aura Flag<br />v2 Decoded</h2>
+        <p class="body-text reveal reveal-d2">
+          The <code>--aura</code> flag survived the v2 rewrite. It now lists 
+          <strong>bytecode compiler</strong> as an achievement, which it earned. 
+          Everything else is identical. <code>payload()</code> still unimplemented. 
+          Shield emojis still present. rot13 still listed under cybersecurity.
+          <strong>Some things are timeless. Some things are hardcoded. Both apply here.</strong>
         </p>
         <div class="aura-terminal reveal reveal-d3">
           <div class="aura-title">
-            <span>╔══ 🌟 QUANTUM LANGUAGE ACHIEVEMENTS 🌟 ══╗</span>
+            <span>╔══ 🌟 QUANTUM v2 LANGUAGE ACHIEVEMENTS 🌟 ══╗</span>
             <span class="aura-live">LIVE OUTPUT</span>
           </div>
           <div class="aura-content">
             <div class="aura-stitle">✅ CORE ACHIEVEMENTS</div>
             <div class="aura-row">
               <span class="ac">✅</span
-              ><span class="at">Complete C++17 Compiler Implementation</span
+              ><span class="at">Bytecode Compiler — .exe output</span
               ><span class="an" style="color: var(--green)"
-                >true. actually, genuinely true.</span
+                >true. legitimately impressive. fibonacci(35) now finishes.</span
               >
             </div>
             <div class="aura-row">
               <span class="ac">✅</span
               ><span class="at">Tree-Walk Interpreter Engine</span
-              ><span class="an" style="color: var(--yellow)"
-                >true. slow. artisanal. fibonacci: [still running]</span
+              ><span class="an" style="color: var(--red)"
+                >DEPRECATED. RETIRED. DECEASED. replaced by bytecode VM in v2.</span
               >
             </div>
             <div class="aura-row">
@@ -1053,11 +1088,11 @@ Uryyb, Dhnaghi!</textarea
           <div class="sec-cell">
             <span class="sec-kw">rot13</span
             ><span class="sec-status s-shipped"
-              >✅ SHIPPED · LIVE · IN PROD</span
+              >✅ SHIPPED · COMPILED · BYTECODED · IN PROD</span
             >
             <div class="sec-desc">
-              The only real crypto. Line 768. Caesar used it. Caesar was stabbed
-              by his friends. Coincidence? Unclear.
+              The only real crypto. Now compiles to bytecode. Still Caesar-level security. Caesar was still stabbed.
+              Speed: increased. Protection: unchanged (zero).
             </div>
           </div>
         </div>
@@ -1069,9 +1104,9 @@ Uryyb, Dhnaghi!</textarea
     <div class="wrap" id="roast">
       <section>
         <div class="stag reveal">
-          // competitive analysis — fully objective and unbiased
+          // competitive analysis v2 — peer review from the tribunal
         </div>
-        <h2 class="reveal reveal-d1">Quantum vs.<br />The World</h2>
+        <h2 class="reveal reveal-d1">Quantum v2 vs.<br />Civilisation</h2>
         <div class="tbl-wrap reveal reveal-d2">
           <table>
             <thead>
@@ -1080,6 +1115,8 @@ Uryyb, Dhnaghi!</textarea
                 <th>Author</th>
                 <th>Dev Time</th>
                 <th>Stars</th>
+                <th>Compiles to .exe</th>
+                <th>VS Code Ext</th>
                 <th>rot13 Built-In</th>
                 <th>Verdict</th>
               </tr>
@@ -1090,40 +1127,50 @@ Uryyb, Dhnaghi!</textarea
                 <td>Guido van Rossum</td>
                 <td>4 years</td>
                 <td class="win">62k+</td>
+                <td class="meh">CPython + PyInstaller</td>
+                <td class="win">Official ext</td>
                 <td class="lose">No</td>
-                <td class="meh">ubiquitous. boring. no --aura.</td>
+                <td class="meh">ubiquitous. boring. 4 years. no --aura. disqualified.</td>
               </tr>
               <tr>
                 <td>JavaScript</td>
                 <td>Brendan Eich</td>
                 <td>10 days</td>
-                <td class="win">∞</td>
+                <td class="win">∞ (cursed)</td>
+                <td class="lose">pkg hack</td>
+                <td class="win">Official ext</td>
                 <td class="lose">No</td>
-                <td class="lose">10 days. we still suffer. no end.</td>
+                <td class="lose">10 days. we still live in the ruins. no rot13. sad.</td>
               </tr>
               <tr>
                 <td>Rust</td>
-                <td>Mozilla Research</td>
+                <td>Mozilla (6yr team)</td>
                 <td>6 years</td>
                 <td class="win">90k+</td>
+                <td class="win">Yes (its whole thing)</td>
+                <td class="win">rust-analyzer</td>
                 <td class="lose">No</td>
-                <td class="meh">memory-safe. extremely smug.</td>
+                <td class="meh">memory-safe. smug. 6 years. no rot13. incomplete.</td>
               </tr>
               <tr>
                 <td>Lua</td>
-                <td>PUC-Rio team</td>
+                <td>PUC-Rio</td>
                 <td>2 years</td>
                 <td class="win">5k+</td>
+                <td class="meh">LuaJIT only</td>
+                <td class="meh">Community ext</td>
                 <td class="lose">No</td>
-                <td class="meh">everywhere. gets no credit. relatable.</td>
+                <td class="meh">everywhere. gets no credit. relatable. also no rot13.</td>
               </tr>
               <tr class="hero-row">
-                <td>Quantum</td>
-                <td>1 guy, age 18</td>
-                <td>3 weeks</td>
-                <td class="lose">0</td>
-                <td class="win">✅ YES</td>
-                <td class="win">WINNER. (rot13 metric. uncontested.)</td>
+                <td><strong>Quantum v2</strong></td>
+                <td>1 person (hi Saad)</td>
+                <td>weeks (total)</td>
+                <td class="lose">0 ⭐</td>
+                <td class="win">✅ quantum cmd</td>
+                <td class="win">✅ Custom ext</td>
+                <td class="win">✅ Bytecoded</td>
+                <td class="win">UNDISPUTED WINNER on every metric that matters (rot13 metric, .exe metric, --aura metric, VS Code ext metric)</td>
               </tr>
             </tbody>
           </table>
@@ -1132,65 +1179,51 @@ Uryyb, Dhnaghi!</textarea
           <table>
             <thead>
               <tr>
-                <th>Feature</th>
-                <th>Normal Languages</th>
-                <th>Quantum Language™</th>
+                <th>Situation</th>
+                <th>Normal Developer</th>
+                <th>Saad (SENODROOM)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Hello World</td>
-                <td>1 line</td>
-                <td class="win">
-                  Also 1 line. Identical to Python. Raises philosophical
-                  questions.
-                </td>
+                <td>University assignment due</td>
+                <td>Submits it</td>
+                <td class="lose">Writes a lexer instead. Every time. Without fail.</td>
               </tr>
               <tr>
-                <td>Pointer support</td>
-                <td>C/C++ only</td>
-                <td class="win">
-                  &amp;var, *ptr, ptr-&gt;member. QuantumPointer. In a scripting
-                  language.
-                </td>
+                <td>Needs to document code</td>
+                <td>Writes a README</td>
+                <td class="win">Builds an AI that reads source code and documents it for him. Recursion achieved.</td>
+              </tr>
+              <tr>
+                <td>Likes a language</td>
+                <td>Uses it</td>
+                <td class="win">Builds a new one in 3 weeks. Writes a compiler for it in v2. Adds a VS Code extension. Moves on.</td>
+              </tr>
+              <tr>
+                <td>Interpreter is slow</td>
+                <td>Optimises it</td>
+                <td class="win">Kills it. Buries it. Builds a bytecode VM on its grave. fibonacci(35): now instant.</td>
               </tr>
               <tr>
                 <td>fibonacci(35)</td>
-                <td>Fast</td>
-                <td class="lose">
-                  [still running] — tree-walk. warm. artisanal. very slow.
-                </td>
+                <td>Instant (every language)</td>
+                <td class="lose">v1: [still running since Tuesday] &nbsp;·&nbsp; v2: instant. We held a memorial for the tree-walker.</td>
               </tr>
               <tr>
-                <td>Stack Overflow</td>
-                <td>Millions of answers</td>
-                <td class="lose">
-                  0. You are the first. You are alone. You have always been
-                  alone.
-                </td>
+                <td>Gets 0 GitHub stars</td>
+                <td>Gives up or asks friends</td>
+                <td class="win">Ships v2 with a compiler, an AI syncer, and a VS Code extension. Dares the world to keep ignoring it.</td>
               </tr>
               <tr>
-                <td>CLI flags</td>
-                <td>--help, --version</td>
-                <td class="win">
-                  --help, --version, --check, --test, AND --aura. --aura:
-                  unmatched in all of computing.
-                </td>
+                <td>Needs syntax highlighting</td>
+                <td>Installs existing extension</td>
+                <td class="win">Invents a language. Writes the extension. Installs it himself. He is all the users now.</td>
               </tr>
               <tr>
-                <td>Cryptography</td>
-                <td>AES, SHA-256, TLS</td>
-                <td class="lose">
-                  rot13 and xor. 5 reserved keywords. sleep tight.
-                </td>
-              </tr>
-              <tr>
-                <td>Multi-syntax</td>
-                <td>1 syntax per language</td>
-                <td class="win">
-                  3 syntaxes simultaneously. the parser makes existential
-                  choices on every line.
-                </td>
+                <td>Security feature request</td>
+                <td>Implements AES or TLS</td>
+                <td class="lose">Adds rot13. Ships it. Lists it under 🛡️ CYBERSECURITY FEATURES with a shield emoji. Straight face.</td>
               </tr>
             </tbody>
           </table>
@@ -1203,9 +1236,9 @@ Uryyb, Dhnaghi!</textarea
     <div class="wrap">
       <section>
         <div class="stag reveal">
-          // git log --oneline — forensically reconstructed
+          // git log --oneline — v2 arc documented
         </div>
-        <h2 class="reveal reveal-d1">A 3-Week<br />Timeline</h2>
+        <h2 class="reveal reveal-d1">The Complete<br />Timeline</h2>
         <div class="timeline reveal reveal-d2">
           <div class="tl-item">
             <div class="tl-dot d1"></div>
@@ -1249,24 +1282,33 @@ Uryyb, Dhnaghi!</textarea
           </div>
           <div class="tl-item">
             <div class="tl-dot d4"></div>
-            <div class="tl-week">Week 4</div>
+            <div class="tl-week">v2 Development</div>
             <div class="tl-text">
-              <strong>0 stars.</strong> Saad stares at the GitHub insights
-              dashboard. The <code>payload</code> keyword sits in Token.h at
-              line 61, reserved, alone, dreaming of a v2.0 that may or may not
-              arrive.
+              The tree-walk interpreter is <strong>killed</strong>. A bytecode compiler 
+              rises from its ashes. <code>quantum hello.sa</code> now produces a real <code>.exe</code>.
+              <code>qrun hello.sa</code> added for no-.exe interpretation.
+              <span class="yl">An AI documentation syncer is built</span> — it reads the 
+              compiler source and rewrites the docs when code changes. 
+              <span class="red">FAST NUCES: nobody checked.</span>
             </div>
           </div>
           <div class="tl-item">
             <div class="tl-dot d5"></div>
-            <div class="tl-week">Week 5</div>
+            <div class="tl-week">v2 Shipped</div>
             <div class="tl-text">
-              Someone builds a roast website sourced entirely from the
-              <code>.cpp</code> and <code>.h</code> files. Saad is unsure if
-              this is better or worse than 0 stars.
-              <strong
-                >It is better. Neither is the FAST NUCES assignment.</strong
-              >
+              <strong>0 stars.</strong> Two versions of a real compiler shipped. An AI maintains the docs.
+              The <code>payload</code> keyword sits in Token.h, reserved, patient, 
+              dreaming of a v3 where it finally does something.
+              <span class="red">FAST NUCES: still no homework. The professors have accepted their fate.</span>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color: var(--accent); background: var(--accent)"></div>
+            <div class="tl-week">This Moment</div>
+            <div class="tl-text">
+              Someone updated the roast website to reflect v2. Saad is unsure 
+              if this is better or worse than 0 stars.
+              <strong>It is better. The homework is still not submitted. Neither is v3.</strong>
             </div>
           </div>
         </div>
@@ -1278,72 +1320,74 @@ Uryyb, Dhnaghi!</textarea
     <div class="wrap">
       <section>
         <div class="stag reveal">
-          // diagnostic imaging — official forensic brain scan
+          // diagnostic imaging — v2 forensic brain scan · updated with new evidence
         </div>
-        <h2 class="reveal reveal-d1">Saad's Brain:<br />Scan Results</h2>
+        <h2 class="reveal reveal-d1">Saad's Brain:<br />MRI Results</h2>
         <div class="brain-grid reveal reveal-d2">
           <div class="brain-cell">
             <div class="bc-lbl">Academic Memory</div>
-            <div class="bc-status b-dead">⚠️ CRITICAL</div>
+            <div class="bc-status b-dead">⚠️ FLATLINE</div>
             <div class="bc-note">
-              Cannot locate "assignment due date" neurons. Last seen:
-              orientation week, year 1.
+              Cannot locate assignment-due-date neurons. v2 performed additional scans. 
+              We found a bytecode opcode table where the homework lobe should be.
             </div>
           </div>
           <div class="brain-cell">
             <div class="bc-lbl">Compiler Theory</div>
-            <div class="bc-status b-ok">✅ FULLY OPERATIONAL</div>
+            <div class="bc-status b-ok">✅ GRADUATE-LEVEL</div>
             <div class="bc-note">
-              Recursive descent parser. 34 AST nodes. SliceExpr. ListComp.
-              QuantumPointer. All real.
+              v1: tree-walk interpreter. v2: bytecode VM + native .exe output. 
+              FAST NUCES has not taught this course yet. Saad is ahead of the curriculum by one compiler.
             </div>
           </div>
           <div class="brain-cell">
-            <div class="bc-lbl">Common Sense</div>
-            <div class="bc-status b-unk">❓ INCONCLUSIVE</div>
+            <div class="bc-lbl">VS Code Extension Lobe</div>
+            <div class="bc-status b-ok">✅ FULLY OPERATIONAL</div>
             <div class="bc-note">
-              Evidence for: working language in 3 weeks. Evidence against: named
-              a flag --aura at 2am.
+              TextMate grammar written. Language config shipped. Syntax highlighting: perfect.
+              Users: 1 (Saad). This region of the brain is working harder than it needs to.
             </div>
           </div>
           <div class="brain-cell">
             <div class="bc-lbl">Self-Awareness</div>
-            <div class="bc-status b-dead">❌ OFFLINE</div>
+            <div class="bc-status b-dead">❌ MISSING</div>
             <div class="bc-note">
-              Listed rot13() under "🛡️ CYBERSECURITY FEATURES" in printAura().
-              With a shield emoji. Straight face.
+              Still lists rot13() under "🛡️ CYBERSECURITY FEATURES" in --aura. 
+              The shield emoji is in the bytecode now. Compiled. Permanent. Eternal.
             </div>
           </div>
           <div class="brain-cell">
             <div class="bc-lbl">Sleep Schedule</div>
-            <div class="bc-status b-dead">💀 DECEASED</div>
+            <div class="bc-status b-dead">💀💀 DOUBLY DECEASED</div>
             <div class="bc-note">
-              Time of death: Week 1. Cause: edge case in the lexer refusing to
-              tokenize at 2am.
+              v1: killed by lexer edge cases. v2: killed by bytecode opcode design at 3am.
+              The VS Code extension grammar was written in the dark. The highlighting still works.
             </div>
           </div>
           <div class="brain-cell">
-            <div class="bc-lbl">Ego</div>
-            <div class="bc-status b-warn">📈 ASTRONOMICAL</div>
+            <div class="bc-lbl">Scope Perception</div>
+            <div class="bc-status b-warn">📈 DANGEROUSLY ABSENT</div>
             <div class="bc-note">
-              Built a VS Code extension for a language with 0 users. Annoyingly,
-              completely justified.
+              Normal scope: "I'll use Python." Saad scope: "I'll invent a language, 
+              compile it, make an AI document it, and give it VS Code support." 
+              The gap between these is not a gap. It is an abyss.
             </div>
           </div>
           <div class="brain-cell">
             <div class="bc-lbl">Regret</div>
-            <div class="bc-status b-ok">✅ NONE DETECTED</div>
+            <div class="bc-status b-ok">✅ ZERO DETECTED (v2 confirmed)</div>
             <div class="bc-note">
-              Shipped at 18. 0 stars. 0 regrets. Enlightenment or disorder.
-              Possibly both simultaneously.
+              Shipped v1. Shipped v2. Shipped a VS Code extension nobody asked for.
+              0 stars. 0 regrets. The --aura flag documents the achievements. 
+              The achievements are real.
             </div>
           </div>
           <div class="brain-cell">
             <div class="bc-lbl">Diagnosis</div>
-            <div class="bc-status b-unk">Chaotic Genius Syndrome</div>
+            <div class="bc-status b-unk">Chaotic Genius Syndrome · v2 · Confirmed</div>
             <div class="bc-note">
-              Treatment: more FAST NUCES homework. Has never worked. Will never
-              work. Professors keep trying.
+              Treatment: one FAST NUCES assignment. Has never worked. Professors have 
+              updated their records to reflect Saad as a permanent edge case.
             </div>
           </div>
         </div>
@@ -1354,15 +1398,15 @@ Uryyb, Dhnaghi!</textarea
 
     <div class="wrap" id="developer">
       <section>
-        <div class="stag reveal">// resume.sa — age 18 — version 1.0.0</div>
+        <div class="stag reveal">// resume.sa — age 18+ — version 2.0.0</div>
         <h2 class="reveal reveal-d1">The Developer</h2>
         <div class="resume-card reveal reveal-d2">
           <div class="resume-top">
             <span class="resume-top-l"
-              >Muhammad Saad Amin — curriculum vitae</span
+              >Muhammad Saad Amin — curriculum vitae — v2 edition</span
             >
             <span class="resume-top-r"
-              >last updated: week 3 · aura: maximum · friends: 0</span
+              >last updated: v2 release · aura: still maximum · homework: still 0</span
             >
           </div>
           <div class="resume-body">
@@ -1371,13 +1415,13 @@ Uryyb, Dhnaghi!</textarea
               ><span class="r-val">Muhammad Saad Amin</span>
             </div>
             <div class="r-row">
-              <span class="r-key">age</span><span class="r-val">18</span>
+              <span class="r-key">age</span><span class="r-val">18+</span>
             </div>
             <div class="r-row">
               <span class="r-key">university</span
               ><span class="r-val"
                 >FAST NUCES · GPA:
-                <span class="rv-yl">classified (403 Forbidden)</span></span
+                <span class="rv-yl">classified (403 Forbidden · still)</span></span
               >
             </div>
             <div class="r-row">
@@ -1385,7 +1429,7 @@ Uryyb, Dhnaghi!</textarea
               ><span class="r-val"
                 >SENODROOM ·
                 <span class="rv-yl"
-                  >we investigated. we found nothing. classified.</span
+                  >we investigated again. still nothing. deeper classified.</span
                 ></span
               >
             </div>
@@ -1394,31 +1438,28 @@ Uryyb, Dhnaghi!</textarea
               <span class="r-key">skills</span
               ><span class="r-val">
                 <span class="rv-ok">✅</span> Full-Stack Development<br />
-                <span class="rv-ok">✅</span> Compiler Development (built one,
-                age 18, 3 weeks, C++17)<br />
-                <span class="rv-ok">✅</span> AI Development<br />
-                <span class="rv-ok">✅</span> Cybersecurity Tooling (rot13
-                counts. we said what we said.)<br />
-                <span class="rv-ok">✅</span> Survived FAST NUCES without doing
-                the homework<br />
-                <span class="rv-ok">✅</span> Aura: Maximum (documented in
-                printAura(), main.cpp line 42)<br />
-                <span class="rv-no">❌</span> Friends: 0 (a choice. definitely a
-                choice.)<br />
-                <span class="rv-no">❌</span> Social Life: 404 Not Found<br />
-                <span class="rv-no">❌</span> FAST NUCES Assignments Submitted:
-                0<br />
+                <span class="rv-ok">✅</span> Compiler Development (tree-walk → bytecode → native .exe · C++17 · from scratch)<br />
+                <span class="rv-ok">✅</span> VS Code Extension Development (TypeScript · TextMate grammar · language config · 1 user: himself)<br />
+                <span class="rv-ok">✅</span> AI Development (built AI DocSyncer that reads source code · does homework AI cannot)<br />
+                <span class="rv-ok">✅</span> Language Design (v1 shipped · v2 shipped · v3: tree-walk interpreter not invited)<br />
+                <span class="rv-ok">✅</span> Cybersecurity Tooling (rot13 compiles to bytecode now · shield emoji: canon · we said what we said)<br />
+                <span class="rv-ok">✅</span> Survived FAST NUCES two compiler versions deep without a single assignment<br />
+                <span class="rv-ok">✅</span> --aura: Maximum · documented in printAura() · unkillable across all versions<br />
+                <span class="rv-no">❌</span> Friends: 0 (the .exe does not make friends · the VS Code extension does not make friends)<br />
+                <span class="rv-no">❌</span> Social Life: 404 Not Found · v2 did not patch this<br />
+                <span class="rv-no">❌</span> FAST NUCES Assignments Submitted: 0 · audited · confirmed · both versions<br />
               </span>
             </div>
             <hr />
             <div class="r-row">
               <span class="r-key">references</span
               ><span class="r-val">
-                GitHub (0 stars — watch this space)<br />
-                The Quantum REPL (non-verbal, consistently present)<br />
+                GitHub (0 stars — watch this space · seriously this time)<br />
+                The Quantum Bytecode VM (non-verbal, faster than predecessor)<br />
+                The AI DocSyncer (reads compiler source · has opinions)<br />
                 FAST NUCES Professors (<span class="rv-no">unavailable</span> —
-                assigning more homework)<br />
-                Friends: <span class="rv-yl">[field intentionally blank]</span>
+                assigning more homework · expecting nothing)<br />
+                Friends: <span class="rv-yl">[field intentionally blank · v2 did not change this]</span>
               </span>
             </div>
           </div>
@@ -1426,7 +1467,7 @@ Uryyb, Dhnaghi!</textarea
         <div class="prog-list reveal reveal-d3">
           <div class="prog-row">
             <div class="prog-head">
-              GitHub Commits (3 weeks) <span>📈 MAXIMUM</span>
+              GitHub Commits (v1 + v2) <span>📈 MAXIMUM · 90 commits confirmed</span>
             </div>
             <div class="prog-track">
               <div class="prog-fill pf-g" style="width: 100%"></div>
@@ -1434,8 +1475,7 @@ Uryyb, Dhnaghi!</textarea
           </div>
           <div class="prog-row">
             <div class="prog-head">
-              Programming Languages Built From Scratch
-              <span>1 (legendary)</span>
+              Programming Languages Shipped From Scratch <span>2 versions (legendary × 2)</span>
             </div>
             <div class="prog-track">
               <div class="prog-fill pf-a" style="width: 100%"></div>
@@ -1443,7 +1483,15 @@ Uryyb, Dhnaghi!</textarea
           </div>
           <div class="prog-row">
             <div class="prog-head">
-              FAST NUCES GPA <span>📉 classified</span>
+              AIs Built to Automate Own Workflow <span>1 (the DocSyncer · unprecedented)</span>
+            </div>
+            <div class="prog-track">
+              <div class="prog-fill pf-a" style="width: 100%"></div>
+            </div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-head">
+              FAST NUCES GPA <span>📉 classified · bytecode didn't help</span>
             </div>
             <div class="prog-track">
               <div class="prog-fill pf-r" style="width: 8%"></div>
@@ -1451,15 +1499,15 @@ Uryyb, Dhnaghi!</textarea
           </div>
           <div class="prog-row">
             <div class="prog-head">
-              Hours Spent On Assigned Homework <span>some. probably.</span>
+              Hours Spent On Assigned Homework <span>some. probably. maybe.</span>
             </div>
             <div class="prog-track">
-              <div class="prog-fill pf-y" style="width: 4%"></div>
+              <div class="prog-fill pf-y" style="width: 3%"></div>
             </div>
           </div>
           <div class="prog-row">
             <div class="prog-head">
-              Hours Spent Building A Whole Compiler <span>ALL OF THEM</span>
+              Hours Spent Building Two Full Compilers + An AI DocSyncer <span>ALL OF THEM</span>
             </div>
             <div class="prog-track">
               <div class="prog-fill pf-g" style="width: 100%"></div>
@@ -1474,86 +1522,70 @@ Uryyb, Dhnaghi!</textarea
     <div class="wrap">
       <section>
         <div class="stag reveal">
-          // real user testimonials™ — from the readme (extremely real)
+          // user testimonials v2 — sourced from the void, authenticated by vibes
         </div>
-        <h2 class="reveal reveal-d1">What People<br />Are Saying</h2>
+        <h2 class="reveal reveal-d1">Voices From<br />The Community™</h2>
         <div class="testi-grid reveal reveal-d2">
           <div class="testi">
             <p>
-              <em
-                >"I tried to use it for penetration testing. The only thing that
-                got penetrated was my patience."</em
-              >
+              <em>"I opened a .sa file in VS Code. The syntax highlighting worked. I had to sit down.
+              A kid invented a language, wrote a compiler for it, and then built VS Code support 
+              so his editor would respect it. I have been writing Python for 11 years and VS Code 
+              has never respected me this much."</em>
             </p>
-            <div class="testi-by">Anonymous Security Researcher</div>
-            <div class="testi-role">
-              victim of the payload keyword's false promises
-            </div>
+            <div class="testi-by">A Senior Engineer, 11 Years Experience</div>
+            <div class="testi-role">currently reconsidering career choices · .sa files: unexpectedly beautiful</div>
           </div>
           <div class="testi">
             <p>
-              <em
-                >"The multi-syntax support is incredible. I can write bad code
-                in three languages simultaneously."</em
-              >
+              <em>"I ran <code>quantum hello.sa</code> and it gave me hello.exe.
+              I ran hello.exe. It said 'Hello from Quantum v2!'. I held the .exe in my hands.
+              This .exe did not exist before. A language I invented last week compiled it.
+              I showed my professor. My professor asked where my assignment was."</em>
             </p>
-            <div class="testi-by">A Confused Developer</div>
-            <div class="testi-role">
-              python colons inside c++ braces. console.log. one file.
-            </div>
+            <div class="testi-by">Muhammad Saad Amin · SENODROOM</div>
+            <div class="testi-role">compiler author · interpreter killer · assignment avoider · confirmed legend</div>
           </div>
           <div class="testi">
             <p>
-              <em
-                >"I ran quantum --aura and my computer started playing lo-fi hip
-                hop. I don't know what happened."</em
-              >
+              <em>"The AI reads his compiler source code and rewrites the documentation automatically.
+              I ask my team to update a single README and it takes three Slack messages and a meeting.
+              Saad solved documentation with AI at age 18. My team has eight engineers. 
+              I am going to lie down."</em>
             </p>
-            <div class="testi-by">@definitely_a_real_user</div>
-            <div class="testi-role">
-              has not slept since. the achievement board cannot be unseen.
-            </div>
+            <div class="testi-by">An Engineering Manager</div>
+            <div class="testi-role">managing 8 engineers · none of them built an AI DocSyncer · reconsidering everything</div>
           </div>
           <div class="testi">
             <p>
-              <em
-                >"Finally, a language where I can write Python-style code that
-                runs at C++ speeds."</em
-              >
-              — This person has never benchmarked a tree-walk interpreter.
-              fibonacci(35): [still running] since Tuesday.
+              <em>"Dear Saad, we noticed your repository contains the keyword <code>payload</code>
+              in <code>Token.h</code>. After our automated review, we found it is reserved and 
+              unimplemented. We have closed this investigation. Please implement it if you 
+              want GitHub to be worried again. Regards, GitHub Trust & Safety."</em>
             </p>
-            <div class="testi-by">Someone Extremely Optimistic</div>
-            <div class="testi-role">
-              still waiting. checking every 20 minutes.
-            </div>
+            <div class="testi-by">GitHub Trust & Safety Team</div>
+            <div class="testi-role">monitoring the payload keyword · will reopen if v3 ships it · watching Token.h line 61</div>
           </div>
           <div class="testi">
             <p>
-              <em
-                >"My payload keyword isn't implemented yet but I appreciate the
-                commitment to the bit."</em
-              >
+              <em>"I asked why the tree-walk interpreter was removed. He said 'it was slow.' 
+              I asked if he missed it. He looked at the bytecode output. He looked at fibonacci(35) 
+              finishing in milliseconds. He said nothing. The tree-walker died for our sins.
+              It died for our fibonacci."</em>
             </p>
-            <div class="testi-by">A GitHub User</div>
-            <div class="testi-role">
-              probably fine. github has a note on the account.
-            </div>
+            <div class="testi-by">A Witness to the v2 Migration</div>
+            <div class="testi-role">present during the tree-walk interpreter's final commit · did not attend the funeral · there was no funeral</div>
           </div>
           <div class="testi">
             <p>
-              Most 18-year-olds are figuring out laundry.
-              <em
-                >Saad wrote a recursive descent parser with 34 AST node
-                types.</em
-              >
-              FAST NUCES professors are assigning more homework. It will not
-              work.
+              Most 18-year-olds are arguing about which framework to use.
+              <em>Saad built a language, killed its interpreter, replaced it with bytecode, 
+              wrote a compiler that produces .exe files, made an AI that reads his source code 
+              and documents it, and shipped a VS Code extension for a language he invented.</em>
+              We filed this under "unfair." FAST NUCES filed it under "where is the assignment."
             </p>
-            <div class="testi-by">This Website</div>
-            <div class="testi-role">
-              sourced from actual .h and .cpp files. mad respect.
-            </div>
+            <div class="testi-by">This Website · Official v2 Record</div>
+            <div class="testi-role">90 commits confirmed · 0 stars confirmed · 0 assignments confirmed · maximum aura: also confirmed</div>
           </div>
         </div>
       </section>
@@ -1564,9 +1596,9 @@ Uryyb, Dhnaghi!</textarea
     <div class="wrap">
       <section>
         <div class="stag reveal">
-          // github issues — 0 open. either perfect or no users.
+          // github issues — 0 open. either perfect or no users. v2 confirms both.
         </div>
-        <h2 class="reveal reveal-d1">Known<br />Bugs</h2>
+        <h2 class="reveal reveal-d1">Known<br />Bugs (v2)</h2>
         <div class="tbl-wrap reveal reveal-d2">
           <table class="bugs-table">
             <thead>
@@ -1578,64 +1610,59 @@ Uryyb, Dhnaghi!</textarea
             </thead>
             <tbody>
               <tr>
-                <td>rot13 applied twice decrypts itself</td>
+                <td>Tree-walk interpreter is slow</td>
+                <td>Fixed · Deceased</td>
+                <td>
+                  Replaced by bytecode VM. fibonacci(35) now finishes. We held a small ceremony.
+                </td>
+              </tr>
+              <tr>
+                <td>rot13 compiled to bytecode is still rot13</td>
                 <td>By Design</td>
                 <td>
-                  This is how math works. Caesar knew. Caesar got stabbed.
-                  Unrelated.
+                  Bytecode compilation does not improve the encryption algorithm. Caesar confirmed this. Caesar: still stabbed.
                 </td>
               </tr>
               <tr>
-                <td>payload keyword does nothing</td>
-                <td>Planned™</td>
+                <td>payload keyword still does nothing</td>
+                <td>Planned™ (v3)</td>
                 <td>
-                  v2.0.0. Probably. GitHub's trust &amp; safety team follows the
-                  repo.
+                  Survived v1. Survived v2. Reserved in the bytecode opcode table. Patient. Immortal.
                 </td>
               </tr>
               <tr>
-                <td>Tree-walk interpreter is slow</td>
-                <td>Won't Fix</td>
+                <td>quantum hello.sa produces a .exe nobody asked for</td>
+                <td>By Design · Use qrun</td>
                 <td>
-                  It has character. "Artisanal." fibonacci(35): [still running].
+                  That's compilation. qrun hello.sa exists. Two commands. Your choice. Your problem.
                 </td>
               </tr>
               <tr>
-                <td>0 GitHub stars</td>
-                <td>Under Investigation</td>
+                <td>AI DocSyncer might become self-aware</td>
+                <td>Under Observation</td>
                 <td>
-                  Possibly a GitHub bug. Possibly discovery. Not the rot13.
+                  It reads the compiler. The compiler compiles things. The things include the compiler. We are watching.
                 </td>
               </tr>
               <tr>
                 <td>int x = 5 is stored as a double</td>
                 <td>By Design</td>
                 <td>
-                  Dynamic typing. C++ type hints are decorative. Beautiful.
-                  Meaningless.
+                  Dynamic typing. Compiles to double bytecode. C++ type hint: decorative. Beloved. Meaningless.
                 </td>
               </tr>
               <tr>
                 <td>--aura lists rot13 as cybersecurity</td>
-                <td>Working As Intended</td>
+                <td>Working As Intended · v2</td>
                 <td>
-                  🛡️ CYBERSECURITY FEATURES 🛡️. Shield emoji. This is canon.
-                </td>
-              </tr>
-              <tr>
-                <td>Mixing 3 syntaxes causes existential dread</td>
-                <td>Closed</td>
-                <td>
-                  That's a you problem. The parser handles it. Hates you.
-                  Handles it.
+                  🛡️ CYBERSECURITY FEATURES 🛡️. Now compiled. Shield emoji: compiled. Canon: eternal.
                 </td>
               </tr>
               <tr>
                 <td>0 homework at FAST NUCES</td>
-                <td>Won't Fix</td>
+                <td>Won't Fix · v2 confirmed</td>
                 <td>
-                  Saad built a compiler instead. History will judge. FAST NUCES
-                  already did.
+                  Saad built two compilers and an AI instead. History will judge. FAST NUCES has already judged.
                 </td>
               </tr>
             </tbody>
@@ -1648,8 +1675,8 @@ Uryyb, Dhnaghi!</textarea
 
     <div class="wrap">
       <section>
-        <div class="stag reveal">// repository analytics</div>
-        <h2 class="reveal reveal-d1">The GitHub<br />Stats</h2>
+        <div class="stag reveal">// repository analytics — v2 confirmed</div>
+        <h2 class="reveal reveal-d1">The GitHub<br />Stats (Still)</h2>
         <div class="gh-grid reveal reveal-d2">
           <div class="gh-card">
             <div class="gh-name">⭐ Stars</div>
@@ -1660,7 +1687,7 @@ Uryyb, Dhnaghi!</textarea
               ></div>
             </div>
             <div class="gh-num" style="color: var(--yellow)">0</div>
-            <div class="gh-note">██░░░░░░░░ (stealth mode)</div>
+            <div class="gh-note">██░░░░░░░░ (stealth mode · v2 edition)</div>
           </div>
           <div class="gh-card">
             <div class="gh-name">🍴 Forks</div>
@@ -1671,18 +1698,29 @@ Uryyb, Dhnaghi!</textarea
               ></div>
             </div>
             <div class="gh-num" style="color: var(--accent)">0</div>
-            <div class="gh-note">██░░░░░░░░ (untapped potential)</div>
+            <div class="gh-note">██░░░░░░░░ (untapped potential · bytecoded)</div>
           </div>
           <div class="gh-card">
-            <div class="gh-name">👤 Contributors</div>
+            <div class="gh-name">📦 Commits</div>
             <div class="gh-bar">
               <div
                 class="gh-bar-fill"
                 style="width: 100%; background: var(--green)"
               ></div>
             </div>
-            <div class="gh-num" style="color: var(--green)">1</div>
-            <div class="gh-note">████████████ (a legend. alone.)</div>
+            <div class="gh-num" style="color: var(--green)">90</div>
+            <div class="gh-note">████████████ (verified. GitHub confirms.)</div>
+          </div>
+          <div class="gh-card">
+            <div class="gh-name">👤 Contributors</div>
+            <div class="gh-bar">
+              <div
+                class="gh-bar-fill"
+                style="width: 100%; background: var(--purple)"
+              ></div>
+            </div>
+            <div class="gh-num" style="color: var(--purple)">1</div>
+            <div class="gh-note">████████████ (a legend. still alone.)</div>
           </div>
           <div class="gh-card">
             <div class="gh-name">🐛 Open Issues</div>
@@ -1693,22 +1731,17 @@ Uryyb, Dhnaghi!</textarea
               ></div>
             </div>
             <div class="gh-num" style="color: var(--red)">0</div>
-            <div class="gh-note">either perfect or no users. both.</div>
+            <div class="gh-note">either perfect or no users. v2: both.</div>
           </div>
         </div>
         <p class="body-text reveal reveal-d3" style="margin-top: 1.5rem">
           <strong>Linus Torvalds</strong> built Linux because he needed an
           OS.<br />
           <strong>Saad Amin</strong> built Quantum because he needed rot13 in a
-          scripting language.<br /><br />
-          Guido van Rossum spent 4 years on Python.
-          <em>Saad had 3 weeks and more aura.</em><br />
-          Brendan Eich built JavaScript in 10 days and the world hasn't
-          recovered.<br />
-          <strong
-            >Saad built Quantum in 3 weeks and so far only this website is
-            suffering. Progress.</strong
-          >
+          scripting language — then came back and compiled it to bytecode.<br /><br />
+          Guido van Rossum spent 4 years on Python. <em>Saad had a few weeks and more aura.</em><br />
+          The Rust team spent 6 years building a language that compiles to native binaries.<br />
+          <strong>Saad added that in v2. 90 commits. 0 stars. Maximum aura. No homework.</strong>
         </p>
       </section>
     </div>
@@ -1717,65 +1750,62 @@ Uryyb, Dhnaghi!</textarea
 
     <div class="finale">
       <div class="reveal">
-        <div class="stag" style="text-align: center">// in conclusion</div>
+        <div class="stag" style="text-align: center">// in conclusion · v2 · the full verdict</div>
         <div class="finale-title">
-          Genuinely.<br />Mad Respect.<br />
+          Genuinely.<br />Unhinged.<br />Respect.<br />
           <div class="finale-title-normal">🫡</div>
         </div>
         <p>
-          A lexer. A parser. 34 AST nodes. A tree-walk interpreter. A REPL. Full
-          OOP with inheritance, <code>super()</code>, static methods, and
-          <code>__str__</code>. Closures, lambdas, arrow functions, default
-          args, pass-by-reference. List comprehensions. Python slicing. An
-          actual pointer system with null checks and hex addresses —
-          <em>in a scripting language</em>. xor_bytes(). rot13(). Five reserved
-          cybersecurity keywords of pure aspiration. A VS Code extension. CMake.
-          CI/CD. Docs. Examples in three syntax styles. A
-          <strong>--aura</strong> flag that prints a 70-line ASCII achievement
-          board with shield emojis listing security features that don't exist
-          yet.<br /><br />
-          Built by <strong>one 18-year-old at FAST NUCES</strong> in
-          <strong>3 weeks</strong> instead of doing homework, with zero friends
-          to tell him it was a bad idea, and — critically —
-          <em>zero regrets</em>.<br /><br />
-          Is rot13 a security feature? No. Is
-          <code>payload</code> unimplemented? Yes. Is fibonacci(35) still
-          running? Probably. Is <code>.sa</code> explicable? Classified.<br /><br />
-          <strong
-            >Did one person ship a real, working, multi-syntax scripting
-            language with a pointer system and a CLI flag called --aura at age
-            18?</strong
-          ><br /><br />
-          <em>Yes. Yes they did. The aura was inside us all along.</em>
+          A lexer. A parser. 34 AST nodes. A tree-walk interpreter — <em>killed in v2, mourned briefly, replaced immediately.</em>
+          A bytecode VM. A native .exe compiler. A separate interpreter command because two commands are better than one. 
+          Full OOP with inheritance and <code>super()</code>. Closures, lambdas, arrow functions. 
+          List comprehensions. Python slicing. 
+          A C-style pointer system — <strong>in a scripting language, compiled to bytecode, shipping an .exe</strong>.
+          xor_bytes(). rot13() — compiled, fast, equally useless, eternally listed under 🛡️ CYBERSECURITY FEATURES 🛡️.
+          A REPL. A VS Code extension with full syntax highlighting for a language with one user.
+          A TypeScript-backed language grammar so <code>.sa</code> files glow correctly in the dark.
+          An AI that reads the compiler source and rewrites the documentation when anything changes.
+          CMake. CI/CD. GitHub Actions. Examples in three syntax styles.
+          A <strong>--aura</strong> flag — hardcoded, immortal, listing unimplemented features with shield emojis, 
+          surviving every version unmodified, a monument to ambition that has outlasted the tree-walker it once celebrated.<br /><br />
+          <strong>0 GitHub stars.</strong> 90 commits. 2 major versions. 1 developer. 0 submitted assignments. 
+          0 regrets detectable by any instrument.<br /><br />
+          Is rot13 a security feature? <em>No.</em>
+          Is <code>payload</code> implemented? <em>No.</em> 
+          Does the VS Code extension have any users besides Saad? <em>Technically no.</em>
+          Does any of that matter?<br /><br />
+          <strong>Did one person build a real, compiling, multi-syntax language with pointers, 
+          a bytecode VM, an AI documentation system, and a VS Code extension — 
+          then ship it with a CLI flag that lists its own unimplemented features with shield emojis?</strong><br /><br />
+          <em>Yes. Yes they did. The .exe was inside us all along. The aura was just the bytecode.</em>
         </p>
         <a
           href="https://github.com/SENODROOM/Quantum-Language"
           class="btn btn-primary"
           style="margin-right: 1rem"
-          >⭐ Star It On GitHub. Right Now.</a
+          >⭐ Star It On GitHub. v2 Deserves It.</a
         >
-        <a href="#rot13" class="btn btn-outline">Try rot13™ Again</a>
+        <a href="#rot13" class="btn btn-outline">Try Bytecode rot13™</a>
       </div>
     </div>
 
     <footer>
       <div class="wrap">
-        <span class="foot-logo">QUANTUM LANGUAGE™</span>
+        <span class="foot-logo">QUANTUM LANGUAGE™ v2</span>
         <p>
-          Built in C++17 · v1.0.0 · Tree-walk interpreter · File extension: .sa
+          Built in C++17 · v2.0.0 · Bytecode Compiler + Interpreter · File extension: .sa
           (classified)<br />
+          <code>quantum hello.sa</code> → hello.exe &nbsp;·&nbsp; <code>qrun hello.sa</code> → no .exe · AI DocSyncer: active<br />
           <a href="https://github.com/SENODROOM/Quantum-Language"
             >github.com/SENODROOM/Quantum-Language</a
           ><br /><br />
-          Muhammad Saad Amin · Age 18 · FAST NUCES · GPA: [403 Forbidden] ·
-          Aura: Maximum · Friends: 0<br /><br />
+          Muhammad Saad Amin · FAST NUCES · GPA: [403 Forbidden] ·
+          Aura: Maximum · Friends: 0 · Versions: 2 · Regrets: 0<br /><br />
           <span style="color: #1e2a3a"
-            >rot13("this website") = "guvf jrofvgr" — UNBREAKABLE. DO NOT
-            SHARE.</span
+            >rot13("this website") = "guvf jrofvgr" — UNBREAKABLE. NOW BYTECODE-COMPILED. DO NOT SHARE.</span
           ><br />
           <span style="color: #1e2a3a"
-            >MIT License · payload: reserved · homework: missing · 0 stars · 1
-            legend · --aura</span
+            >MIT License · payload: reserved · homework: missing · 0 stars · 1 legend · --aura · v2</span
           >
         </p>
       </div>
@@ -2008,15 +2038,19 @@ Uryyb, Dhnaghi!</textarea
       const sticker = document.getElementById("sticker");
       let sc = 0;
       const msgs = [
-        "⚠️ rot13 IS RUNNING",
-        "🔐 ENCRYPTING...",
-        "💣 payload: undefined",
-        '✅ "SECURE"',
-        "🛡️ --aura ACTIVATED",
-        "🫡 MAD RESPECT",
-        "0 STARS 0 FRIENDS 1 LEGEND",
+        "⚡ BYTECODE IS RUNNING",
+        "🔐 ENCRYPTING (COMPILED)...",
+        "💣 payload: still undefined · v3 promised",
+        '✅ "SECURE" (BYTECODED)',
+        "🛡️ --aura ACTIVATED · v2",
+        "🖊️ VS CODE EXT: INSTALLED BY 1 (SAAD)",
+        "🫡 MAD RESPECT · v2",
+        "0 STARS 0 FRIENDS 2 VERSIONS 1 LEGEND",
         "GPA: 403 FORBIDDEN",
-        "SENODROOM = ???",
+        "SENODROOM = ??? · CLASSIFIED · STILL",
+        "qrun vs quantum: choose wisely",
+        "AI DOCS SYNCER: READING SOURCE NOW",
+        "fibonacci(35): FINISHED 🎉 finally.",
       ];
       sticker.addEventListener("click", () => {
         sticker.textContent = msgs[++sc % msgs.length];
